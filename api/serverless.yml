@@ -40,7 +40,16 @@ functions:
             parameters:
                paths:
                  relaychain: true
-                 parachain: false
+                 parachain: true
+      -
+        http:
+          path: nodes/{relaychain}
+          method: get
+          cors: true
+          request:
+            parameters:
+               paths:
+                 relaychain: true
 
   node:
     timeout: 29

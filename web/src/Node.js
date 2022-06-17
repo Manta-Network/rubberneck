@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Spinner from 'react-bootstrap/Spinner';
 import Table from 'react-bootstrap/Table';
+import { dateDiff } from './utils';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -171,7 +172,11 @@ function Node(props) {
                                 launch
                               </th>
                               <td>
-                                {new Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.launch)).toLowerCase()}
+                                {
+                                  dateDiff(new Date(node.launch), null, 'significant')
+                                } ago: {
+                                  new Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.launch)).toLowerCase()
+                                }
                               </td>
                             </tr>
                           )
@@ -199,7 +204,11 @@ function Node(props) {
                                 configuration
                               </th>
                               <td>
-                                <a href={`https://github.com/Manta-Network/pelagos/blob/main/terraform/deployment/${(node.blockchain.tier === 'parachain') ? `${node.blockchain.relay}/${node.blockchain.name}` : node.blockchain.relay}/${node.hostname}/main.tf`}>
+                                <a href={`https://github.com/Manta-Network/pelagos/blob/main/terraform/deployment/${
+                                  (node.blockchain.tier === 'parachain')
+                                    ? `${node.blockchain.relay}/${node.blockchain.name}`
+                                    : node.blockchain.name
+                                  }/${node.hostname}/main.tf`}>
                                   terraform
                                 </a>
                               </td>

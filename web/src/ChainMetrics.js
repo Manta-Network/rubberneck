@@ -33,7 +33,7 @@ function ChainMetrics(props) {
         path: 'api/v1/query',
         params: new URLSearchParams({
           // todo: fix prometheus job names
-          query: `node_netstat_Tcp_CurrEstab{job=~".*${props.blockchain.replace('kusama/calamari', 'calamari').replace('rococo/dolphin', 'dolphin').replace('polkadot/manta', 'manta')}.*"}[1${period.value}]`,
+          query: `node_netstat_Tcp_CurrEstab{job=~".*${props.blockchain.replace('kusama/calamari', 'calamari').replace('rococo/dolphin', 'dolphin').replace('polkadot/manta', 'manta').replace('baikal/calamari-testnet', 'calamari-testnet')}.*"}[1${period.value}]`,
           start: start.getTime()/1000.0,
           end: end.getTime()/1000.0,
         }).toString(),

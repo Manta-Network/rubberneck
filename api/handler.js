@@ -18,6 +18,18 @@ const endpoints = {
 };
 const blockchains = [
   {
+    name: 'baikal',
+    domains: [
+      'baikal.manta.systems',
+    ],
+    jobs: {
+      invulnerable: [
+        'baikal invulnerable validator (ssl)'
+      ],
+    },
+    tier: 'relaychain',
+  },
+  {
     name: 'dolphin',
     domains: [
       'dolphin.community',

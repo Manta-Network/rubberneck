@@ -33,9 +33,12 @@ function Chain(props) {
   const { relaychain, parachain } = useParams();
   const [nodes, setNodes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const apiUrl = (parachain !== undefined)
+    ? `https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${relaychain}/${parachain}`
+    : `https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${relaychain}`;
   useEffect(() => {
     setLoading(true);
-    fetch(`https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${relaychain}/${parachain}`)
+    fetch(apiUrl)
       .then(response => response.json())
       .then((container) => {
         if (!!container.error) {
