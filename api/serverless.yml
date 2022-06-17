@@ -1,0 +1,57 @@
+service: rubberneck
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: prod
+  profile: pelagos-service
+  region: eu-central-1
+  lambdaHashingVersion: 20201221
+
+plugins:
+  - serverless-offline
+
+package:
+  excludeDevDependencies: false
+
+functions:
+
+  blockchains:
+    handler: handler.blockchains
+    events:
+      -
+        http:
+          path: blockchains
+          method: get
+          cors: true
+
+  nodes:
+    timeout: 29
+    handler: handler.nodes
+    events:
+      -
+        http:
+          path: nodes/{relaychain}/{parachain}
+          method: get
+          cors: true
+          request:
+            parameters:
+               paths:
+                 relaychain: true
+                 parachain: false
+
+  node:
+    timeout: 29
+    handler: handler.node
+    events:
+      -
+        http:
+          path: node/{fqdn}
+          method: get
+          cors: true
+          request:
+            parameters:
+               paths:
+                 fqdn: true
