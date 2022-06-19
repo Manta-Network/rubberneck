@@ -52,7 +52,7 @@ function Chain(props) {
         console.error(error);
         setLoading(false);
       });
-  }, [relaychain, parachain]);
+  }, [relaychain, parachain, apiUrl]);
   return (
     <Fragment>
       {

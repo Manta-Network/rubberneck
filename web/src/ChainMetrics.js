@@ -26,16 +26,31 @@ function ChainMetrics(props) {
     if (!!props.blockchain) {
       let start = new Date();
       let end = new Date();
-      start.setDate(start.getDate() - 1);
+      let step;
+      switch (period.label) {
+        case 'minute':
+          start.setMinutes(start.getMinutes() - 1);
+          step = '10s';
+          break;
+        case 'hour':
+          start.setHours(start.getHours() - 1);
+          step = '10m';
+          break;
+        default:
+          start.setDate(start.getDate() - 1);
+          step = '30m';
+      }
+      
       const url = {
         scheme: 'https',
         hostname: 'pulse.pelagos.systems',
-        path: 'api/v1/query',
+        path: 'api/v1/query_range',
         params: new URLSearchParams({
           // todo: fix prometheus job names
-          query: `node_netstat_Tcp_CurrEstab{job=~".*${props.blockchain.replace('kusama/calamari', 'calamari').replace('rococo/dolphin', 'dolphin').replace('polkadot/manta', 'manta').replace('baikal/calamari-testnet', 'calamari-testnet')}.*"}[1${period.value}]`,
+          query: `node_netstat_Tcp_CurrEstab{job=~".*${props.blockchain.replace('kusama/calamari', 'calamari').replace('rococo/dolphin', 'dolphin').replace('polkadot/manta', 'manta').replace('baikal/calamari-testnet', 'calamari-testnet')}.*"}`,
           start: start.getTime()/1000.0,
           end: end.getTime()/1000.0,
+          step,
         }).toString(),
       };
       fetch(`${url.scheme}://${url.hostname}/${url.path}?${url.params}`)
@@ -58,7 +73,7 @@ function ChainMetrics(props) {
               labels: [],
               datasets: [],
               error: `no metrics data available from endpoint:`,
-              endpoint: `${url.scheme}://${url.hostname}/${url.path}?${url.params}` 
+              endpoint: `${url.scheme}://${url.hostname}/${url.path}?${url.params}`
             });
           }
           setLoading(false);
