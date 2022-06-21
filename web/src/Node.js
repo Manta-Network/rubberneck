@@ -328,10 +328,10 @@ function Node(props) {
                               </th>
                               <td>
                                 {
-                                  dateDiff(new Date(node.launch), null, 'significant')
-                                } ago: {
-                                  new Intl.DateTimeFormat('default', {dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.launch)).toLowerCase()
-                                }
+                                  new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.launch)).toLowerCase()
+                                } ({
+                                  dateDiff(new Date(node.launch), null, 3)
+                                } ago)
                               </td>
                             </tr>
                           )
@@ -434,7 +434,7 @@ function Node(props) {
                                       validity:
                                       <ul>
                                         <li>
-                                          from: {(new Date(node.certificate.valid_from)).toISOString()}
+                                          from: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_from)).toLowerCase()} ({dateDiff(new Date(node.certificate.valid_from), null, 2)} ago)
                                         </li>
                                         <li className={`text-${
                                             (new Date(node.certificate.valid_to) <= new Date((new Date()).valueOf() + (1000 * 60 * 60 * 24 * 7)))
@@ -443,7 +443,7 @@ function Node(props) {
                                                 ? 'text-warning'
                                                 : null
                                           }`}>
-                                          to: {(new Date(node.certificate.valid_to)).toISOString()}
+                                          to: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_to)).toLowerCase()} ({dateDiff(new Date(node.certificate.valid_to), null, 2)} {(new Date(node.certificate.valid_to) > new Date()) ? 'from now' : 'ago'})
                                         </li>
                                       </ul>
                                     </li>
