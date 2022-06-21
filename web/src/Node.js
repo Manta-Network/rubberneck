@@ -329,9 +329,11 @@ function Node(props) {
                               <td>
                                 {
                                   new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.launch)).toLowerCase()
-                                } ({
-                                  dateDiff(new Date(node.launch), null, 3)
-                                } ago)
+                                } (
+                                  <em className="text-muted">
+                                    {dateDiff(new Date(node.launch), null, 3)} ago
+                                  </em>
+                                )
                               </td>
                             </tr>
                           )
@@ -434,7 +436,11 @@ function Node(props) {
                                       validity:
                                       <ul>
                                         <li>
-                                          from: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_from)).toLowerCase()} ({dateDiff(new Date(node.certificate.valid_from), null, 2)} ago)
+                                          from: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_from)).toLowerCase()} (
+                                            <em className="text-muted">
+                                              {dateDiff(new Date(node.certificate.valid_from), null, 2)} ago
+                                            </em>
+                                          )
                                         </li>
                                         <li className={`text-${
                                             (new Date(node.certificate.valid_to) <= new Date((new Date()).valueOf() + (1000 * 60 * 60 * 24 * 7)))
@@ -443,7 +449,11 @@ function Node(props) {
                                                 ? 'text-warning'
                                                 : null
                                           }`}>
-                                          to: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_to)).toLowerCase()} ({dateDiff(new Date(node.certificate.valid_to), null, 2)} {(new Date(node.certificate.valid_to) > new Date()) ? 'from now' : 'ago'})
+                                          to: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_to)).toLowerCase()} (
+                                            <em className="text-muted">
+                                              {dateDiff(new Date(node.certificate.valid_to), null, 2)} {(new Date(node.certificate.valid_to) > new Date()) ? 'from now' : 'ago'}
+                                            </em>
+                                          )
                                         </li>
                                       </ul>
                                     </li>
