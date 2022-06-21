@@ -210,6 +210,14 @@ const fetchInstanceMetrics = async (key, instance) => {
     },
   };
 };
+const fetchParsedMetrics = async (key, fqdn) => {
+  const response = await fetch(`https://metrics.sparta.pelagos.systems/${fqdn}/${key}.json`);
+  const result = await response.json();
+  return {
+    key,
+    result,
+  };
+};
 const fetchNode = async (fqdn) => {
   const certificate = await sslCertificate.get(fqdn);
   const [ instance, targets ] = [
@@ -234,6 +242,13 @@ const fetchNode = async (fqdn) => {
       metrics[lm.key].latest = lm.result;
     }
   });
+  const parsedMetrics = await Promise.all(Object.keys(metrics).map((key) => fetchParsedMetrics(key, fqdn)));
+  parsedMetrics.forEach((pm) => {
+    if (!!pm.result) {
+      metrics[pm.key].parsed = pm.result;
+    }
+  });
+
   const node = {
     ...instance,
     roles: invulnerables.includes(instance.hostname) ? ['invulnerable'] : ['full'],

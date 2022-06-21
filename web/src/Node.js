@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
+import Badge from 'react-bootstrap/Badge';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -7,6 +8,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Table from 'react-bootstrap/Table';
+import palette from 'google-palette';
 import { dateDiff } from './utils';
 import {
   Chart as ChartJS,
@@ -155,21 +157,38 @@ const metrics = {
   }
 };
 const options = {
-  elements: {
-    point: {
-      radius: 0
-    }
-  },
   plugins: {
     legend: {
       display: false
     }
   }
 };
+const lineOptions = {
+  ...options,
+  elements: {
+    point: {
+      radius: 0
+    }
+  }
+};
+const doughnutOptions = {
+  ...options,
+  //maintainAspectRatio: false,
+  //circumference: Math.PI + 1,
+  //rotation: -Math.PI - 0.5,
+  //cutoutPercentage: 65,
+}
 const tabs = {
   node: 'node',
   para: 'parachain',
   relay: 'relay-chain',
+};
+const unitClass = {
+  service: 'journal',
+  path: 'arrow-down-right-square',
+  socket: 'outlet',
+  timer: 'stopwatch',
+  target: 'bullseye'
 };
 
 function Node(props) {
@@ -516,7 +535,7 @@ function Node(props) {
                                 {
                                   (!!data[tab] && !!data[tab][name] && !!data[tab][name].datasets)
                                     ? (
-                                        <Chart type={`line`} options={options} plugins={[CategoryScale]} data={data[tab][name]} />
+                                        <Chart type={`line`} options={lineOptions} plugins={[CategoryScale]} data={data[tab][name]} />
                                       )
                                     : !!loading
                                       ? (
@@ -535,6 +554,32 @@ function Node(props) {
                           </Col>
                         ))
                       }
+                      {
+                        (tab !== 'node' && !!node.metrics[tab] && !!node.metrics[tab].parsed && !!node.metrics[tab].parsed.length)
+                          ? node.metrics[tab].parsed.filter((p) => p.type === 'HISTOGRAM' && Object.values(p.metrics[0].buckets).some((v) => (v > 0))).map((pm, pmI) => (
+                              <Col key={pmI}>
+                                <Card>
+                                  <Card.Body>
+                                    <Card.Title>
+                                      {pm.name.replace('substrate_', '').replaceAll('_', ' ').toLowerCase()}
+                                    </Card.Title>
+                                    <Card.Text>
+                                      {pm.type.toLowerCase()}: {pm.help.toLowerCase()}
+                                    </Card.Text>
+                                    <Chart type="bar" options={options} data={{
+                                      labels: Object.keys(pm.metrics[0].buckets),
+                                      datasets: [{
+                                        data: Object.values(pm.metrics[0].buckets).map((v) => parseInt(v)),
+                                        backgroundColor: 'rgb(158, 193, 249, .5)',
+                                        borderColor: 'rgb(158, 193, 249)'
+                                      }]
+                                    }} />
+                                  </Card.Body>
+                                </Card>
+                              </Col>
+                            ))
+                          : null
+                      }
                     </Row>
                   </Tab>
                 ))
@@ -546,25 +591,56 @@ function Node(props) {
         (!!node.metrics && !!node.metrics.node && !!node.metrics.node.units && !!node.metrics.node.units.length)
           ? (
               <Row>
-                <h3>services</h3>
-                <Table striped>
-                  <tbody>
-                    {
-                      node.metrics.node.units.filter(u => !u.name.startsWith('systemd-') && u.name.endsWith('.service') && u.state !== 'inactive').map((service, sI) => (
-                        <tr key={sI}>
-                          <th>
-                            {service.name.replace('.service', '')}
-                            <span className="text-muted" style={{fontWeight: 'normal'}}>.service</span>
-                          </th>
-                          <td>
-                            <i className={`bi bi-${(service.state === 'active' ? 'activity' : 'stop')} text-${(service.state === 'active' ? 'success' : 'danger')}`} title={service.state} style={{marginRight: '0.5em'}} />
-                            {service.state} {/*new Intl.DateTimeFormat('default', { hour: 'numeric', minute: 'numeric' }).format(service.time).toLowerCase()*/}
-                          </td>
-                        </tr>
-                      ))
-                    }
-                  </tbody>
-                </Table>
+                <h3>systemd</h3>
+                <Tabs defaultActiveKey="service">
+                  {
+                    [...(new Set(node.metrics.node.units.map(u => u.name.split('.').slice(-1)[0])))].map((tab) => (
+                      <Tab key={tab} eventKey={tab} title={(
+                          <span>
+                            <i className={`bi bi-${unitClass[tab]}`} title={tab} style={{marginRight: '0.5em'}} />
+                            {tab}
+                          </span>
+                        )}>
+                        <Tabs defaultActiveKey="active">
+                        {
+                          [...(new Set(node.metrics.node.units.filter(u => u.name.endsWith(`.${tab}`)).map(u => u.state)))].map((state) => (
+                            <Tab key={state} eventKey={state} title={(
+                                <span>
+                                  <i className={`bi bi-${((state === 'active') ? 'activity' : (state === 'inactive') ? 'stop' : 'exclamation-square')} text-${((state === 'active') ? 'success' : (state === 'inactive') ? 'warning' : 'danger')}`} title={state} style={{marginRight: '0.5em'}} />
+                                  {state}
+                                  <Badge pill bg="dark" style={{marginLeft: '0.5em'}}>
+                                    {node.metrics.node.units.filter(u => u.name.endsWith(`.${tab}`) && u.state === state).length}
+                                  </Badge>
+                                  
+                                </span>
+                              )}>
+                              <Table striped>
+                                <tbody>
+                                  {
+                                    node.metrics.node.units.filter(u => u.name.endsWith(`.${tab}`) && u.state === state).map((unit, sI) => (
+                                      <tr key={sI}>
+                                        <th>
+                                          <i className={`bi bi-${unitClass[tab]}`} title={tab} style={{fontWeight: 'normal', marginRight: '0.5em'}} />
+                                          {unit.name.replace(`.${tab}`, '')}
+                                          <span className="text-muted" style={{fontWeight: 'normal'}}>.{tab}</span>
+                                        </th>
+                                        <td>
+                                          <i className={`bi bi-${((unit.state === 'active') ? 'activity' : (unit.state === 'inactive') ? 'stop' : 'exclamation-square')} text-${((unit.state === 'active') ? 'success' : (unit.state === 'inactive') ? 'warning' : 'danger')}`} title={unit.state} style={{marginRight: '0.5em'}} />
+                                          {unit.state} {/*new Intl.DateTimeFormat('default', { hour: 'numeric', minute: 'numeric' }).format(unit.time).toLowerCase()*/}
+                                        </td>
+                                      </tr>
+                                    ))
+                                  }
+                                </tbody>
+                              </Table>
+                            </Tab>
+                          ))
+                        }
+                      </Tabs>
+                    </Tab>
+                  ))
+                }
+                </Tabs>
               </Row>
             )
           : null
