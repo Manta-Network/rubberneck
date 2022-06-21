@@ -191,12 +191,47 @@ const fetchChainNodes = async (relaychain, parachain) => {
     }));
   return nodes;
 };
+const fetchInstanceMetrics = async (key, instance) => {
+  const url = {
+    scheme: 'https',
+    hostname: 'pulse.pelagos.systems',
+    path: 'api/v1/query',
+    params: new URLSearchParams({
+      query: `{instance="${instance}"}`
+    }).toString(),
+  };
+  const response = await fetch(`${url.scheme}://${url.hostname}/${url.path}?${url.params}`);
+  const json = await response.json();
+  return {
+    key,
+    ...(json.status === 'success' && !!json.data && !!json.data.result && !!json.data.result.length) && {
+      result: json.data.result
+    },
+  };
+};
 const fetchNode = async (fqdn) => {
   const [ instance, targets ] = [
     (await fetchInstances()).find(t => t.fqdn === fqdn),
     (await fetchTargets()).filter(t => t.fqdn === fqdn),
   ];
   const blockchain = blockchains.find((b) => b.domains.includes(instance.domain));
+  const metrics = {
+    ...targets.some((t) => t.discoveredLabels.__address__ === t.fqdn) && {
+      node: targets.find((t) => t.discoveredLabels.__address__ === t.fqdn)
+    },
+    ...targets.some((t) => t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`) && {
+      para: targets.find((t) => t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`)
+    },
+    ...targets.some((t) => t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`) && {
+      relay: targets.find((t) => t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`)
+    },
+  };
+  const latestMetrics = await Promise.all(Object.keys(metrics).map((key) => fetchInstanceMetrics(key, metrics[key].labels.instance)));
+  latestMetrics.forEach((lm) => {
+    if (!!lm.result) {
+      metrics[lm.key].latest = lm.result;
+    }
+  });
   const node = {
     ...instance,
     roles: invulnerables.includes(instance.hostname) ? ['invulnerable'] : ['full'],
@@ -205,17 +240,7 @@ const fetchNode = async (fqdn) => {
       tier: blockchain.tier,
       relay: blockchain.relay,
     },
-    metrics: {
-      ...targets.some((t) => t.discoveredLabels.__address__ === t.fqdn) && {
-        node: targets.find((t) => t.discoveredLabels.__address__ === t.fqdn)
-      },
-      ...targets.some((t) => t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`) && {
-        para: targets.find((t) => t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`)
-      },
-      ...targets.some((t) => t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`) && {
-        relay: targets.find((t) => t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`)
-      },
-    }
+    metrics,
   };
   return node;
 };
