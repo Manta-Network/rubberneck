@@ -1,6 +1,7 @@
 'use strict';
 
 const fetch = require('node-fetch');
+const sslCertificate = require('get-ssl-certificate');
 const cache = {
   lifetime: 3600
 };
@@ -210,6 +211,7 @@ const fetchInstanceMetrics = async (key, instance) => {
   };
 };
 const fetchNode = async (fqdn) => {
+  const certificate = await sslCertificate.get(fqdn);
   const [ instance, targets ] = [
     (await fetchInstances()).find(t => t.fqdn === fqdn),
     (await fetchTargets()).filter(t => t.fqdn === fqdn),
@@ -240,6 +242,7 @@ const fetchNode = async (fqdn) => {
       tier: blockchain.tier,
       relay: blockchain.relay,
     },
+    certificate,
     metrics,
   };
   return node;

@@ -1,9 +1,10 @@
 {
   "dependencies": {
+    "get-ssl-certificate": "^2.3.3",
     "node-fetch": "2"
   },
   "devDependencies": {
-    "serverless-offline": "8",
-    "serverless": "2"
+    "serverless": "2",
+    "serverless-offline": "8"
   }
 }

@@ -417,6 +417,59 @@ function Node(props) {
                           )
                         : null
                     }
+                    <tr>
+                      <th>
+                        certificate
+                      </th>
+                      <td>
+                        {
+                          (!!node.certificate)
+                            ? (
+                                <Fragment>
+                                  <ul>
+                                    <li>
+                                      issuer: {node.certificate.issuer.O.toLowerCase()}
+                                    </li>
+                                    <li>
+                                      validity:
+                                      <ul>
+                                        <li>
+                                          from: {(new Date(node.certificate.valid_from)).toISOString()}
+                                        </li>
+                                        <li className={`text-${
+                                            (new Date(node.certificate.valid_to) <= new Date((new Date()).valueOf() + (1000 * 60 * 60 * 24 * 7)))
+                                              ? 'text-danger'
+                                              : (new Date(node.certificate.valid_to) <= new Date((new Date()).valueOf() + (1000 * 60 * 60 * 24 * 30)))
+                                                ? 'text-warning'
+                                                : null
+                                          }`}>
+                                          to: {(new Date(node.certificate.valid_to)).toISOString()}
+                                        </li>
+                                      </ul>
+                                    </li>
+                                    <li>
+                                      subject(s):
+                                      <ul>
+                                      {
+                                        [...(new Set([...[node.certificate.subject.CN], ...node.certificate.subjectaltname.replaceAll('DNS:', '').split(', ')]))].map((hostname, hI) => (
+                                          <li key={hI} style={{fontWeight: (hI === 0) ? 'bold' : 'normal'}}>
+                                            {hostname}
+                                          </li>
+                                        ))
+                                      }
+                                      </ul>
+                                    </li>
+                                  </ul>
+                                </Fragment>
+                              )
+                            : (
+                                <span className="text-danger">
+                                  none
+                                </span>
+                              )
+                        }
+                      </td>
+                    </tr>
                   </tbody>
                 </Table>
               )
