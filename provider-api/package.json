@@ -1,8 +1,6 @@
 {
   "dependencies": {
-    "aws-sdk": "^2.1158.0",
-    "get-ssl-certificate": "^2.3.3",
-    "node-fetch": "2"
+    "aws-sdk": "^2.1158.0"
   },
   "devDependencies": {
     "serverless": "2",

@@ -327,6 +327,89 @@ function Node(props) {
                 <Table striped>
                   <tbody>
                     {
+                      (!!node.metrics)
+                        ? (
+                            <Fragment>
+                              <tr>
+                                <th>
+                                  telemetry name
+                                </th>
+                                <td>
+                                  {node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.name}
+                                </td>
+                              </tr>  
+                              <tr>
+                                <th>
+                                  substrate version
+                                </th>
+                                <td>
+                                  {node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.version}
+                                </td>
+                              </tr>
+                            </Fragment>
+                          )
+                        : null
+                    }
+                    <tr>
+                      <th>
+                        uptime
+                      </th>
+                      <td>
+                        <ul style={{marginBottom: '0'}}>
+                          {
+                            (!!node.launch)
+                              ? (
+                                  <li>
+                                    node launch:
+                                    <span style={{marginLeft: '0.5em'}}>
+                                      {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.launch)).toLowerCase()}
+                                    </span>
+                                    <em style={{marginLeft: '0.5em'}} className="text-muted">
+                                      {dateDiff(new Date(node.launch), null, 3)} ago
+                                    </em>
+                                  </li>
+                                )
+                              : null
+                          }
+                          {
+                            (!!node.metrics && !!node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'])
+                              ? (
+                                  <li>
+                                    substrate (re)start:
+                                    <span style={{marginLeft: '0.5em'}}>
+                                      {
+                                        new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(
+                                          new Date(
+                                            parseInt(
+                                              node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest
+                                                .find((m) => m.metric.__name__ === 'substrate_process_start_time_seconds')
+                                                .value[1]
+                                            ) * 1000
+                                          )
+                                        ).toLowerCase()
+                                      }
+                                    </span>
+                                    <em style={{marginLeft: '0.5em'}} className="text-muted">
+                                      {
+                                        dateDiff(
+                                          new Date(
+                                            parseInt(
+                                              node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest
+                                                .find((m) => m.metric.__name__ === 'substrate_process_start_time_seconds')
+                                                .value[1]
+                                            ) * 1000
+                                          ), null, 3
+                                        )
+                                      } ago
+                                    </em>
+                                  </li>
+                                )
+                              : null
+                          }
+                        </ul>
+                      </td>
+                    </tr>
+                    {
                       ['id', 'ami', 'machine', 'region', 'ip', 'state'].map((property, pI) => (
                         <tr key={pI}>
                           <th>
@@ -337,26 +420,6 @@ function Node(props) {
                           </td>
                         </tr>
                       ))
-                    }
-                    {
-                      (!!node.launch)
-                        ? (
-                            <tr>
-                              <th>
-                                launch
-                              </th>
-                              <td>
-                                {
-                                  new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.launch)).toLowerCase()
-                                } (
-                                  <em className="text-muted">
-                                    {dateDiff(new Date(node.launch), null, 3)} ago
-                                  </em>
-                                )
-                              </td>
-                            </tr>
-                          )
-                        : null
                     }
                     {
                       (!!node.location)
@@ -414,30 +477,6 @@ function Node(props) {
                           )
                         : null
                     }
-                    {
-                      (!!node.metrics)
-                        ? (
-                            <Fragment>
-                              <tr>
-                                <th>
-                                  telemetry name
-                                </th>
-                                <td>
-                                  {node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.name}
-                                </td>
-                              </tr>  
-                              <tr>
-                                <th>
-                                  substrate version
-                                </th>
-                                <td>
-                                  {node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.version}
-                                </td>
-                              </tr>
-                            </Fragment>
-                          )
-                        : null
-                    }
                     <tr>
                       <th>
                         certificate
@@ -447,7 +486,7 @@ function Node(props) {
                           (!!node.certificate)
                             ? (
                                 <Fragment>
-                                  <ul>
+                                  <ul style={{marginBottom: '0'}}>
                                     <li>
                                       issuer: {node.certificate.issuer.O.toLowerCase()}
                                     </li>
@@ -455,11 +494,10 @@ function Node(props) {
                                       validity:
                                       <ul>
                                         <li>
-                                          from: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_from)).toLowerCase()} (
-                                            <em className="text-muted">
-                                              {dateDiff(new Date(node.certificate.valid_from), null, 2)} ago
-                                            </em>
-                                          )
+                                          from: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_from)).toLowerCase()}
+                                          <em style={{marginLeft: '0.5em'}} className="text-muted">
+                                            {dateDiff(new Date(node.certificate.valid_from), null, 2)} ago
+                                          </em>
                                         </li>
                                         <li className={`text-${
                                             (new Date(node.certificate.valid_to) <= new Date((new Date()).valueOf() + (1000 * 60 * 60 * 24 * 7)))
@@ -468,11 +506,10 @@ function Node(props) {
                                                 ? 'text-warning'
                                                 : null
                                           }`}>
-                                          to: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_to)).toLowerCase()} (
-                                            <em className="text-muted">
-                                              {dateDiff(new Date(node.certificate.valid_to), null, 2)} {(new Date(node.certificate.valid_to) > new Date()) ? 'from now' : 'ago'}
-                                            </em>
-                                          )
+                                          to: {new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(node.certificate.valid_to)).toLowerCase()}
+                                          <em style={{marginLeft: '0.5em'}} className="text-muted">
+                                            {dateDiff(new Date(node.certificate.valid_to), null, 2)} {(new Date(node.certificate.valid_to) > new Date()) ? 'from now' : 'ago'}
+                                          </em>
                                         </li>
                                       </ul>
                                     </li>

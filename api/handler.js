@@ -117,6 +117,7 @@ const response = {
   headers: {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': true,
+    'Content-Type': 'application/json',
   },
 };
 
@@ -297,6 +298,188 @@ module.exports.node = async (event) => {
   let error;
   const body = {
     node,
+    error,
+  };
+  return {
+    ...response,
+    statusCode: (!!error) ? 500 : 200,
+    body: JSON.stringify(body, null, 2),
+  };
+}
+
+module.exports.dns = async (event) => {
+  const params = {
+    StartTime: new Date(),
+    EndTime: new Date((new Date()).valueOf() + (1000 * 60 * 60 * 24 * 2)),
+    MetricDataQueries: [
+      {
+        Id: 'dolphin_community',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z04723123RSFKX973KWFU'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'dolphin_engineering',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z08463631VRW8SQN1AZ34'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'pelagosmanta_network',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z050068439CHVGZHSWZ4I'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'dolphin_red',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z0343786EH6Y8Q6853Y4'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'calamari_systems',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z05193482B5IW6HGQWXBH'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'manta_systems',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z0172210BDGAFVE6L94R'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'pelagos_systems',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z05342861ELNV43ZXZBSE'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'seahorse_systems',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z0296724LRL3VTM5YJGE'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      },
+      {
+        Id: 'subsquid_systems',
+        MetricStat: {
+          Metric: {
+            Namespace: 'AWS/Route53',
+            MetricName: 'DNSQueries',
+            Dimensions: [
+              {
+                Name: 'HostedZoneId',
+                Value: 'Z0680932252D7OELWSESC'
+              }
+            ]
+          },
+          Period: 60,
+          Stat: 'Sum'
+        },
+        ReturnData: true
+      }
+    ]
+  };
+  const metrics = await (new aws.CloudWatch()).getMetricData(params).promise();
+  let error;
+  const body = {
+    metrics,
     error,
   };
   return {

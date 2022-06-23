@@ -1,0 +1,40 @@
+---
+service: rubberneck-provider
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: prod
+  profile: pelagos-ops
+  region: us-east-1
+  lambdaHashingVersion: 20201221
+  iam:
+    role:
+      name: rubberneck
+      statements:
+        -
+          Effect: Allow
+          Action:
+            - 'cloudwatch:GetMetricData'
+            - 'cloudwatch:ListMetrics'
+          Resource: '*'
+
+plugins:
+  - serverless-offline
+
+package:
+  excludeDevDependencies: false
+
+functions:
+
+  dns:
+    timeout: 29
+    handler: handler.dns
+    events:
+      -
+        http:
+          path: dns
+          method: get
+          cors: true
