@@ -22,10 +22,10 @@ _post_to_discord() {
     --color 0x${color} \
     --title ${fqdn} \
     --description "${message}" \
-    --thumbnail https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/${image}-${color}.svg \
+    --thumbnail https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/${image}-${color}.png \
     --author rubberneck \
     --author-url https://github.com/Manta-Network/rubberneck \
-    --author-icon https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/rush-to-the-people.svg \
+    --author-icon https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/rush-to-the-people.png \
     --url https://polkadot.js.org/apps/?rpc=wss%253A%252F%252F${fqdn} \
     --timestamp
 }
