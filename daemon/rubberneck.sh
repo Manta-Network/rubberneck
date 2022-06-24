@@ -3,6 +3,8 @@
 blockchains_path=/tmp/5eklk8knsd-blockchains.json
 blockchains_url=https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/blockchains
 authority_key_id="14:2E:B3:17:B7:58:56:CB:AE:50:09:40:E6:1F:AF:9D:8B:14:C2:C6"
+mongo_connection=$(cat ${HOME}/.mongo-rubberneck-readwrite)
+observer_ip=$(curl -sL https://checkip.amazonaws.com)
 
 
 _decode_property() {
@@ -10,6 +12,22 @@ _decode_property() {
 }
 _echo_to_stderr() {
   echo "$@" 1>&2;
+}
+_post_to_discord() {
+  image=${1}
+  color=${2}
+  fqdn=${3}
+  message=${4}
+  ${HOME}/.local/bin/discord.sh \
+    --color 0x${color} \
+    --title ${fqdn} \
+    --description "${message}" \
+    --thumbnail https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/${image}-${color}.svg \
+    --author rubberneck \
+    --author-url https://github.com/Manta-Network/rubberneck \
+    --author-icon https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/rush-to-the-people.svg \
+    --url https://polkadot.js.org/apps/?rpc=wss%253A%252F%252F${fqdn} \
+    --timestamp
 }
 
 if [ ! -x ${HOME}/.local/bin/certinfo ]; then
@@ -51,12 +69,14 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     relaychain_name=$(_decode_property ${blockchain_as_base64} .relay)
     nodes_url=https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${relaychain_name}/${blockchain_name}
     nodes_path=/tmp/5eklk8knsd-nodes-${relaychain_name}-${blockchain_name}.json
-    echo "- ${relaychain_name}/${blockchain_name}"
+    blockchain_id=${relaychain_name}/${blockchain_name}
   else
     nodes_url=https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${blockchain_name}
     nodes_path=/tmp/5eklk8knsd-nodes-${blockchain_name}.json
-    echo "- ${blockchain_name}"
+    blockchain_id=${blockchain_name}
   fi
+  echo "- ${blockchain_id}"
+
   if curl \
     -sLH 'Cache-Control: no-cache, no-store' \
     -o ${nodes_path} \
@@ -84,52 +104,26 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     else
       rm -f ${cert_path}
       _echo_to_stderr "    failed to obtain ${cert_path} with certinfo"
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     fi
     observed_not_before=$(jq -r .not_before ${cert_path})
     observed_not_after=$(jq -r .not_after ${cert_path})
     if [ $(date +%s) -ge $(date -d ${observed_not_before} +%s) ] && [ $(date +%s) -le $(date -d ${observed_not_after} +%s) ]; then
       _echo_to_stderr "    certificate validity verified (${observed_not_before} - ${observed_not_after})"
-      if [ -s ${old_cert_path} ] && [ $(date +%s) -ge $(date -d $(jq -r .not_after ${old_cert_path}) +%s) ]; then
+      if [ $(date +%s) -gt $(date -d "${observed_not_after} - 7 day" +%s) ]; then
+        _post_to_discord ssl-certificate ff0000 ${node_fqdn} "imminent expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
+      elif [ $(date +%s) -gt $(date -d "${observed_not_after} - 30 day" +%s) ]; then
+        _post_to_discord ssl-certificate ffbf00 ${node_fqdn} "approaching expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
+      elif [ -s ${old_cert_path} ] && [ $(date +%s) -ge $(date -d $(jq -r .not_after ${old_cert_path}) +%s) ]; then
         _echo_to_stderr "    certificate validity recovery detected"
-        ${HOME}/.local/bin/discord.sh \
-          --color 0xaaff00 \
-          --title "${node_fqdn}" \
-          --description "ssl cert renewal detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}" \
-          --thumbnail https://www.globalsign.com/application/files/7115/7562/0340/chrome-expired-ssl.PNG \
-          --author rubberneck \
-          --author-url https://github.com/Manta-Network/rubberneck \
-          --author-icon https://gawkstopper.com/wp-content/uploads/2019/05/rubbernecking-1.jpg \
-          --url https://polkadot.js.org/apps/?rpc=wss%253A%252F%252F${node_fqdn} \
-          --timestamp
+        _post_to_discord ssl-certificate aaff00 ${node_fqdn} "ssl cert renewal detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
         rm ${old_cert_path}
       fi
     else
       _echo_to_stderr "    certificate validity refuted (${observed_not_before} - ${observed_not_after})"
-      ${HOME}/.local/bin/discord.sh \
-        --color 0xff0000 \
-        --title "${node_fqdn}" \
-        --description "expired ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}" \
-        --thumbnail https://www.globalsign.com/application/files/7115/7562/0340/chrome-expired-ssl.PNG \
-        --author rubberneck \
-        --author-url https://github.com/Manta-Network/rubberneck \
-        --author-icon https://gawkstopper.com/wp-content/uploads/2019/05/rubbernecking-1.jpg \
-        --url https://polkadot.js.org/apps/?rpc=wss%253A%252F%252F${node_fqdn} \
-        --timestamp
-        #--footer "discord.sh"
-        #--description "ssl cert validity expiration detected" \
-        #--color "0xffffff" \
-        #--url "https://${node_fqdn}" \
-        #--author "$(whoami)@$(hostname -f)" \
-        #--author-url "https://github.com/Manta-Network/rubberneck" \
-        #--author-icon "https://i.imgur.com/12jyR5Q.png" \
-        #--image "https://i.imgur.com/12jyR5Q.png" \
-        #--thumbnail "https://i.imgur.com/12jyR5Q.png" \
-        #--field "Author;ChaoticWeg" \
-        #--field "Author;fieu" \
-        #--footer "discord.sh" \
-        #--footer-icon "https://i.imgur.com/12jyR5Q.png" \
-        #--timestamp
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+      _post_to_discord ssl-certificate ff0000 ${node_fqdn} "expired ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
       continue
     fi
     observed_authority_key_id=$(jq -r .authority_key_id ${cert_path})
@@ -137,6 +131,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    certificate authority verified (${observed_authority_key_id})"
     else
       _echo_to_stderr "    certificate authority refuted (${observed_authority_key_id})"
+      _post_to_discord ssl-certificate ff0000 ${node_fqdn} "unrecognised authority for ssl cert detected on ${node_fqdn}\n- authority: ${observed_authority_key_id}"
       continue
     fi
     observed_cert_name=$(jq -r .subject.common_name ${cert_path})
@@ -144,28 +139,25 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    certificate name verified (${observed_cert_name})"
     else
       _echo_to_stderr "    certificate name refuted (${observed_cert_name})"
-      ${HOME}/.local/bin/discord.sh \
-        --color 0xffbf00 \
-        --title "${node_fqdn}" \
-        --description "unexpected ssl cert name detected on ${node_fqdn}\n- cert name: ${observed_cert_name}" \
-        --author rubberneck \
-        --author-url "https://github.com/Manta-Network/rubberneck" \
-        --author-icon "https://gawkstopper.com/wp-content/uploads/2019/05/rubbernecking-1.jpg"
+      _post_to_discord ssl-certificate ffbf00 ${node_fqdn} "unexpected ssl cert name detected on ${node_fqdn}\n- cert name: ${observed_cert_name}"
     fi
 
-    observed_peer_count=$(echo system_health | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result.peers)
-    if (( observed_peer_count > 0 )); then
-      _echo_to_stderr "    peer count verified (${observed_peer_count})"
-    else
-      _echo_to_stderr "    peer count refuted (${observed_peer_count})"
-      continue
-    fi
     observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
     observed_peer_id_length=${#observed_peer_id}
     if (( observed_peer_id_length = 52 )) && [[ ${observed_peer_id} == 12* ]]; then
       _echo_to_stderr "    peer id verified (${observed_peer_id})"
     else
       _echo_to_stderr "    peer id refuted (${observed_peer_id})"
+      _post_to_discord peers ff0000 ${node_fqdn} "invalid peer id detected for ${node_fqdn}\n- peer id: ${observed_peer_id}"
+    mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+      continue
+    fi
+    observed_peer_count=$(echo system_health | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result.peers)
+    if (( observed_peer_count > 0 )); then
+      _echo_to_stderr "    peer count verified (${observed_peer_count})"
+    else
+      _echo_to_stderr "    peer count refuted (${observed_peer_count})"
+      _post_to_discord peers ff0000 ${node_fqdn} "no peers detected for ${node_fqdn}"
       continue
     fi
     observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
@@ -175,5 +167,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    system version refuted (${observed_system_version})"
       continue
     fi
+    mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+    #_post_to_discord check 2ca6e0 ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id: ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert expiry: ${observed_not_after}"
   done
 done
