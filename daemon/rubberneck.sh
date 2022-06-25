@@ -19,6 +19,8 @@ _post_to_discord() {
   fqdn=${3}
   message=${4}
   ${HOME}/.local/bin/discord.sh \
+    --username 'marvin the paranoid android' \
+    --avatar https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/marvin.png \
     --color 0x${color} \
     --title ${fqdn} \
     --description "${message}" \

@@ -79,7 +79,7 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
         renewed_not_before=$(${HOME}/.local/bin/certinfo -domain ${node_fqdn} | jq -r .not_before)
         renewed_not_after=$(${HOME}/.local/bin/certinfo -domain ${node_fqdn} | jq -r .not_after)
         if [ $(date -d 'next month' +%s) -lt $(date -d "${renewed_not_after}" +%s) ]; then
-          _post_to_discord ssl-certificate aaff00 ${node_fqdn} "ssl cert renewed for ${node_fqdn}\n- issued: ${renewed_not_before}\n- expired: ${renewed_not_after}"
+          _post_to_discord ssl-certificate aaff00 ${node_fqdn} "ssl cert renewed for ${node_fqdn}\n- issued: ${renewed_not_before}\n- expires: ${renewed_not_after}"
         fi
       fi
     else
