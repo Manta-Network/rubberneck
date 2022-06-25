@@ -19,6 +19,7 @@ _post_to_discord() {
   fqdn=${3}
   message=${4}
   ${HOME}/.local/bin/discord.sh \
+    --webhook-url $(cat ${HOME}/.discord.mustache)
     --username 'mustache the fixer' \
     --avatar https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/mustache-the-fixer.png \
     --color 0x${color} \
