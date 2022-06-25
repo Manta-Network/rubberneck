@@ -1,0 +1,17 @@
+[Unit]
+Description=mustache the fixer
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=grenade
+Group=grenade
+Type=simple
+ExecStartPre=curl -sLo /home/grenade/.local/bin/mustache-the-fixer.sh https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/mustache-the-fixer.sh
+ExecStartPre=chmod +x /home/grenade/.local/bin/mustache-the-fixer.sh
+ExecStart=/home/grenade/.local/bin/mustache-the-fixer.sh
+Restart=always
+RestartSec=600
+
+[Install]
+WantedBy=multi-user.target

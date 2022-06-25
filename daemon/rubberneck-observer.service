@@ -1,0 +1,17 @@
+[Unit]
+Description=rubberneck observer
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=grenade
+Group=grenade
+Type=simple
+ExecStartPre=curl -sLo /home/grenade/.local/bin/rubberneck-observer.sh https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/rubberneck.sh
+ExecStartPre=chmod +x /home/grenade/.local/bin/rubberneck-observer.sh
+ExecStart=/home/grenade/.local/bin/rubberneck-observer.sh
+Restart=always
+RestartSec=600
+
+[Install]
+WantedBy=multi-user.target
