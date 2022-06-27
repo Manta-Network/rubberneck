@@ -56,7 +56,7 @@ authenticator = standalone
 server = https://acme-v02.api.letsencrypt.org/directory
 EOF"
 sudo systemctl stop nginx.service
-sudo certbot renew
+sudo certbot renew --no-random-sleep-on-renew
 sudo systemctl start nginx.service
 systemctl status nginx.service
 sudo ls -ahl /etc/letsencrypt/{live,archive,renewal}
