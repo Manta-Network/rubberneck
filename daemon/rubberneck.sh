@@ -11,6 +11,8 @@ color_success=aaff00
 webhook_dev=${HOME}/.discord/manta/devops/dev/marvin.webhook
 webhook_test=${HOME}/.discord/manta/devops/test/marvin.webhook
 webhook_prod=${HOME}/.discord/manta/devops/prod/marvin.webhook
+webhook_debug=${HOME}/.discord/pelagos/marvin.webhook
+
 
 _decode_property() {
   echo ${1} | base64 --decode | jq -r ${2}
@@ -189,8 +191,6 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
     mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-    #if [ ${webhook_path} != ${webhook_prod} ]; then
-    #  _post_to_discord ${webhook_path} check 2ca6e0 ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id:\n  ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert validity: ${observed_not_before:0:10} - ${observed_not_after:0:10}"
-    #fi
+    _post_to_discord ${webhook_debug} check 2ca6e0 ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id:\n  ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert validity: ${observed_not_before:0:10} - ${observed_not_after:0:10}"
   done
 done
