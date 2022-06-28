@@ -9,6 +9,8 @@ color_danger=ff0000
 color_warn=ffbf00
 color_success=aaff00
 webhook_dev=${HOME}/.discord/manta/devops/dev/marvin.webhook
+webhook_test=${HOME}/.discord/manta/devops/test/marvin.webhook
+webhook_prod=${HOME}/.discord/manta/devops/prod/marvin.webhook
 
 _decode_property() {
   echo ${1} | base64 --decode | jq -r ${2}
@@ -23,7 +25,7 @@ _post_to_discord() {
   fqdn=${4}
   message=${5}
   ${HOME}/.local/bin/discord.sh \
-    --webhook-url $(cat ${HOME}/.discord.marvin) \
+    --webhook-url $(cat ${webhook}) \
     --username 'marvin the paranoid android' \
     --avatar https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/marvin.png \
     --color 0x${color} \
@@ -99,6 +101,18 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
   _echo_to_stderr "  observed ${#nodes_as_base64[@]} node configurations in ${nodes_path}"
   for node_as_base64 in ${nodes_as_base64[@]}; do
     node_fqdn=$(_decode_property ${node_as_base64} .fqdn)
+    node_domain=$(_decode_property ${node_as_base64} .domain)
+    case ${node_domain} in
+      calamari.systems)
+        webhook_path=${webhook_prod}
+        ;;
+      rococo.dolphin.engineering)
+        webhook_path=${webhook_test}
+        ;;
+      *)
+        webhook_path=${webhook_dev}
+        ;;
+    esac
     echo "  - ${node_fqdn}"
     cert_path=/tmp/5eklk8knsd-cert-${node_fqdn}.json
     old_cert_path=/tmp/5eklk8knsd-old-cert-${node_fqdn}.json
@@ -119,18 +133,18 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     if [ $(date +%s) -ge $(date -d ${observed_not_before} +%s) ] && [ $(date +%s) -le $(date -d ${observed_not_after} +%s) ]; then
       _echo_to_stderr "    certificate validity verified (${observed_not_before} - ${observed_not_after})"
       if [ $(date +%s) -gt $(date -d "${observed_not_after} - 7 day" +%s) ]; then
-        _post_to_discord ${webhook_dev} ssl-certificate ${color_danger} ${node_fqdn} "imminent expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
+        _post_to_discord ${webhook_path} ssl-certificate ${color_danger} ${node_fqdn} "imminent expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
       elif [ $(date +%s) -gt $(date -d "${observed_not_after} - 30 day" +%s) ]; then
-        _post_to_discord ${webhook_dev} ssl-certificate ${color_warn} ${node_fqdn} "approaching expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
+        _post_to_discord ${webhook_path} ssl-certificate ${color_warn} ${node_fqdn} "approaching expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
       elif [ -s ${old_cert_path} ] && [ $(date +%s) -ge $(date -d $(jq -r .not_after ${old_cert_path}) +%s) ]; then
         _echo_to_stderr "    certificate validity recovery detected"
-        _post_to_discord ${webhook_dev} ssl-certificate ${color_success} ${node_fqdn} "ssl cert renewal detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
+        _post_to_discord ${webhook_path} ssl-certificate ${color_success} ${node_fqdn} "ssl cert renewal detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
         rm ${old_cert_path}
       fi
     else
       _echo_to_stderr "    certificate validity refuted (${observed_not_before} - ${observed_not_after})"
       mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-      _post_to_discord ${webhook_dev} ssl-certificate ${color_danger} ${node_fqdn} "expired ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
+      _post_to_discord ${webhook_path} ssl-certificate ${color_danger} ${node_fqdn} "expired ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
       continue
     fi
     observed_authority_key_id=$(jq -r .authority_key_id ${cert_path})
@@ -138,7 +152,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    certificate authority verified (${observed_authority_key_id})"
     else
       _echo_to_stderr "    certificate authority refuted (${observed_authority_key_id})"
-      _post_to_discord ${webhook_dev} ssl-certificate ${color_danger} ${node_fqdn} "unrecognised authority for ssl cert detected on ${node_fqdn}\n- authority: ${observed_authority_key_id}"
+      _post_to_discord ${webhook_path} ssl-certificate ${color_danger} ${node_fqdn} "unrecognised authority for ssl cert detected on ${node_fqdn}\n- authority: ${observed_authority_key_id}"
       continue
     fi
     observed_cert_name=$(jq -r .subject.common_name ${cert_path})
@@ -146,7 +160,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    certificate name verified (${observed_cert_name})"
     else
       _echo_to_stderr "    certificate name refuted (${observed_cert_name})"
-      _post_to_discord ${webhook_dev} ssl-certificate ${color_warn} ${node_fqdn} "unexpected ssl cert name detected on ${node_fqdn}\n- cert name: ${observed_cert_name}"
+      _post_to_discord ${webhook_path} ssl-certificate ${color_warn} ${node_fqdn} "unexpected ssl cert name detected on ${node_fqdn}\n- cert name: ${observed_cert_name}"
     fi
 
     observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
@@ -155,7 +169,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    peer id verified (${observed_peer_id})"
     else
       _echo_to_stderr "    peer id refuted (${observed_peer_id})"
-      _post_to_discord ${webhook_dev} peers ${color_danger} ${node_fqdn} "invalid peer id detected for ${node_fqdn}\n- peer id: ${observed_peer_id}"
+      _post_to_discord ${webhook_path} websocket ${color_danger} ${node_fqdn} "failed to obtain node id over websocket connection to ${node_fqdn}"
     mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     fi
@@ -164,7 +178,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    peer count verified (${observed_peer_count})"
     else
       _echo_to_stderr "    peer count refuted (${observed_peer_count})"
-      _post_to_discord ${webhook_dev} peers ${color_danger} ${node_fqdn} "no peers detected for ${node_fqdn}"
+      _post_to_discord ${webhook_path} peers ${color_danger} ${node_fqdn} "no peers detected for ${node_fqdn}"
       continue
     fi
     observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
@@ -175,6 +189,6 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
     mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-    #_post_to_discord ${webhook_dev} check 2ca6e0 ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id: ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert expiry: ${observed_not_after}"
+    #_post_to_discord ${webhook_path} check 2ca6e0 ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id: ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert expiry: ${observed_not_after}"
   done
 done

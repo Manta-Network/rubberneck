@@ -24,7 +24,7 @@ _post_to_discord() {
   fqdn=${4}
   message=${5}
   ${HOME}/.local/bin/discord.sh \
-    --webhook-url $(cat ${HOME}/.discord.mustache) \
+    --webhook-url $(cat ${webhook}) \
     --username 'mustache the fixer' \
     --avatar https://gist.githubusercontent.com/grenade/f6ea0e897ee632e6fd318cf0fcba5b4f/raw/mustache-the-fixer.png \
     --color 0x${color} \
@@ -68,6 +68,17 @@ cert_renewal_targets=( $(mongosh --quiet --eval '
 
 for node_fqdn in ${cert_renewal_targets[@]}; do
   node_tld=$(echo ${fqdn} | rev | cut -d "." -f1-2 | rev)
+  case ${node_tld} in
+    calamari.systems)
+      webhook_path=${webhook_prod}
+      ;;
+    dolphin.engineering)
+      webhook_path=${webhook_test}
+      ;;
+    *)
+      webhook_path=${webhook_dev}
+      ;;
+  esac
   echo "- fqdn: ${node_fqdn}, tld: ${node_tld}"
   cert_path=/tmp/$(uuidgen)-cert-${node_fqdn}.json
   if ${HOME}/.local/bin/certinfo -domain ${node_fqdn} > ${cert_path} && [ -s ${cert_path} ]; then
@@ -87,19 +98,19 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
         renewed_not_before=$(${HOME}/.local/bin/certinfo -domain ${node_fqdn} | jq -r .not_before)
         renewed_not_after=$(${HOME}/.local/bin/certinfo -domain ${node_fqdn} | jq -r .not_after)
         if [ $(date -d 'next month' +%s) -lt $(date -d "${renewed_not_after}" +%s) ]; then
-          _post_to_discord ${webhook_dev} ssl-certificate ${color_success} ${node_fqdn} "ssl cert renewed for ${node_fqdn}\n- issued: ${renewed_not_before}\n- expiry: ${renewed_not_after}"
+          _post_to_discord ${webhook_path} ssl-certificate ${color_success} ${node_fqdn} "ssl cert renewed for ${node_fqdn}\n- issued: ${renewed_not_before}\n- expiry: ${renewed_not_after}"
         else
-          _post_to_discord ${webhook_dev} ssl-certificate ${color_danger} ${node_fqdn} "ssl cert renewal failed for ${node_fqdn}\n- issued: ${renewed_not_before}\n- expiry: ${renewed_not_after}"
+          _post_to_discord ${webhook_path} ssl-certificate ${color_danger} ${node_fqdn} "ssl cert renewal failed for ${node_fqdn}\n- issued: ${renewed_not_before}\n- expiry: ${renewed_not_after}"
         fi
       fi
     else
       _echo_to_stderr "  certificate validity verified (${observed_not_before} - ${observed_not_after})"
-      #_post_to_discord ${webhook_dev} ssl-certificate ${color_warn} ${node_fqdn} "approaching expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
+      #_post_to_discord ${webhook_path} ssl-certificate ${color_warn} ${node_fqdn} "approaching expiry for ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expires: ${observed_not_after}"
     fi
   else
     _echo_to_stderr "  certificate validity refuted (${observed_not_before} - ${observed_not_after})"
     #mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-    #_post_to_discord ${webhook_dev} ssl-certificate ${color_danger} ${node_fqdn} "expired ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
+    #_post_to_discord ${webhook_path} ssl-certificate ${color_danger} ${node_fqdn} "expired ssl cert detected on ${node_fqdn}\n- issued: ${observed_not_before}\n- expired: ${observed_not_after}"
     continue
   fi
   #mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
