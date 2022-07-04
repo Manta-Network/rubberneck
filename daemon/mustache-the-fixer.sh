@@ -5,7 +5,11 @@ mongo_connection=$(cat ${HOME}/.mongo-rubberneck-readwrite)
 color_danger=ff0000
 color_warn=ffbf00
 color_success=aaff00
+color_info=2ca6e0
 webhook_dev=${HOME}/.discord/manta/devops/dev/mustache.webhook
+webhook_test=${HOME}/.discord/manta/devops/test/mustache.webhook
+webhook_prod=${HOME}/.discord/manta/devops/prod/mustache.webhook
+webhook_debug=${HOME}/.discord/pelagos/mustache.webhook
 
 ssh_key=${HOME}/.ssh/id_manta_ci
 eval `ssh-agent`
@@ -37,6 +41,13 @@ _post_to_discord() {
     --url https://polkadot.js.org/apps/?rpc=wss%253A%252F%252F${fqdn} \
     --timestamp
 }
+
+for webhook_path in ${webhook_dev} ${webhook_test} ${webhook_prod} ${webhook_debug}; do
+  if [ ! -f ${webhook_path} ]; then
+    _echo_to_stderr "  missing webhook credentials at ${webhook_path}"
+    exit 1
+  fi
+done
 
 if [ ! -x ${HOME}/.local/bin/certinfo ]; then
   [ -d ${HOME}/.local/bin ] || mkdir -p ${HOME}/.local/bin
