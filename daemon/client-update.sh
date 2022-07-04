@@ -21,6 +21,10 @@ if dpkg -l manta; then
 
   sudo apt install --only-upgrade manta
 
+  sudo curl -sLo /usr/share/substrate/rococo.json https://raw.githubusercontent.com/paritytech/polkadot/master/node/service/chain-specs/rococo.json
+  sudo curl -sLo /usr/share/substrate/kusama.json https://raw.githubusercontent.com/paritytech/polkadot/master/node/service/chain-specs/kusama.json
+  sudo curl -sLo /usr/share/substrate/polkadot.json https://raw.githubusercontent.com/paritytech/polkadot/master/node/service/chain-specs/polkadot.json
+
   if [ ${calamari_service_pre_update_state} = active ] && ! systemctl is-active --quiet calamari.service; then
     sudo systemctl start calamari.service
   fi
