@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+release_path=${HOME}/.local/bin/manta
 blockchains_path=/tmp/5eklk8knsd-blockchains.json
 blockchains_url=https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/blockchains
 authority_key_id="14:2E:B3:17:B7:58:56:CB:AE:50:09:40:E6:1F:AF:9D:8B:14:C2:C6"
@@ -8,6 +9,7 @@ observer_ip=$(curl -sL https://checkip.amazonaws.com)
 color_danger=ff0000
 color_warn=ffbf00
 color_success=aaff00
+color_info=2ca6e0
 webhook_dev=${HOME}/.discord/manta/devops/dev/marvin.webhook
 webhook_test=${HOME}/.discord/manta/devops/test/marvin.webhook
 webhook_prod=${HOME}/.discord/manta/devops/prod/marvin.webhook
@@ -70,6 +72,28 @@ else
   _echo_to_stderr "    failed to fetch ${blockchains_path} from ${blockchains_url}"
   exit 1
 fi
+
+latest_manta_release_index_url=https://api.github.com/repos/Manta-Network/Manta/releases/latest
+latest_manta_release_download_url=$(curl \
+  -sL \
+  -H 'Cache-Control: no-cache, no-store' \
+  -H 'Accept: application/vnd.github+json' \
+  ${latest_manta_release_index_url} \
+  | jq -r '.assets[] | select(.name == "manta") | .browser_download_url')
+
+if curl \
+  -sLH 'Cache-Control: no-cache, no-store' \
+  -o ${release_path} \
+  ${latest_manta_release_download_url} \
+  && [ -s ${release_path} ] \
+  && chmod +x ${release_path}; then
+  _echo_to_stderr "    fetched ${release_path} from ${latest_manta_release_download_url}"
+else
+  rm -f ${release_path}
+  _echo_to_stderr "    failed to fetch ${release_path} from ${latest_manta_release_download_url}"
+  exit 1
+fi
+latest_manta_release_version=$(${release_path} --version | head -n 1 | cut -d ' ' -f2)
 
 blockchains_as_base64=( $(jq -r '.blockchains[] | @base64' ${blockchains_path}) )
 _echo_to_stderr "    observed ${#blockchains_as_base64[@]} blockchain configurations in ${blockchains_path}"
@@ -185,12 +209,23 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     fi
     observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
     if [ -n ${observed_system_version} ]; then
-      _echo_to_stderr "    system version verified (${observed_system_version})"
+      if [ ${blockchain_tier} = "parachain" ]; then
+        if [ ${observed_system_version} = ${latest_manta_release_version} ]; then
+          _echo_to_stderr "    system version (${observed_system_version}) matches latest manta version (${latest_manta_release_version})"
+        else
+          _echo_to_stderr "    system version (${observed_system_version}) does not match latest manta version (${latest_manta_release_version})"
+          mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+          _post_to_discord ${webhook_debug} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version}"
+          continue
+        fi
+      else
+        _echo_to_stderr "    system version verified (${observed_system_version})"
+      fi
     else
       _echo_to_stderr "    system version refuted (${observed_system_version})"
       continue
     fi
     mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-    _post_to_discord ${webhook_debug} check 2ca6e0 ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id:\n  ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert validity: ${observed_not_before:0:10} - ${observed_not_after:0:10}"
+    _post_to_discord ${webhook_debug} check ${color_info} ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id:\n  ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert validity: ${observed_not_before:0:10} - ${observed_not_after:0:10}"
   done
 done
