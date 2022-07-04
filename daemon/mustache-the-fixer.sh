@@ -186,7 +186,6 @@ for node_fqdn in ${client_update_targets[@]}; do
     _echo_to_stderr "    system version (${observed_system_version_pre_patch}) does not match latest manta version (${latest_manta_release_version})"
 
     if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/client-update.sh | bash'; then
-      sleep 60
       observed_system_version_post_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
       if [ ${observed_system_version_post_patch} = ${latest_manta_release_version} ]; then
         _post_to_discord ${webhook_path} semver ${color_success} ${node_fqdn} "manta client updated on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"

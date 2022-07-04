@@ -26,12 +26,12 @@ if dpkg -l manta; then
   sudo curl -sLo /usr/share/substrate/polkadot.json https://raw.githubusercontent.com/paritytech/polkadot/master/node/service/chain-specs/polkadot.json
 
   if [ ${calamari_service_pre_update_state} = active ] && ! systemctl is-active --quiet calamari.service; then
-    sudo systemctl start calamari.service
+    sudo systemctl start calamari.service && sleep 60
   fi
   if [ ${dolphin_service_pre_update_state} = active ] && ! systemctl is-active --quiet dolphin.service; then
-    sudo systemctl start dolphin.service
+    sudo systemctl start dolphin.service && sleep 60
   fi
   if [ ${manta_service_pre_update_state} = active ] && ! systemctl is-active --quiet manta.service; then
-    sudo systemctl start manta.service
+    sudo systemctl start manta.service && sleep 60
   fi
 fi
