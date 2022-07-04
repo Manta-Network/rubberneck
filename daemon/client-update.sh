@@ -49,7 +49,7 @@ elif systemctl is-active --quiet calamari-pc.service; then
     if sudo curl \
       -sLo /usr/local/bin/manta \
       ${latest_manta_release_download_url} \
-      && chmod +x /usr/local/bin/manta; then
+      && sudo chmod +x /usr/local/bin/manta; then
       sudo rm -f /usr/local/bin/calamari-pc
       sudo ln -sfr /usr/local/bin/manta /usr/local/bin/calamari-pc
     fi
