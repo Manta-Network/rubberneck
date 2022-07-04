@@ -50,6 +50,8 @@ if [ ! -x ${HOME}/.local/bin/discord.sh ]; then
   chmod +x ${HOME}/.local/bin/discord.sh
 fi
 
+# tls certificate renewals
+
 cert_renewal_targets=( $(mongosh --quiet --eval '
   JSON.stringify(
     db.observation.distinct(
@@ -93,7 +95,6 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
   if [ $(date +%s) -ge $(date -d ${observed_not_before} +%s) ] && [ $(date +%s) -le $(date -d ${observed_not_after} +%s) ]; then
     if [ $(date +%s) -gt $(date -d "${observed_not_after} - 30 day" +%s) ]; then
       _echo_to_stderr "  approaching expiry for ssl cert detected (${observed_not_before} - ${observed_not_after})"
-      #if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo systemctl stop nginx.service && sudo certbot renew && sudo systemctl start nginx.service'; then
       if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/cert-fix.sh | bash'; then
         renewed_not_before=$(${HOME}/.local/bin/certinfo -domain ${node_fqdn} | jq -r .not_before)
         renewed_not_after=$(${HOME}/.local/bin/certinfo -domain ${node_fqdn} | jq -r .not_after)
@@ -115,3 +116,27 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
   fi
   #mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
 done
+
+# client updates
+
+latest_manta_release_index_url=https://api.github.com/repos/Manta-Network/Manta/releases/latest
+latest_manta_release_download_url=$(curl \
+  -sL \
+  -H 'Cache-Control: no-cache, no-store' \
+  -H 'Accept: application/vnd.github+json' \
+  ${latest_manta_release_index_url} \
+  | jq -r '.assets[] | select(.name == "manta") | .browser_download_url')
+
+if curl \
+  -sLH 'Cache-Control: no-cache, no-store' \
+  -o ${release_path} \
+  ${latest_manta_release_download_url} \
+  && [ -s ${release_path} ] \
+  && chmod +x ${release_path}; then
+  _echo_to_stderr "    fetched ${release_path} from ${latest_manta_release_download_url}"
+else
+  rm -f ${release_path}
+  _echo_to_stderr "    failed to fetch ${release_path} from ${latest_manta_release_download_url}"
+  exit 1
+fi
+latest_manta_release_version=$(${release_path} --version | head -n 1 | cut -d ' ' -f2)
