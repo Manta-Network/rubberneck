@@ -125,6 +125,7 @@ done
 
 # client updates
 
+latest_manta_release_path=${HOME}/.local/bin/manta
 latest_manta_release_index_url=https://api.github.com/repos/Manta-Network/Manta/releases/latest
 latest_manta_release_download_url=$(curl \
   -sL \
@@ -135,17 +136,17 @@ latest_manta_release_download_url=$(curl \
 
 if curl \
   -sLH 'Cache-Control: no-cache, no-store' \
-  -o ${release_path} \
+  -o ${latest_manta_release_path} \
   ${latest_manta_release_download_url} \
-  && [ -s ${release_path} ] \
-  && chmod +x ${release_path}; then
-  _echo_to_stderr "    fetched ${release_path} from ${latest_manta_release_download_url}"
+  && [ -s ${latest_manta_release_path} ] \
+  && chmod +x ${latest_manta_release_path}; then
+  _echo_to_stderr "    fetched ${latest_manta_release_path} from ${latest_manta_release_download_url}"
 else
-  rm -f ${release_path}
-  _echo_to_stderr "    failed to fetch ${release_path} from ${latest_manta_release_download_url}"
+  rm -f ${latest_manta_release_path}
+  _echo_to_stderr "    failed to fetch ${latest_manta_release_path} from ${latest_manta_release_download_url}"
   exit 1
 fi
-latest_manta_release_version=$(${release_path} --version | head -n 1 | cut -d ' ' -f2)
+latest_manta_release_version=$(${latest_manta_release_path} --version | head -n 1 | cut -d ' ' -f2)
 
 client_update_targets=( $(mongosh --quiet --eval '
   JSON.stringify(

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-release_path=${HOME}/.local/bin/manta
+latest_manta_release_path=${HOME}/.local/bin/manta
 blockchains_path=/tmp/5eklk8knsd-blockchains.json
 blockchains_url=https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/blockchains
 authority_key_id="14:2E:B3:17:B7:58:56:CB:AE:50:09:40:E6:1F:AF:9D:8B:14:C2:C6"
@@ -83,17 +83,17 @@ latest_manta_release_download_url=$(curl \
 
 if curl \
   -sLH 'Cache-Control: no-cache, no-store' \
-  -o ${release_path} \
+  -o ${latest_manta_release_path} \
   ${latest_manta_release_download_url} \
-  && [ -s ${release_path} ] \
-  && chmod +x ${release_path}; then
-  _echo_to_stderr "    fetched ${release_path} from ${latest_manta_release_download_url}"
+  && [ -s ${latest_manta_release_path} ] \
+  && chmod +x ${latest_manta_release_path}; then
+  _echo_to_stderr "    fetched ${latest_manta_release_path} from ${latest_manta_release_download_url}"
 else
-  rm -f ${release_path}
-  _echo_to_stderr "    failed to fetch ${release_path} from ${latest_manta_release_download_url}"
+  rm -f ${latest_manta_release_path}
+  _echo_to_stderr "    failed to fetch ${latest_manta_release_path} from ${latest_manta_release_download_url}"
   exit 1
 fi
-latest_manta_release_version=$(${release_path} --version | head -n 1 | cut -d ' ' -f2)
+latest_manta_release_version=$(${latest_manta_release_path} --version | head -n 1 | cut -d ' ' -f2)
 
 blockchains_as_base64=( $(jq -r '.blockchains[] | @base64' ${blockchains_path}) )
 _echo_to_stderr "    observed ${#blockchains_as_base64[@]} blockchain configurations in ${blockchains_path}"
