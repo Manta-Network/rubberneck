@@ -209,13 +209,13 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     fi
     observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
     if [ -n ${observed_system_version} ]; then
-      if [ ${blockchain_tier} = "parachain" ]; then
+      if [ ${${node_domain}} = "calamari.systems" ]; then
         if [ ${observed_system_version} = ${latest_manta_release_version} ]; then
           _echo_to_stderr "    system version (${observed_system_version}) matches latest manta version (${latest_manta_release_version})"
         else
           _echo_to_stderr "    system version (${observed_system_version}) does not match latest manta version (${latest_manta_release_version})"
           mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-          _post_to_discord ${webhook_debug} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version}"
+          _post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version}"
           continue
         fi
       else
