@@ -247,7 +247,7 @@ for node_fqdn in ${websocket_offline_targets[@]}; do
   observed_peer_id_length=${#observed_peer_id}
   if (( observed_peer_id_length = 52 )) && [[ ${observed_peer_id} == 12* ]]; then
     _echo_to_stderr "    peer id verified (${observed_peer_id})"
-    _post_to_discord ${webhook_path} websocket ${color_success} ${node_fqdn} "node id obtained over websocket connection to ${node_fqdn}"
+    _post_to_discord ${webhook_path} websocket ${color_success} ${node_fqdn} "node id (${observed_peer_id}) obtained over websocket connection to ${node_fqdn}"
   else
     _echo_to_stderr "    peer id refuted (${observed_peer_id})"
     # todo: implement and call websocket fix script
