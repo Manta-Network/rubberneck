@@ -191,20 +191,84 @@ for node_fqdn in ${client_update_targets[@]}; do
   esac
   echo "- fqdn: ${node_fqdn}, tld: ${node_tld}"
   observed_system_version_pre_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-  if [ ${observed_system_version_pre_patch} = ${latest_manta_release_version} ]; then
-    _echo_to_stderr "    system version (${observed_system_version_pre_patch}) matches latest manta version (${latest_manta_release_version})"
-  else
-    _echo_to_stderr "    system version (${observed_system_version_pre_patch}) does not match latest manta version (${latest_manta_release_version})"
+  if [ -n ${observed_system_version_pre_patch} ]; then
+    if [ ${observed_system_version_pre_patch} = ${latest_manta_release_version} ]; then
+      _echo_to_stderr "    system version (${observed_system_version_pre_patch}) matches latest manta version (${latest_manta_release_version})"
+    else
+      _echo_to_stderr "    system version (${observed_system_version_pre_patch}) does not match latest manta version (${latest_manta_release_version})"
 
-    if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/client-update.sh | bash'; then
-      observed_system_version_post_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-      if [ ${observed_system_version_post_patch} = ${latest_manta_release_version} ]; then
-        _post_to_discord ${webhook_path} semver ${color_success} ${node_fqdn} "manta client updated on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
-      else
-        _post_to_discord ${webhook_path} semver ${color_danger} ${node_fqdn} "manta client update failed on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
+      if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/client-update.sh | bash'; then
+        observed_system_version_post_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
+        if [ ${observed_system_version_post_patch} = ${latest_manta_release_version} ]; then
+          _post_to_discord ${webhook_path} semver ${color_success} ${node_fqdn} "manta client updated on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
+        else
+          _post_to_discord ${webhook_path} semver ${color_danger} ${node_fqdn} "manta client update failed on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
+        fi
       fi
+      #_post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version_pre_patch}"
+      continue
     fi
-    #_post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version_pre_patch}"
-    continue
+  else
+    _echo_to_stderr "    failed to determine system version"
+  fi
+done
+
+package_update_targets=( $(mongosh --quiet --eval '
+  JSON.stringify(
+    db.observation.distinct(
+      "fqdn",
+      {
+        observed: {
+          $gt: new Date (ISODate().getTime() - 1000 * 60 * 20)
+        },
+        "updates.pending": {
+          $exists: true
+        },
+        "updates.pending.0": {
+          $exists: true
+        }
+      }
+    )
+  )
+' ${mongo_connection} | jq -r '.[]') )
+
+for node_fqdn in ${package_update_targets[@]}; do
+  node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
+  case ${node_tld} in
+    calamari.systems)
+      webhook_path=${webhook_prod}
+      ;;
+    dolphin.engineering)
+      webhook_path=${webhook_test}
+      ;;
+    *)
+      webhook_path=${webhook_dev}
+      ;;
+  esac
+  echo "- fqdn: ${node_fqdn}, tld: ${node_tld}"
+  pending_update_count_pre_patch=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2 | wc -l')
+  if (( pending_update_count_pre_patch > 0 )); then
+    _echo_to_stderr "    ${pending_update_count_pre_patch} pending updates detected"
+
+    # trigger updates. also reboots, if required. usually returns a non zero exit code, due to disconnect triggered by reboot
+    ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/package-update.sh | bash'
+
+    # check update success
+    sleep 10
+    if ssh -i ${ssh_key} -o ConnectTimeout=60 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} exit; then
+      pending_update_count_post_patch=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2 | wc -l')
+      package_update_count=$(( pending_update_count_pre_patch - pending_update_count_post_patch ))
+      if (( pending_update_count_post_patch < 1 )); then
+        _post_to_discord ${webhook_path} package ${color_success} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
+      elif (( package_update_count > 0 )); then
+        _post_to_discord ${webhook_path} package ${color_info} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
+      else
+        _post_to_discord ${webhook_path} package ${color_danger} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
+      fi
+    else
+      _post_to_discord ${webhook_path} package ${color_danger} ${node_fqdn} "failed to determine if package updates succeeded on ${node_fqdn}"
+    fi
+  else
+    _echo_to_stderr "    no pending updates detected"
   fi
 done

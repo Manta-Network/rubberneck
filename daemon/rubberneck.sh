@@ -15,6 +15,9 @@ webhook_test=${HOME}/.discord/manta/devops/test/marvin.webhook
 webhook_prod=${HOME}/.discord/manta/devops/prod/marvin.webhook
 webhook_debug=${HOME}/.discord/pelagos/marvin.webhook
 
+ssh_key=${HOME}/.ssh/id_manta_ci
+eval `ssh-agent`
+ssh-add ${ssh_key}
 
 _decode_property() {
   echo ${1} | base64 --decode | jq -r ${2}
@@ -42,6 +45,13 @@ _post_to_discord() {
     --url https://polkadot.js.org/apps/?rpc=wss%253A%252F%252F${fqdn} \
     --timestamp
 }
+function join_by {
+  local d=${1-} f=${2-}
+  if shift 2; then
+    printf %s "$f" "${@/#/$d}"
+  fi
+}
+
 
 if [ ! -x ${HOME}/.local/bin/certinfo ]; then
   [ -d ${HOME}/.local/bin ] || mkdir -p ${HOME}/.local/bin
@@ -223,6 +233,22 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       fi
     else
       _echo_to_stderr "    system version refuted (${observed_system_version})"
+      continue
+    fi
+
+    package_updates=( $(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2') )
+    package_update_count=${#package_updates[@]}
+    if (( package_update_count > 0 )); then
+      if (( package_update_count > 9 )); then
+        color_severity=${color_danger}
+      elif (( package_update_count > 3 )); then
+        color_severity=${color_warn}
+      else
+        color_severity=${color_info}
+      fi
+      package_updates_pending=$(jq -nc '$ARGS.positional' --args ${package_updates[@]})
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, updates: { pending: ${package_updates_pending//\"/\'} }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+      _post_to_discord ${webhook_path} package ${color_severity} ${node_fqdn} "${node_fqdn} requires ${package_update_count} security updates\n- $(join_by '\n- ' ${package_updates[@]})"
       continue
     fi
     mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
