@@ -164,7 +164,12 @@ client_update_targets=( $(mongosh --quiet --eval '
         observed: {
           $gt: new Date (ISODate().getTime() - 1000 * 60 * 20)
         },
-        "node.chain": "kusama/calamari",
+        "node.chain": {
+          $in: [
+            "kusama/calamari",
+            "polkadot/manta"
+          ]
+        },
         "node.version": {
           $ne: "'${latest_manta_release_version}'"
         }
