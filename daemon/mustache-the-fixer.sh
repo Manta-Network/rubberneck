@@ -87,7 +87,7 @@ cert_renewal_targets=( $(mongosh --quiet --eval '
 
 for node_fqdn in ${cert_renewal_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
-  case ${node_tld} in
+  case ${node_fqdn#*.} in
     calamari.systems)
       webhook_path=${webhook_prod}
       ;;
@@ -178,7 +178,7 @@ client_update_targets=( $(mongosh --quiet --eval '
 
 for node_fqdn in ${client_update_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
-  case ${node_tld} in
+  case ${node_fqdn#*.} in
     calamari.systems)
       webhook_path=${webhook_prod}
       ;;
@@ -234,7 +234,7 @@ package_update_targets=( $(mongosh --quiet --eval '
 
 for node_fqdn in ${package_update_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
-  case ${node_tld} in
+  case ${node_fqdn#*.} in
     calamari.systems)
       webhook_path=${webhook_prod}
       ;;
