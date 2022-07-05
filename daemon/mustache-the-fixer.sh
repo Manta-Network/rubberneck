@@ -166,8 +166,7 @@ client_update_targets=( $(mongosh --quiet --eval '
         },
         "node.chain": {
           $in: [
-            "kusama/calamari",
-            "polkadot/manta"
+            "kusama/calamari"
           ]
         },
         "node.version": {
