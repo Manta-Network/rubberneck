@@ -68,7 +68,6 @@ if [ ! -x ${HOME}/.local/bin/discord.sh ]; then
 fi
 
 # tls certificate renewals
-
 cert_renewal_targets=( $(mongosh --quiet --eval '
   JSON.stringify(
     db.observation.distinct(
@@ -98,7 +97,7 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
       webhook_path=${webhook_dev}
       ;;
   esac
-  echo "- fqdn: ${node_fqdn}, tld: ${node_tld}"
+  echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
   cert_path=/tmp/$(uuidgen)-cert-${node_fqdn}.json
   if ${HOME}/.local/bin/certinfo -domain ${node_fqdn} > ${cert_path} && [ -s ${cert_path} ]; then
     _echo_to_stderr "  obtained ${cert_path} with certinfo"
@@ -135,7 +134,6 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
 done
 
 # client updates
-
 latest_manta_release_path=${HOME}/.local/bin/manta
 latest_manta_release_index_url=https://api.github.com/repos/Manta-Network/Manta/releases/latest
 latest_manta_release_download_url=$(curl \
@@ -158,7 +156,6 @@ else
   exit 1
 fi
 latest_manta_release_version=$(${latest_manta_release_path} --version | head -n 1 | cut -d ' ' -f2)
-
 client_update_targets=( $(mongosh --quiet --eval '
   JSON.stringify(
     db.observation.distinct(
@@ -175,7 +172,6 @@ client_update_targets=( $(mongosh --quiet --eval '
     )
   )
 ' ${mongo_connection} | jq -r '.[]') )
-
 for node_fqdn in ${client_update_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
   case ${node_fqdn#*.} in
@@ -189,7 +185,7 @@ for node_fqdn in ${client_update_targets[@]}; do
       webhook_path=${webhook_dev}
       ;;
   esac
-  echo "- fqdn: ${node_fqdn}, tld: ${node_tld}"
+  echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
   observed_system_version_pre_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
   if [ -n ${observed_system_version_pre_patch} ]; then
     if [ ${observed_system_version_pre_patch} = ${latest_manta_release_version} ]; then
@@ -213,6 +209,48 @@ for node_fqdn in ${client_update_targets[@]}; do
   fi
 done
 
+# websockets
+websocket_offline_targets=( $(mongosh --quiet --eval '
+  JSON.stringify(
+    db.observation.distinct(
+      "fqdn",
+      {
+        observed: {
+          $gt: new Date (ISODate().getTime() - 1000 * 60 * 20)
+        },
+        "node.id": {
+          $exists: false
+        }
+      }
+    )
+  )
+' ${mongo_connection} | jq -r '.[]') )
+for node_fqdn in ${websocket_offline_targets[@]}; do
+  node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
+  case ${node_fqdn#*.} in
+    calamari.systems)
+      webhook_path=${webhook_prod}
+      ;;
+    dolphin.engineering)
+      webhook_path=${webhook_test}
+      ;;
+    *)
+      webhook_path=${webhook_dev}
+      ;;
+  esac
+  echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
+  observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
+  observed_peer_id_length=${#observed_peer_id}
+  if (( observed_peer_id_length = 52 )) && [[ ${observed_peer_id} == 12* ]]; then
+    _echo_to_stderr "    peer id verified (${observed_peer_id})"
+    _post_to_discord ${webhook_path} websocket ${color_success} ${node_fqdn} "node id obtained over websocket connection to ${node_fqdn}"
+  else
+    _echo_to_stderr "    peer id refuted (${observed_peer_id})"
+    # todo: implement and call websocket fix script
+  fi
+done
+
+# package updates
 package_update_targets=( $(mongosh --quiet --eval '
   JSON.stringify(
     db.observation.distinct(
@@ -231,7 +269,6 @@ package_update_targets=( $(mongosh --quiet --eval '
     )
   )
 ' ${mongo_connection} | jq -r '.[]') )
-
 for node_fqdn in ${package_update_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
   case ${node_fqdn#*.} in
@@ -245,7 +282,7 @@ for node_fqdn in ${package_update_targets[@]}; do
       webhook_path=${webhook_dev}
       ;;
   esac
-  echo "- fqdn: ${node_fqdn}, tld: ${node_tld}"
+  echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
   pending_update_count_pre_patch=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2 | wc -l')
   if (( pending_update_count_pre_patch > 0 )); then
     _echo_to_stderr "    ${pending_update_count_pre_patch} pending updates detected"
