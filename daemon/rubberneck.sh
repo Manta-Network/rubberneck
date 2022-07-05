@@ -236,19 +236,19 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
 
-    package_updates=( $(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2') )
-    package_update_count=${#package_updates[@]}
-    if (( package_update_count > 0 )); then
-      if (( package_update_count > 9 )); then
+    pending_updates=( $(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2') )
+    pending_update_count=${#pending_updates[@]}
+    if (( pending_update_count > 0 )); then
+      if (( pending_update_count > 9 )); then
         color_severity=${color_danger}
-      elif (( package_update_count > 3 )); then
+      elif (( pending_update_count > 3 )); then
         color_severity=${color_warn}
       else
         color_severity=${color_info}
       fi
-      package_updates_pending=$(jq -nc '$ARGS.positional' --args ${package_updates[@]})
-      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, updates: { pending: ${package_updates_pending//\"/\'} }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-      _post_to_discord ${webhook_path} package ${color_severity} ${node_fqdn} "${node_fqdn} requires ${package_update_count} security updates\n- $(join_by '\n- ' ${package_updates[@]})"
+      pending_updates_json=$(jq -nc '$ARGS.positional' --args ${pending_updates[@]})
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, updates: { pending: ${pending_updates_json//\"/\'} }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+      _post_to_discord ${webhook_path} package ${color_severity} ${node_fqdn} "${node_fqdn} requires ${pending_update_count} security updates\n- $(join_by '\n- ' ${pending_updates[@]})"
       continue
     fi
     mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
