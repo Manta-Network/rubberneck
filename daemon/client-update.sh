@@ -52,8 +52,10 @@ else
           -sLo /usr/local/bin/manta \
           ${latest_manta_release_download_url} \
           && sudo chmod +x /usr/local/bin/manta; then
-          sudo rm -f /usr/local/bin/${unit}
-          sudo ln -sfr /usr/local/bin/manta /usr/local/bin/${unit}
+          if [ ${unit} != manta ]; then
+            sudo rm -f /usr/local/bin/${unit}
+            sudo ln -sfr /usr/local/bin/manta /usr/local/bin/${unit}
+          fi
         fi
         sudo systemctl start ${unit}.service && sleep 60
       fi
