@@ -254,7 +254,7 @@ for node_fqdn in ${package_update_targets[@]}; do
     ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/package-update.sh | bash'
 
     # check update success
-    sleep 10
+    sleep 20
     if ssh -i ${ssh_key} -o ConnectTimeout=60 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} exit; then
       pending_update_count_post_patch=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2 | wc -l')
       package_update_count=$(( pending_update_count_pre_patch - pending_update_count_post_patch ))
