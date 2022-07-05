@@ -239,9 +239,9 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     pending_updates=( $(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2') )
     pending_update_count=${#pending_updates[@]}
     if (( pending_update_count > 0 )); then
-      if (( pending_update_count > 9 )); then
+      if (( pending_update_count > 30 )); then
         color_severity=${color_danger}
-      elif (( pending_update_count > 3 )); then
+      elif (( pending_update_count > 20 )); then
         color_severity=${color_warn}
       else
         color_severity=${color_info}
