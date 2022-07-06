@@ -300,14 +300,14 @@ for node_fqdn in ${package_update_targets[@]}; do
       pending_update_count_post_patch=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2 | wc -l')
       package_update_count=$(( pending_update_count_pre_patch - pending_update_count_post_patch ))
       if (( pending_update_count_post_patch < 1 )); then
-        _post_to_discord ${webhook_path} package ${color_success} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
+        _post_to_discord ${webhook_debug} package ${color_success} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
       elif (( package_update_count > 0 )); then
-        _post_to_discord ${webhook_path} package ${color_info} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
+        _post_to_discord ${webhook_debug} package ${color_info} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
       else
-        _post_to_discord ${webhook_path} package ${color_danger} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
+        _post_to_discord ${webhook_debug} package ${color_danger} ${node_fqdn} "${package_update_count}/${pending_update_count_pre_patch} packages updated on ${node_fqdn}"
       fi
     else
-      _post_to_discord ${webhook_path} package ${color_danger} ${node_fqdn} "failed to determine if package updates succeeded on ${node_fqdn}"
+      _post_to_discord ${webhook_debug} package ${color_danger} ${node_fqdn} "failed to determine if package updates succeeded on ${node_fqdn}"
     fi
   else
     _echo_to_stderr "    no pending updates detected"

@@ -248,7 +248,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       fi
       pending_updates_json=$(jq -nc '$ARGS.positional' --args ${pending_updates[@]})
       mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, updates: { pending: ${pending_updates_json//\"/\'} }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-      _post_to_discord ${webhook_path} package ${color_severity} ${node_fqdn} "${node_fqdn} requires ${pending_update_count} package updates\n- $(join_by '\n- ' ${pending_updates[@]})"
+      _post_to_discord ${webhook_debug} package ${color_severity} ${node_fqdn} "${node_fqdn} requires ${pending_update_count} package updates\n- $(join_by '\n- ' ${pending_updates[@]})"
       continue
     fi
     mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
