@@ -219,7 +219,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     fi
     observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
     if [ -n ${observed_system_version} ]; then
-      if [ -n ${latest_manta_release_version} ] && [ ${node_domain} = "calamari.systems" ]; then
+      if [ -n "${latest_manta_release_version}" ] && [ ${node_domain} = "calamari.systems" ]; then
         if [ ${observed_system_version} = ${latest_manta_release_version} ]; then
           _echo_to_stderr "    system version (${observed_system_version}) matches latest manta version (${latest_manta_release_version})"
         else
