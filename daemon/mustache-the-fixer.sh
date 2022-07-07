@@ -90,7 +90,7 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
     calamari.systems)
       webhook_path=${webhook_prod}
       ;;
-    dolphin.engineering)
+    rococo.dolphin.engineering)
       webhook_path=${webhook_test}
       ;;
     *)
@@ -182,7 +182,7 @@ for node_fqdn in ${client_update_targets[@]}; do
     calamari.systems)
       webhook_path=${webhook_prod}
       ;;
-    dolphin.engineering)
+    rococo.dolphin.engineering)
       webhook_path=${webhook_test}
       ;;
     *)
@@ -191,7 +191,7 @@ for node_fqdn in ${client_update_targets[@]}; do
   esac
   echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
   observed_system_version_pre_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-  if [ -n ${observed_system_version_pre_patch} ]; then
+  if [ -n ${observed_system_version_pre_patch} ] && [ ! -z "${observed_system_version_pre_patch// }" ]; then
     if [ ${observed_system_version_pre_patch} = ${latest_manta_release_version} ]; then
       _echo_to_stderr "    system version (${observed_system_version_pre_patch}) matches latest manta version (${latest_manta_release_version})"
     else
@@ -235,7 +235,7 @@ for node_fqdn in ${websocket_offline_targets[@]}; do
     calamari.systems)
       webhook_path=${webhook_prod}
       ;;
-    dolphin.engineering)
+    rococo.dolphin.engineering)
       webhook_path=${webhook_test}
       ;;
     *)
@@ -279,7 +279,7 @@ for node_fqdn in ${package_update_targets[@]}; do
     calamari.systems)
       webhook_path=${webhook_prod}
       ;;
-    dolphin.engineering)
+    rococo.dolphin.engineering)
       webhook_path=${webhook_test}
       ;;
     *)
