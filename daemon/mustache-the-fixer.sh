@@ -255,7 +255,6 @@ for node_fqdn in ${websocket_offline_targets[@]}; do
   else
     _echo_to_stderr "    peer id refuted (${observed_peer_id})"
     if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/websocket-fix.sh | bash'; then
-      sleep 30
       observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
       observed_peer_id_length=${#observed_peer_id}
       if (( observed_peer_id_length = 52 )) && [[ ${observed_peer_id} == 12* ]]; then

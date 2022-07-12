@@ -37,6 +37,7 @@ if [ -n ${unit} ]; then
   else
     if sudo systemctl start ${unit}.service; then
       echo "set active state for ${unit}.service"
+      sleep 60
     else
       echo "failed to set active state for ${unit}.service"
       exit 1
