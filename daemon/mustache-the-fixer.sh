@@ -254,7 +254,17 @@ for node_fqdn in ${websocket_offline_targets[@]}; do
     _post_to_discord ${webhook_path} websocket ${color_success} ${node_fqdn} "node id (${observed_peer_id}) obtained over websocket connection to ${node_fqdn}"
   else
     _echo_to_stderr "    peer id refuted (${observed_peer_id})"
-    # todo: implement and call websocket fix script
+    if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/websocket-fix.sh | bash'; then
+      sleep 30
+      observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
+      observed_peer_id_length=${#observed_peer_id}
+      if (( observed_peer_id_length = 52 )) && [[ ${observed_peer_id} == 12* ]]; then
+        _echo_to_stderr "    peer id verified (${observed_peer_id})"
+        _post_to_discord ${webhook_path} websocket ${color_success} ${node_fqdn} "node id (${observed_peer_id}) obtained over websocket connection to ${node_fqdn}"
+      else
+        _post_to_discord ${webhook_debug} websocket ${color_danger} ${node_fqdn} "failed to obtain node id over websocket after running websocket-fix on ${node_fqdn}"
+      fi
+    fi
   fi
 done
 
