@@ -2,9 +2,7 @@
 
 # usage: curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/websocket-fix.sh | bash
 
-domain=$(hostname -d)
-
-case ${domain} in
+case $(hostname -d) in
   calamari.systems)
     if dpkg -l manta; then
       unit=calamari
@@ -27,7 +25,7 @@ if [ -n ${unit} ]; then
   if systemctl is-enabled ${unit}.service; then
     echo "detected enabled state for ${unit}.service"
   else
-    if systemctl enable ${unit}.service; then
+    if sudo systemctl enable ${unit}.service; then
       echo "set enabled state for ${unit}.service"
     else
       echo "failed to set enabled state for ${unit}.service"
@@ -37,7 +35,7 @@ if [ -n ${unit} ]; then
   if systemctl is-active ${unit}.service; then
     echo "detected active state for ${unit}.service"
   else
-    if systemctl start ${unit}.service; then
+    if sudo systemctl start ${unit}.service; then
       echo "set active state for ${unit}.service"
     else
       echo "failed to set active state for ${unit}.service"
