@@ -201,8 +201,10 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
 
     if getent hosts rpc.${node_fqdn} &> /dev/null; then
       health_endpoint=https://rpc.${node_fqdn}/health
+      relay_health_endpoint=https://rpc.${node_fqdn}/relay/health
     else
       health_endpoint=https://${node_fqdn}/health
+      relay_health_endpoint=https://${node_fqdn}/relay/health
     fi
     is_syncing=$(curl -sL ${health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end')
     if [ "${is_syncing}" = true ]; then
@@ -215,6 +217,13 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     else
       _echo_to_stderr "    node health rpc endpoint unreachable (${health_endpoint})"
       _post_to_discord ${webhook_path} health ${color_danger} ${node_fqdn} "node health rpc endpoint unreachable (${health_endpoint})"
+      continue
+    fi
+
+    is_relay_syncing=$(curl -sL ${relay_health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end')
+    if [ "${is_relay_syncing}" = true ]; then
+      _echo_to_stderr "    relay sync in progress (${node_fqdn})"
+      _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node observed in syncing state (${relay_health_endpoint})"
       continue
     fi
 
