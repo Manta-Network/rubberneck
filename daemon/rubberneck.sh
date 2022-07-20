@@ -204,7 +204,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     else
       health_endpoint=https://${node_fqdn}/health
     fi
-    is_syncing=$(curl -sL ${health_endpoint} | jq .isSyncing)
+    is_syncing=$(curl -sL ${health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end')
     if [ "${is_syncing}" = true ]; then
       _echo_to_stderr "    sync in progress (${node_fqdn})"
       _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node observed in syncing state (${health_endpoint})"
