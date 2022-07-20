@@ -223,7 +223,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     is_relay_syncing=$(curl -sL ${relay_health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end')
     if [ "${is_relay_syncing}" = true ]; then
       _echo_to_stderr "    relay sync in progress (${node_fqdn})"
-      _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node observed in syncing state (${relay_health_endpoint})"
+      _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node relay observed in syncing state (${relay_health_endpoint})"
       continue
     fi
 
