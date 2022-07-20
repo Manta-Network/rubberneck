@@ -199,17 +199,22 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _post_to_discord ${webhook_path} ssl-certificate ${color_warn} ${node_fqdn} "unexpected ssl cert name detected on ${node_fqdn}\n- cert name: ${observed_cert_name}"
     fi
 
-    is_syncing=$(curl -sL https://${node_fqdn}/health | jq .isSyncing)
+    if getent hosts rpc.${node_fqdn} &> /dev/null; then
+      health_endpoint=https://rpc.${node_fqdn}/health
+    else
+      health_endpoint=https://${node_fqdn}/health
+    fi
+    is_syncing=$(curl -sL ${health_endpoint} | jq .isSyncing)
     if [ "${is_syncing}" = true ]; then
       _echo_to_stderr "    sync in progress (${node_fqdn})"
-      _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node observed in syncing state (https://${node_fqdn}/health)"
+      _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node observed in syncing state (${health_endpoint})"
       continue
     elif [ "${is_syncing}" = false ]; then
-      _echo_to_stderr "    node health rpc endpoint is reachable (https://${node_fqdn}/health)"
-      _post_to_discord ${webhook_debug} health ${color_info} ${node_fqdn} "node observed in not syncing state (https://${node_fqdn}/health)"
+      _echo_to_stderr "    node health rpc endpoint is reachable (${health_endpoint})"
+      _post_to_discord ${webhook_debug} health ${color_info} ${node_fqdn} "node observed in not syncing state (${health_endpoint})"
     else
-      _echo_to_stderr "    node health rpc endpoint unreachable (https://${node_fqdn}/health)"
-      _post_to_discord ${webhook_path} health ${color_danger} ${node_fqdn} "node health rpc endpoint unreachable (https://${node_fqdn}/health)"
+      _echo_to_stderr "    node health rpc endpoint unreachable (${health_endpoint})"
+      _post_to_discord ${webhook_path} health ${color_danger} ${node_fqdn} "node health rpc endpoint unreachable (${health_endpoint})"
       continue
     fi
 
