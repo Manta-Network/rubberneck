@@ -213,7 +213,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     elif [ "${is_syncing}" = false ]; then
       _echo_to_stderr "    node health rpc endpoint is reachable (${health_endpoint})"
-      _post_to_discord ${webhook_debug} health ${color_info} ${node_fqdn} "node observed in not syncing state (${health_endpoint})"
+      #_post_to_discord ${webhook_debug} health ${color_info} ${node_fqdn} "node observed in not syncing state (${health_endpoint})"
     else
       _echo_to_stderr "    node health rpc endpoint unreachable (${health_endpoint})"
       _post_to_discord ${webhook_path} health ${color_danger} ${node_fqdn} "node health rpc endpoint unreachable (${health_endpoint})"
