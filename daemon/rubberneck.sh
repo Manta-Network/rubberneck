@@ -210,6 +210,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     if [ "${is_syncing}" = true ]; then
       _echo_to_stderr "    sync in progress (${node_fqdn})"
       _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node observed in syncing state (${health_endpoint})"
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: true }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     elif [ "${is_syncing}" = false ]; then
       _echo_to_stderr "    node health rpc endpoint is reachable (${health_endpoint})"
@@ -217,6 +218,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     else
       _echo_to_stderr "    node health rpc endpoint unreachable (${health_endpoint})"
       _post_to_discord ${webhook_path} health ${color_danger} ${node_fqdn} "node health rpc endpoint unreachable (${health_endpoint})"
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: '${is_syncing}' }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     fi
 
@@ -224,6 +226,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     if [ "${is_relay_syncing}" = true ]; then
       _echo_to_stderr "    relay sync in progress (${node_fqdn})"
       _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node relay observed in syncing state (${relay_health_endpoint})"
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: true }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     fi
 
@@ -234,7 +237,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     else
       _echo_to_stderr "    peer id refuted (${observed_peer_id})"
       _post_to_discord ${webhook_path} websocket ${color_danger} ${node_fqdn} "failed to obtain node id over websocket connection to ${node_fqdn}"
-      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     fi
     observed_peer_count=$(echo system_health | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result.peers)
@@ -252,7 +255,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
           _echo_to_stderr "    system version (${observed_system_version}) matches latest manta version (${latest_manta_release_version})"
         else
           _echo_to_stderr "    system version (${observed_system_version}) does not match latest manta version (${latest_manta_release_version})"
-          mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+          mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
           _post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version}"
           continue
         fi
@@ -275,11 +278,11 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
         color_severity=${color_info}
       fi
       pending_updates_json=$(jq -nc '$ARGS.positional' --args ${pending_updates[@]})
-      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, updates: { pending: ${pending_updates_json//\"/\'} }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, updates: { pending: ${pending_updates_json//\"/\'} }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       _post_to_discord ${webhook_debug} package ${color_severity} ${node_fqdn} "${node_fqdn} requires ${pending_update_count} package updates\n- $(join_by '\n- ' ${pending_updates[@]})"
       continue
     fi
-    mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+    mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
     _post_to_discord ${webhook_debug} check ${color_info} ${node_fqdn} "all validations passed for ${node_fqdn}\n- node id:\n  ${observed_peer_id}\n- peers: ${observed_peer_count}\n- version: ${observed_system_version}\n- cert validity: ${observed_not_before:0:10} - ${observed_not_after:0:10}"
   done
 done
