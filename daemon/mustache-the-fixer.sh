@@ -228,6 +228,12 @@ websocket_offline_targets=( $(mongosh --quiet --eval '
         },
         "node.id": {
           $exists: false
+        },
+        "syncing.para": {
+          $ne: true
+        },
+        "syncing.relay": {
+          $ne: true
         }
       }
     )
