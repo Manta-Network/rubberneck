@@ -256,24 +256,49 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _post_to_discord ${webhook_path} peers ${color_danger} ${node_fqdn} "no peers detected for ${node_fqdn}"
       continue
     fi
+
     observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-    if [ -n ${observed_system_version} ]; then
-      if [ -n "${latest_manta_release_version}" ] && [ ${node_domain} = "calamari.systems" ]; then
-        if [ ${observed_system_version} = ${latest_manta_release_version} ]; then
-          _echo_to_stderr "    system version (${observed_system_version}) matches latest manta version (${latest_manta_release_version})"
-        else
-          _echo_to_stderr "    system version (${observed_system_version}) does not match latest manta version (${latest_manta_release_version})"
-          mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-          _post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version}"
-          continue
-        fi
+    #if [ ${node_domain} = "calamari.systems" ]; then
+    #  if [ -n ${observed_system_version} ]; then
+    #    if [ -n "${latest_manta_release_version}" ] && ; then
+    #      if [ ${observed_system_version} = ${latest_manta_release_version} ]; then
+    #        _echo_to_stderr "    system version (${observed_system_version}) matches latest manta version (${latest_manta_release_version})"
+    #      else
+    #        _echo_to_stderr "    system version (${observed_system_version}) does not match latest manta version (${latest_manta_release_version})"
+    #        mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count} }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+    #        _post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version}"
+    #        continue
+    #      fi
+    #    else
+    #      _echo_to_stderr "    system version verified (${observed_system_version})"
+    #    fi
+    #  else
+    #    _echo_to_stderr "    system version refuted (${observed_system_version})"
+    #    continue
+    #  fi
+    #fi
+
+    executables_as_base64=( $(curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json | jq --arg fqdn ${node_fqdn} -r '.[] | select (.fqdn == $fqdn) | @base64') )
+    _echo_to_stderr "    observed ${#executables_as_base64[@]} executable version configurations in https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json"
+    for executable_as_base64 in ${executables_as_base64[@]}; do
+      expected_path=$(_decode_property ${executable_as_base64} .path)
+      expected_sha256=$(_decode_property ${executable_as_base64} .sha256)
+      expected_unit=$(_decode_property ${executable_as_base64} .unit)
+      expected_url=$(_decode_property ${executable_as_base64} .url)
+
+      observed_sha256=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} "sha256sum ${path} | cut -d ' ' -f 1")
+      if [ "${observed_sha256}" = "${expected_sha256}" ]; then
+        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) matches expected checksum (${expected_sha256})"
       else
-        _echo_to_stderr "    system version verified (${observed_system_version})"
+        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) does not match expected checksum (${expected_sha256})"
+        # todo: collect all checksums before inserting observation (this only works because there's only one checksum)
+        mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count}, checksum: [ { path: '${expected_path}', sha256: '${observed_sha256}' } ] }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+        _post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "observed invalid checksum for ${expected_path} on ${node_fqdn}\n- expected: [${expected_sha256}](${expected_url})\n- observed: ${observed_sha256}"
+        continue
       fi
-    else
-      _echo_to_stderr "    system version refuted (${observed_system_version})"
-      continue
-    fi
+    done
+
+
 
     pending_updates=( $(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2') )
     pending_update_count=${#pending_updates[@]}
