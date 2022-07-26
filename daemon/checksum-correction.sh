@@ -15,9 +15,9 @@ for executable_as_base64 in ${executables_as_base64[@]}; do
 
   observed_sha256=$(sha256sum ${expected_path} | cut -d ' ' -f 1)
   if [ "${observed_sha256}" = "${expected_sha256}" ]; then
-    echo "${expected_path} checksum (${observed_sha256}) matches expected checksum (${expected_sha256})"
+    echo "$(hostname -f):${expected_path} checksum (${observed_sha256}) matches expected checksum (${expected_sha256})"
   else
-    echo "${expected_path} checksum (${observed_sha256}) does not match expected checksum (${expected_sha256})"
+    echo "$(hostname -f):${expected_path} checksum (${observed_sha256}) does not match expected checksum (${expected_sha256})"
     systemctl is-active --quiet ${expected_unit} && sudo systemctl stop ${expected_unit}
     sudo curl -sLo ${expected_path} ${expected_url}
     sudo chmod +x ${expected_path}
