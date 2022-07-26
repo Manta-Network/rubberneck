@@ -1,5 +1,47 @@
 [
   {
+    "fqdn": "avocado.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "bokkeum.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "chilli.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "falafel.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "fritti.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "jalapeno.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
     "fqdn": "kebab.calamari.systems",
     "path": "/usr/bin/manta",
     "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
@@ -12,5 +54,40 @@
     "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
     "unit": "calamari.service",
     "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
-  }
+  },
+  {
+    "fqdn": "salad.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "serrano.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "smoothie.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "tempura.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "terumbu.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  }      
 ]
