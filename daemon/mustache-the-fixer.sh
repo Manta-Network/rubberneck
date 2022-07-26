@@ -133,89 +133,108 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
   #mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
 done
 
-# client updates
-latest_manta_release_path=${HOME}/.local/bin/manta
-latest_manta_release_index_url=https://api.github.com/repos/Manta-Network/Manta/releases/latest
-latest_manta_release_download_url=$(curl \
-  -sL \
-  -H 'Cache-Control: no-cache, no-store' \
-  -H 'Accept: application/vnd.github+json' \
-  ${latest_manta_release_index_url} \
-  | jq -r '.assets[] | select(.name == "manta") | .browser_download_url')
-
-if curl \
-  -sLH 'Cache-Control: no-cache, no-store' \
-  -o ${latest_manta_release_path} \
-  ${latest_manta_release_download_url} \
-  && [ -s ${latest_manta_release_path} ] \
-  && chmod +x ${latest_manta_release_path}; then
-  _echo_to_stderr "    fetched ${latest_manta_release_path} from ${latest_manta_release_download_url}"
-else
-  rm -f ${latest_manta_release_path}
-  _echo_to_stderr "    failed to fetch ${latest_manta_release_path} from ${latest_manta_release_download_url}"
-  exit 1
-fi
-latest_manta_release_version=$(${latest_manta_release_path} --version | head -n 1 | cut -d ' ' -f2)
-if [ -n "${latest_manta_release_version}" ]; then
-  client_update_targets=( $(mongosh --quiet --eval '
-    JSON.stringify(
-      db.observation.distinct(
-        "fqdn",
-        {
-          observed: {
-            $gt: new Date (ISODate().getTime() - 1000 * 60 * 20)
-          },
-          "node.chain": {
-            $in: [
-              "kusama/calamari"
-            ]
-          },
-          "node.version": {
-            $ne: "'${latest_manta_release_version}'"
-          }
+# checksum corrections
+checksum_correction_targets=( $(mongosh --quiet --eval '
+  JSON.stringify(
+    db.observation.distinct(
+      "fqdn",
+      {
+        observed: {
+          $gt: new Date (ISODate().getTime() - 1000 * 60 * 20)
+        },
+        "node.checksum": {
+          $exists: true
         }
-      )
+      }
     )
-  ' ${mongo_connection} | jq -r '.[]') )
-  for node_fqdn in ${client_update_targets[@]}; do
-    node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
-    case ${node_fqdn#*.} in
-      calamari.systems)
-        webhook_path=${webhook_prod}
-        ;;
-      rococo.dolphin.engineering)
-        webhook_path=${webhook_test}
-        ;;
-      *)
-        webhook_path=${webhook_dev}
-        ;;
-    esac
-    echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
-    observed_system_version_pre_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-    if [ -n ${observed_system_version_pre_patch} ] && [ ! -z "${observed_system_version_pre_patch// }" ]; then
-      if [ ${observed_system_version_pre_patch} = ${latest_manta_release_version} ]; then
-        _echo_to_stderr "    system version (${observed_system_version_pre_patch}) matches latest manta version (${latest_manta_release_version})"
-      else
-        _echo_to_stderr "    system version (${observed_system_version_pre_patch}) does not match latest manta version (${latest_manta_release_version})"
+  )
+' ${mongo_connection} | jq -r '.[]') )
 
-        if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/client-update.sh | bash'; then
-          observed_system_version_post_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-          if [ ${observed_system_version_post_patch} = ${latest_manta_release_version} ]; then
-            _post_to_discord ${webhook_path} semver ${color_success} ${node_fqdn} "manta client updated on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
-          else
-            _post_to_discord ${webhook_path} semver ${color_danger} ${node_fqdn} "manta client update failed on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
-          fi
-        fi
-        #_post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version_pre_patch}"
-        continue
-      fi
-    else
-      _echo_to_stderr "    failed to determine system version"
-    fi
-  done
-else
-  _echo_to_stderr "failed to determine latest manta release version. skipping client update targets..."
-fi
+
+
+## client updates
+#latest_manta_release_path=${HOME}/.local/bin/manta
+#latest_manta_release_index_url=https://api.github.com/repos/Manta-Network/Manta/releases/latest
+#latest_manta_release_download_url=$(curl \
+#  -sL \
+#  -H 'Cache-Control: no-cache, no-store' \
+#  -H 'Accept: application/vnd.github+json' \
+#  ${latest_manta_release_index_url} \
+#  | jq -r '.assets[] | select(.name == "manta") | .browser_download_url')
+#
+#if curl \
+#  -sLH 'Cache-Control: no-cache, no-store' \
+#  -o ${latest_manta_release_path} \
+#  ${latest_manta_release_download_url} \
+#  && [ -s ${latest_manta_release_path} ] \
+#  && chmod +x ${latest_manta_release_path}; then
+#  _echo_to_stderr "    fetched ${latest_manta_release_path} from ${latest_manta_release_download_url}"
+#else
+#  rm -f ${latest_manta_release_path}
+#  _echo_to_stderr "    failed to fetch ${latest_manta_release_path} from ${latest_manta_release_download_url}"
+#  exit 1
+#fi
+#latest_manta_release_version=$(${latest_manta_release_path} --version | head -n 1 | cut -d ' ' -f2)
+#if [ -n "${latest_manta_release_version}" ]; then
+#  client_update_targets=( $(mongosh --quiet --eval '
+#    JSON.stringify(
+#      db.observation.distinct(
+#        "fqdn",
+#        {
+#          observed: {
+#            $gt: new Date (ISODate().getTime() - 1000 * 60 * 20)
+#          },
+#          "node.chain": {
+#            $in: [
+#              "kusama/calamari"
+#            ]
+#          },
+#          "node.version": {
+#            $ne: "'${latest_manta_release_version}'"
+#          }
+#        }
+#      )
+#    )
+#  ' ${mongo_connection} | jq -r '.[]') )
+#  for node_fqdn in ${client_update_targets[@]}; do
+#    node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
+#    case ${node_fqdn#*.} in
+#      calamari.systems)
+#        webhook_path=${webhook_prod}
+#        ;;
+#      rococo.dolphin.engineering)
+#        webhook_path=${webhook_test}
+#        ;;
+#      *)
+#        webhook_path=${webhook_dev}
+#        ;;
+#    esac
+#    echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
+#    observed_system_version_pre_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
+#    if [ -n ${observed_system_version_pre_patch} ] && [ ! -z "${observed_system_version_pre_patch// }" ]; then
+#      if [ ${observed_system_version_pre_patch} = ${latest_manta_release_version} ]; then
+#        _echo_to_stderr "    system version (${observed_system_version_pre_patch}) matches latest manta version (${latest_manta_release_version})"
+#      else
+#        _echo_to_stderr "    system version (${observed_system_version_pre_patch}) does not match latest manta version (${latest_manta_release_version})"
+#
+#        if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/client-update.sh | bash'; then
+#          observed_system_version_post_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
+#          if [ ${observed_system_version_post_patch} = ${latest_manta_release_version} ]; then
+#            _post_to_discord ${webhook_path} semver ${color_success} ${node_fqdn} "manta client updated on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
+#          else
+#            _post_to_discord ${webhook_path} semver ${color_danger} ${node_fqdn} "manta client update failed on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
+#          fi
+#        fi
+#        #_post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version_pre_patch}"
+#        continue
+#      fi
+#    else
+#      _echo_to_stderr "    failed to determine system version"
+#    fi
+#  done
+#else
+#  _echo_to_stderr "failed to determine latest manta release version. skipping client update targets..."
+#fi
 
 # websockets
 websocket_offline_targets=( $(mongosh --quiet --eval '

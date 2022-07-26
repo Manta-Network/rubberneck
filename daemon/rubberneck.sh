@@ -259,7 +259,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       expected_unit=$(_decode_property ${executable_as_base64} .unit)
       expected_url=$(_decode_property ${executable_as_base64} .url)
 
-      observed_sha256=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} "sha256sum ${path} | cut -d ' ' -f 1")
+      observed_sha256=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} "sha256sum ${expected_path} | cut -d ' ' -f 1")
       if [ "${observed_sha256}" = "${expected_sha256}" ]; then
         _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) matches expected checksum (${expected_sha256})"
       else
