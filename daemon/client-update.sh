@@ -21,7 +21,7 @@ if dpkg -l manta; then
 
   sudo apt autoremove -y
   sudo apt update
-  sudo apt install --only-upgrade manta
+  sudo apt install -y --only-upgrade manta
 
   sudo curl -sLo /usr/share/substrate/rococo.json https://raw.githubusercontent.com/paritytech/polkadot/master/node/service/chain-specs/rococo.json
   sudo curl -sLo /usr/share/substrate/kusama.json https://raw.githubusercontent.com/paritytech/polkadot/master/node/service/chain-specs/kusama.json
