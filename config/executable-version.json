@@ -1,0 +1,58 @@
+[
+  {
+    "fqdn": "c1.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "c2.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "c3.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "c4.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "f1.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "f2.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "f3.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  },
+  {
+    "fqdn": "f4.calamari.systems",
+    "path": "/usr/bin/manta",
+    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "unit": "calamari.service",
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+  }
+]
