@@ -19,6 +19,7 @@ if dpkg -l manta; then
     manta_service_pre_update_state=inactive
   fi
 
+  export DEBIAN_FRONTEND=noninteractive
   sudo apt autoremove -y
   sudo apt update
   sudo apt install -y --only-upgrade manta
