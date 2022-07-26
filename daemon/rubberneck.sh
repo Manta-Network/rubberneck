@@ -230,7 +230,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
 
-    is_relay_syncing=$(curl -sL ${relay_health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end')
+    is_relay_syncing=$(curl -sL ${relay_health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end' 2> /dev/null)
     if [ "${is_relay_syncing}" = true ]; then
       _echo_to_stderr "    relay sync in progress (${node_fqdn})"
       _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node relay observed in syncing state (${relay_health_endpoint})"
@@ -248,7 +248,29 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     fi
+
+
     observed_peer_count=$(echo system_health | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result.peers)
+    executables_as_base64=( $(curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json | jq --arg fqdn ${node_fqdn} -r '.[] | select (.fqdn == $fqdn) | @base64') )
+    _echo_to_stderr "    observed ${#executables_as_base64[@]} executable version configurations in https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json"
+    for executable_as_base64 in ${executables_as_base64[@]}; do
+      expected_path=$(_decode_property ${executable_as_base64} .path)
+      expected_sha256=$(_decode_property ${executable_as_base64} .sha256)
+      expected_unit=$(_decode_property ${executable_as_base64} .unit)
+      expected_url=$(_decode_property ${executable_as_base64} .url)
+
+      observed_sha256=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} "sha256sum ${path} | cut -d ' ' -f 1")
+      if [ "${observed_sha256}" = "${expected_sha256}" ]; then
+        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) matches expected checksum (${expected_sha256})"
+      else
+        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) does not match expected checksum (${expected_sha256})"
+        # todo: collect all checksums before inserting observation (this only works because there's only one checksum)
+        mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', chain: '${blockchain_id}', peers: ${observed_peer_count}, checksum: [ { path: '${expected_path}', sha256: '${observed_sha256}' } ] }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+        _post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "observed invalid checksum for ${expected_path} on ${node_fqdn}\n- expected: [${expected_sha256}](${expected_url})\n- observed: ${observed_sha256}"
+        continue
+      fi
+    done
+
     if (( observed_peer_count > 0 )); then
       _echo_to_stderr "    peer count verified (${observed_peer_count})"
     else
@@ -277,28 +299,6 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     #    continue
     #  fi
     #fi
-
-    executables_as_base64=( $(curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json | jq --arg fqdn ${node_fqdn} -r '.[] | select (.fqdn == $fqdn) | @base64') )
-    _echo_to_stderr "    observed ${#executables_as_base64[@]} executable version configurations in https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json"
-    for executable_as_base64 in ${executables_as_base64[@]}; do
-      expected_path=$(_decode_property ${executable_as_base64} .path)
-      expected_sha256=$(_decode_property ${executable_as_base64} .sha256)
-      expected_unit=$(_decode_property ${executable_as_base64} .unit)
-      expected_url=$(_decode_property ${executable_as_base64} .url)
-
-      observed_sha256=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} "sha256sum ${path} | cut -d ' ' -f 1")
-      if [ "${observed_sha256}" = "${expected_sha256}" ]; then
-        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) matches expected checksum (${expected_sha256})"
-      else
-        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) does not match expected checksum (${expected_sha256})"
-        # todo: collect all checksums before inserting observation (this only works because there's only one checksum)
-        mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { id: '${observed_peer_id}', version: '${observed_system_version}', chain: '${blockchain_id}', peers: ${observed_peer_count}, checksum: [ { path: '${expected_path}', sha256: '${observed_sha256}' } ] }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-        _post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "observed invalid checksum for ${expected_path} on ${node_fqdn}\n- expected: [${expected_sha256}](${expected_url})\n- observed: ${observed_sha256}"
-        continue
-      fi
-    done
-
-
 
     pending_updates=( $(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2') )
     pending_update_count=${#pending_updates[@]}
