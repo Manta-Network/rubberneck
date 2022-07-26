@@ -19,6 +19,8 @@ if dpkg -l manta; then
     manta_service_pre_update_state=inactive
   fi
 
+  sudo apt autoremove -y
+  sudo apt update
   sudo apt install --only-upgrade manta
 
   sudo curl -sLo /usr/share/substrate/rococo.json https://raw.githubusercontent.com/paritytech/polkadot/master/node/service/chain-specs/rococo.json
