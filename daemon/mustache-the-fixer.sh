@@ -83,7 +83,7 @@ cert_renewal_targets=( $(mongosh --quiet --eval '
     )
   )
 ' ${mongo_connection} | jq -r '.[]') )
-
+echo "- observed ${#cert_renewal_targets[@]} cert renewal targets"
 for node_fqdn in ${cert_renewal_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
   case ${node_fqdn#*.} in
@@ -97,7 +97,7 @@ for node_fqdn in ${cert_renewal_targets[@]}; do
       webhook_path=${webhook_dev}
       ;;
   esac
-  echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
+  echo "  - fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
   cert_path=/tmp/$(uuidgen)-cert-${node_fqdn}.json
   if ${HOME}/.local/bin/certinfo -domain ${node_fqdn} > ${cert_path} && [ -s ${cert_path} ]; then
     _echo_to_stderr "  obtained ${cert_path} with certinfo"
@@ -149,92 +149,30 @@ checksum_correction_targets=( $(mongosh --quiet --eval '
     )
   )
 ' ${mongo_connection} | jq -r '.[]') )
+echo "- observed ${#checksum_correction_targets[@]} checksum correction targets"
+for node_fqdn in ${checksum_correction_targets[@]}; do
+  node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
+  echo "  - fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
+  if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/checksum-correction.sh | bash'; then
+    executables_as_base64=( $(curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json | jq --arg fqdn ${node_fqdn} -r '.[] | select (.fqdn == $fqdn) | @base64') )
+    _echo_to_stderr "    observed ${#executables_as_base64[@]} executable version configurations in https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json"
+    for executable_as_base64 in ${executables_as_base64[@]}; do
+      expected_path=$(_decode_property ${executable_as_base64} .path)
+      expected_sha256=$(_decode_property ${executable_as_base64} .sha256)
+      expected_unit=$(_decode_property ${executable_as_base64} .unit)
+      expected_url=$(_decode_property ${executable_as_base64} .url)
 
-
-
-## client updates
-#latest_manta_release_path=${HOME}/.local/bin/manta
-#latest_manta_release_index_url=https://api.github.com/repos/Manta-Network/Manta/releases/latest
-#latest_manta_release_download_url=$(curl \
-#  -sL \
-#  -H 'Cache-Control: no-cache, no-store' \
-#  -H 'Accept: application/vnd.github+json' \
-#  ${latest_manta_release_index_url} \
-#  | jq -r '.assets[] | select(.name == "manta") | .browser_download_url')
-#
-#if curl \
-#  -sLH 'Cache-Control: no-cache, no-store' \
-#  -o ${latest_manta_release_path} \
-#  ${latest_manta_release_download_url} \
-#  && [ -s ${latest_manta_release_path} ] \
-#  && chmod +x ${latest_manta_release_path}; then
-#  _echo_to_stderr "    fetched ${latest_manta_release_path} from ${latest_manta_release_download_url}"
-#else
-#  rm -f ${latest_manta_release_path}
-#  _echo_to_stderr "    failed to fetch ${latest_manta_release_path} from ${latest_manta_release_download_url}"
-#  exit 1
-#fi
-#latest_manta_release_version=$(${latest_manta_release_path} --version | head -n 1 | cut -d ' ' -f2)
-#if [ -n "${latest_manta_release_version}" ]; then
-#  client_update_targets=( $(mongosh --quiet --eval '
-#    JSON.stringify(
-#      db.observation.distinct(
-#        "fqdn",
-#        {
-#          observed: {
-#            $gt: new Date (ISODate().getTime() - 1000 * 60 * 20)
-#          },
-#          "node.chain": {
-#            $in: [
-#              "kusama/calamari"
-#            ]
-#          },
-#          "node.version": {
-#            $ne: "'${latest_manta_release_version}'"
-#          }
-#        }
-#      )
-#    )
-#  ' ${mongo_connection} | jq -r '.[]') )
-#  for node_fqdn in ${client_update_targets[@]}; do
-#    node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
-#    case ${node_fqdn#*.} in
-#      calamari.systems)
-#        webhook_path=${webhook_prod}
-#        ;;
-#      rococo.dolphin.engineering)
-#        webhook_path=${webhook_test}
-#        ;;
-#      *)
-#        webhook_path=${webhook_dev}
-#        ;;
-#    esac
-#    echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
-#    observed_system_version_pre_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-#    if [ -n ${observed_system_version_pre_patch} ] && [ ! -z "${observed_system_version_pre_patch// }" ]; then
-#      if [ ${observed_system_version_pre_patch} = ${latest_manta_release_version} ]; then
-#        _echo_to_stderr "    system version (${observed_system_version_pre_patch}) matches latest manta version (${latest_manta_release_version})"
-#      else
-#        _echo_to_stderr "    system version (${observed_system_version_pre_patch}) does not match latest manta version (${latest_manta_release_version})"
-#
-#        if ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/client-update.sh | bash'; then
-#          observed_system_version_post_patch=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
-#          if [ ${observed_system_version_post_patch} = ${latest_manta_release_version} ]; then
-#            _post_to_discord ${webhook_path} semver ${color_success} ${node_fqdn} "manta client updated on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
-#          else
-#            _post_to_discord ${webhook_path} semver ${color_danger} ${node_fqdn} "manta client update failed on ${node_fqdn}\n- was: ${observed_system_version_pre_patch}\n- now: ${observed_system_version_post_patch}\n- latest: ${latest_manta_release_version}"
-#          fi
-#        fi
-#        #_post_to_discord ${webhook_path} semver ${color_warn} ${node_fqdn} "outdated manta version detected on ${node_fqdn}\n- latest release: [${latest_manta_release_version}](https://github.com/Manta-Network/Manta/releases/latest)\n- observed version: ${observed_system_version_pre_patch}"
-#        continue
-#      fi
-#    else
-#      _echo_to_stderr "    failed to determine system version"
-#    fi
-#  done
-#else
-#  _echo_to_stderr "failed to determine latest manta release version. skipping client update targets..."
-#fi
+      observed_sha256=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} "sha256sum ${path} | cut -d ' ' -f 1")
+      if [ "${observed_sha256}" = "${expected_sha256}" ]; then
+        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) matches expected checksum (${expected_sha256})"
+        _post_to_discord ${webhook_path} semver ${color_success} ${node_fqdn} "observed valid checksum for ${expected_path} on ${node_fqdn}\n- expected: [${expected_sha256}](${expected_url})\n- observed: ${observed_sha256}"
+      else
+        _echo_to_stderr "    ${expected_path} checksum (${observed_sha256}) does not match expected checksum (${expected_sha256})"
+        _post_to_discord ${webhook_debug} semver ${color_warn} ${node_fqdn} "observed invalid checksum for ${expected_path} on ${node_fqdn}\n- expected: [${expected_sha256}](${expected_url})\n- observed: ${observed_sha256}"
+      fi
+    done
+  fi
+done
 
 # websockets
 websocket_offline_targets=( $(mongosh --quiet --eval '
@@ -258,6 +196,7 @@ websocket_offline_targets=( $(mongosh --quiet --eval '
     )
   )
 ' ${mongo_connection} | jq -r '.[]') )
+echo "- observed ${#websocket_offline_targets[@]} websocket offline targets"
 for node_fqdn in ${websocket_offline_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
   case ${node_fqdn#*.} in
@@ -271,7 +210,7 @@ for node_fqdn in ${websocket_offline_targets[@]}; do
       webhook_path=${webhook_dev}
       ;;
   esac
-  echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
+  echo "  - fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
   observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
   observed_peer_id_length=${#observed_peer_id}
   if (( observed_peer_id_length = 52 )) && [[ ${observed_peer_id} == 12* ]]; then
@@ -311,6 +250,7 @@ package_update_targets=( $(mongosh --quiet --eval '
     )
   )
 ' ${mongo_connection} | jq -r '.[]') )
+echo "- observed ${#package_update_targets[@]} package update targets"
 for node_fqdn in ${package_update_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
   case ${node_fqdn#*.} in
@@ -324,7 +264,7 @@ for node_fqdn in ${package_update_targets[@]}; do
       webhook_path=${webhook_dev}
       ;;
   esac
-  echo "- fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
+  echo "  - fqdn: ${node_fqdn}, domain: ${node_fqdn#*.}, tld: ${node_tld}"
   pending_update_count_pre_patch=$(ssh -i ${ssh_key} -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new mobula@${node_fqdn} 'sudo unattended-upgrade --dry-run -d 2> /dev/null | grep Checking | cut -d " " -f2 | wc -l')
   if (( pending_update_count_pre_patch > 0 )); then
     _echo_to_stderr "    ${pending_update_count_pre_patch} pending updates detected"
