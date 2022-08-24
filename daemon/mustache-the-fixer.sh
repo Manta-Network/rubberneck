@@ -174,8 +174,8 @@ for node_fqdn in ${checksum_correction_targets[@]}; do
   fi
 done
 
-# websockets
-websocket_offline_targets=( $(mongosh --quiet --eval '
+# offline
+offline_targets=( $(mongosh --quiet --eval '
   JSON.stringify(
     db.observation.distinct(
       "fqdn",
@@ -196,6 +196,23 @@ websocket_offline_targets=( $(mongosh --quiet --eval '
     )
   )
 ' ${mongo_connection} | jq -r '.[]') )
+declare –a health_offline_targets=()
+declare –a websocket_offline_targets=()
+for node_fqdn in ${offline_targets[@]}; do
+  if getent hosts rpc.${node_fqdn} &> /dev/null; then
+    health_endpoint=https://rpc.${node_fqdn}/health
+  else
+    health_endpoint=https://${node_fqdn}/health
+  fi
+  health_response_code=$(curl --write-out '%{http_code}' --silent --output /dev/null ${health_endpoint})
+  if [ "${health_response_code}" = "200" ]; then
+    websocket_offline_targets+=( ${node_fqdn} )
+  else
+    health_offline_targets+=( ${node_fqdn} )
+  fi
+done
+echo "- observed ${#health_offline_targets[@]} health offline targets"
+
 echo "- observed ${#websocket_offline_targets[@]} websocket offline targets"
 for node_fqdn in ${websocket_offline_targets[@]}; do
   node_tld=$(echo ${node_fqdn} | rev | cut -d "." -f1-2 | rev)
