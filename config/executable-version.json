@@ -93,37 +93,37 @@
   {
     "fqdn": "crispy.calamari.systems",
     "path": "/usr/local/bin/manta",
-    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
     "unit": "calamari-pc.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
   },
   {
     "fqdn": "crunchy.calamari.systems",
     "path": "/usr/local/bin/manta",
-    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
     "unit": "calamari-pc.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
   },
   {
     "fqdn": "hotdog.calamari.systems",
     "path": "/usr/local/bin/manta",
     "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
     "unit": "calamari-pc.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
   },
   {
     "fqdn": "tasty.calamari.systems",
     "path": "/usr/local/bin/manta",
-    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
     "unit": "calamari-pc.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
   },
   {
     "fqdn": "tender.calamari.systems",
     "path": "/usr/local/bin/manta",
-    "sha256": "8ef20310311f2d777f95104739a12ad6ee465da63a9b94ea6ab1251c9c3dc38f",
+    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
     "unit": "calamari-pc.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.2.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
   },
   {
     "fqdn": "eddie.rococo.dolphin.engineering",
