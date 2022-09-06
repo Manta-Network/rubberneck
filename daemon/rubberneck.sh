@@ -244,7 +244,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    peer id verified (${observed_peer_id})"
     else
       _echo_to_stderr "    peer id refuted (${observed_peer_id})"
-      _post_to_discord ${webhook_path} websocket ${color_danger} ${node_fqdn} "failed to obtain node id over websocket connection to ${node_fqdn}"
+      _post_to_discord ${webhook_debug} websocket ${color_danger} ${node_fqdn} "failed to obtain node id over websocket connection to ${node_fqdn}"
       mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: false }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       continue
     fi
