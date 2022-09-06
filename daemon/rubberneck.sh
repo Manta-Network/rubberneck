@@ -275,7 +275,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       _echo_to_stderr "    peer count verified (${observed_peer_count})"
     else
       _echo_to_stderr "    peer count refuted (${observed_peer_count})"
-      _post_to_discord ${webhook_path} peers ${color_danger} ${node_fqdn} "no peers detected for ${node_fqdn}"
+      _post_to_discord ${webhook_debug} peers ${color_danger} ${node_fqdn} "no peers detected for ${node_fqdn}"
       continue
     fi
 
