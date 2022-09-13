@@ -220,6 +220,7 @@ const blockchains = [
     name: 'dolphin',
     domains: [
       'rococo.dolphin.engineering',
+      'dolphin.engineering',
     ],
     jobs: {
       invulnerable: [
@@ -453,6 +454,154 @@ const fetchShockDedicatedInstances = () => {
         },
         month: {
           amount: 60,
+          currency: 'USD',
+        }
+      },
+    },
+    {
+      provider: 'shock-dedicated',
+      profile: 'default',
+      project: 'default',
+      region: 'london',
+      image: 'ubuntu-20-04',
+      fqdn: 'a1.calamari.systems',
+      hostname: 'a1',
+      domain: 'calamari.systems',
+      id: '29223',
+      ip: '45.155.39.202',
+      machine: 'UK-DH2',
+      launch: '2022-09-08T11:21:00Z',
+      location: {
+        az: 'uk-d11',
+        country: {
+          code: 'GB',
+          name: 'United Kingdom',
+          flag: flag('GB'),
+        },
+        city: {
+          name: 'London',
+        },
+        latitude: '51.5164',
+        longitude: '0.093',
+      },
+      price: {
+        hour: {
+          amount: 170.98 * 4 / 365 / 24,
+          currency: 'USD',
+        },
+        month: {
+          amount: 170.98 * 4 / 12,
+          currency: 'USD',
+        }
+      },
+    },
+    {
+      provider: 'shock-dedicated',
+      profile: 'default',
+      project: 'default',
+      region: 'florida',
+      image: 'ubuntu-20-04',
+      fqdn: 'a2.calamari.systems',
+      hostname: 'a2',
+      domain: 'calamari.systems',
+      id: '29225',
+      ip: '104.225.131.146',
+      machine: 'FL-DH2',
+      launch: '2022-09-08T11:21:00Z',
+      location: {
+        az: 'fl-d9',
+        country: {
+          code: 'US',
+          name: 'United States',
+          flag: flag('US'),
+        },
+        city: {
+          name: 'Jacksonville',
+        },
+        latitude: '30.3341',
+        longitude: '-81.6544',
+      },
+      price: {
+        hour: {
+          amount: 170.98 * 4 / 365 / 24,
+          currency: 'USD',
+        },
+        month: {
+          amount: 170.98 * 4 / 12,
+          currency: 'USD',
+        }
+      },
+    },
+    {
+      provider: 'shock-dedicated',
+      profile: 'default',
+      project: 'default',
+      region: 'london',
+      image: 'ubuntu-20-04',
+      fqdn: 'c1.dolphin.engineering',
+      hostname: 'c1',
+      domain: 'dolphin.engineering',
+      id: '29224',
+      ip: '45.155.39.210',
+      machine: 'UK-DS1',
+      launch: '2022-09-08T11:21:00Z',
+      location: {
+        az: 'uk-d18',
+        country: {
+          code: 'GB',
+          name: 'United Kingdom',
+          flag: flag('GB'),
+        },
+        city: {
+          name: 'London',
+        },
+        latitude: '51.5164',
+        longitude: '0.093',
+      },
+      price: {
+        hour: {
+          amount: 142.48 * 4 / 365 / 24,
+          currency: 'USD',
+        },
+        month: {
+          amount: 142.48 * 4 / 12,
+          currency: 'USD',
+        }
+      },
+    },
+    {
+      provider: 'shock-dedicated',
+      profile: 'default',
+      project: 'default',
+      region: 'new york',
+      image: 'ubuntu-20-04',
+      fqdn: 'c2.dolphin.engineering',
+      hostname: 'c2',
+      domain: 'dolphin.engineering',
+      id: '29226',
+      ip: '52.129.44.90',
+      machine: 'NJ-DH2',
+      launch: '2022-09-08T11:21:00Z',
+      location: {
+        az: 'nj-d43',
+        country: {
+          code: 'US',
+          name: 'United States',
+          flag: flag('US'),
+        },
+        city: {
+          name: 'New York',
+        },
+        latitude: '40.7597',
+        longitude: '-73.981',
+      },
+      price: {
+        hour: {
+          amount: 170.98 * 4 / 365 / 24,
+          currency: 'USD',
+        },
+        month: {
+          amount: 170.98 * 4 / 12,
           currency: 'USD',
         }
       },
