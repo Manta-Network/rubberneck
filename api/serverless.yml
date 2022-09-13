@@ -1,6 +1,7 @@
 service: rubberneck
 
 frameworkVersion: '2'
+variablesResolutionMode: 20210326
 
 provider:
   name: aws
@@ -9,6 +10,21 @@ provider:
   profile: pelagos-service
   region: eu-central-1
   lambdaHashingVersion: 20201221
+  iam:
+    role:
+      name: rubberneck-node-status
+      # https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-access.html
+      statements:
+        -
+          Effect: Allow
+          Action:
+            - 'ssm:DescribeParameters'
+          Resource: '*'
+        -
+          Effect: Allow
+          Action:
+            - 'ssm:GetParameter'
+          Resource: 'arn:aws:ssm:eu-central-1::parameter/rubberneck_*'
 
 plugins:
   - serverless-offline
@@ -30,6 +46,11 @@ functions:
   nodes:
     timeout: 29
     handler: handler.nodes
+    environment:
+      rubberneck_hetzner_calamari: ${ssm:/rubberneck_hetzner_calamari}
+      rubberneck_hetzner_dolphin: ${ssm:/rubberneck_hetzner_dolphin}
+      rubberneck_hetzner_robot_default_username: ${ssm:/rubberneck_hetzner_robot_default_username}
+      rubberneck_hetzner_robot_default_password: ${ssm:/rubberneck_hetzner_robot_default_password}
     events:
       -
         http:
@@ -64,3 +85,36 @@ functions:
             parameters:
                paths:
                  fqdn: true
+
+  observations:
+    timeout: 29
+    handler: handler.observations
+    vpc:
+      securityGroupIds:
+        - sg-0b88eb681e170ddac
+      subnetIds:
+        - subnet-0b285be6d5b687629
+        - subnet-0e880bfb309f2f7c8
+        - subnet-0d992d72b76b84264
+    environment:
+      rubberneck_db_readwrite: ${ssm:/rubberneck_db_readwrite}
+    events:
+      -
+        http:
+          path: node/{fqdn}/observations
+          method: get
+          cors: true
+          request:
+            parameters:
+               paths:
+                 fqdn: true
+
+#  health:
+#    timeout: 29
+#    handler: handler.health
+#    events:
+#      -
+#        http:
+#          path: health
+#          method: get
+#          cors: true

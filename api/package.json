@@ -2,10 +2,13 @@
   "dependencies": {
     "aws-sdk": "^2.1158.0",
     "get-ssl-certificate": "^2.3.3",
+    "jsonrpc-websocket-client": "^0.7.2",
+    "mongodb": "^4.7.0",
     "node-fetch": "2"
   },
   "devDependencies": {
     "serverless": "2",
-    "serverless-offline": "8"
+    "serverless-offline": "8",
+    "serverless-offline-ssm": "^6.2.0"
   }
 }
