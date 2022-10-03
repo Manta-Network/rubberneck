@@ -2,93 +2,93 @@
   {
     "fqdn": "avocado.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "bokkeum.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "chilli.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "falafel.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "fritti.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "jalapeno.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "kebab.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "pasta.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "salad.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "serrano.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "smoothie.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "tempura.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "terumbu.calamari.systems",
     "path": "/usr/bin/manta",
-    "sha256": "03dc21f97e2dc4e08056a85243c827f383e9512deb6fc04cb444d3519a13ae2a",
+    "sha256": "09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac",
     "unit": "calamari.service",
-    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.3.0/manta"
+    "url": "https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta"
   },
   {
     "fqdn": "crispy.calamari.systems",
