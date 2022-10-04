@@ -5,6 +5,7 @@ After=network-online.target
 
 [Service]
 Type=simple
+Environment=HOME=/root
 ExecStartPre=curl -sLo /usr/local/bin/sync-shared-certs.sh https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/sync-shared-certs.sh
 ExecStartPre=chmod +x /usr/local/bin/sync-shared-certs.sh
 ExecStart=/usr/local/bin/sync-shared-certs.sh

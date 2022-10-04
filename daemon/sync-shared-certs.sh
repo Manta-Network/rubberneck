@@ -3,7 +3,6 @@
 # usage: curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/sync-shared-certs.sh | bash
 
 tmp=$(mktemp -d)
-#subl ${tmp}
 
 _decode_property() {
   echo ${1} | base64 --decode | jq -r ${2}
@@ -50,35 +49,36 @@ for domain in ${domain_list[@]}; do
     https://api.github.com/repos/${rubberneck_github_org}/${rubberneck_github_repo}/contents/config/${domain}
   host_list=$(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config-${domain}.json)
   for hostname in ${host_list[@]}; do
+    fqdn=${hostname}.${domain}
     if curl -sL \
-      -o ${tmp}/${hostname}.${domain}-config.yml \
+      -o ${tmp}/${fqdn}-config.yml \
       https://raw.githubusercontent.com/${rubberneck_github_org}/${rubberneck_github_repo}/${rubberneck_github_latest_sha}/config/${domain}/${hostname}/config.yml; then
-      echo "[${hostname}.${domain}] config fetch suceeded"
-      action=$(yq -r .action ${tmp}/${hostname}.${domain}-config.yml)
-      alias_list_as_base64=$(yq -r '.dns.alias[] | @base64' ${tmp}/${hostname}.${domain}-config.yml)
+      echo "[${fqdn}] config fetch suceeded"
+      action=$(yq -r .action ${tmp}/${fqdn}-config.yml)
+      alias_list_as_base64=$(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml)
       for alias_as_base64 in ${alias_list_as_base64[@]}; do
         alias_name=$(_decode_property ${alias_as_base64} .name)
         for cert_target in archive live; do
           if [ "${action}" = "sync" ]; then
             if [ "$(hostname -s)" = "kavula" ] && [ -d /etc/letsencrypt/${cert_target}/${alias_name} ]; then
               if rsync -e "ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=accept-new -i ${ops_private_key}" -og --chown=root:root --rsync-path='sudo rsync' -a /etc/letsencrypt/${cert_target}/${alias_name}/ ${ops_username}@${fqdn}:/etc/letsencrypt/${cert_target}/${alias_name}; then
-                echo "[${hostname}.${domain}:/etc/letsencrypt/${cert_target}/${alias_name}] sync suceeded"
+                echo "[${fqdn}:/etc/letsencrypt/${cert_target}/${alias_name}] sync suceeded"
               else
-                echo "[${hostname}.${domain}:/etc/letsencrypt/${cert_target}/${alias_name}] sync failed"
+                echo "[${fqdn}:/etc/letsencrypt/${cert_target}/${alias_name}] sync failed"
               fi
             else
-              echo "[${hostname}.${domain}:/etc/letsencrypt/${cert_target}/${alias_name}] sync not attempted due to missing cert"
+              echo "[${fqdn}:/etc/letsencrypt/${cert_target}/${alias_name}] sync not attempted due to missing cert"
               if [ "$(hostname -s)" = "kavula" ]; then
                 test -f /etc/letsencrypt/renewal/${alias_name}.conf || certbot certonly -m ops@manta.network --agree-tos --no-eff-email --dns-route53 -d ${alias_name}
               fi
             fi
           else
-            echo "[${hostname}.${domain}:/etc/letsencrypt/${cert_target}/${alias_name}] sync skipped"
+            echo "[${fqdn}:/etc/letsencrypt/${cert_target}/${alias_name}] sync skipped"
           fi
         done
       done
     else
-      echo "[${hostname}.${domain}] config fetch failed"
+      echo "[${fqdn}] config fetch failed"
     fi
   done
 done
