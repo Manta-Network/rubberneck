@@ -35,6 +35,7 @@ user:
         - stechu
 command:
   - sudo passwd -l root
+  - systemctl is-active calamari.service || sudo systemctl start calamari.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf || sudo certbot certonly --expand -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
