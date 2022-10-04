@@ -97,8 +97,7 @@ for domain in ${domain_list[@]}; do
           done
           if [ "${action}" = "sync" ]; then
             if ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} sudo curl -sLo ${file_target} ${file_source}; then
-              echo "      ${fg_dim}download:${reset} ${fg_green}succeeded${reset}"
-              echo "      ${fg_dim}commands (post):${reset}"
+              echo "[${fqdn}:file ${file_index}] download succeeded (${file_target}, ${file_source})"
               file_post_command_list_as_base64=$(_decode_property ${file_as_base64} '(.command.post//empty)|.[]|@base64')
               command_index=0
               for file_post_command_as_base64 in ${file_post_command_list_as_base64[@]}; do
@@ -108,6 +107,8 @@ for domain in ${domain_list[@]}; do
                 echo "[${fqdn}:file ${file_index}, post command ${command_index}] exit code: ${command_exit_code}, command: ${command}"
                 command_index=$((command_index+1))
               done
+            else
+              echo "[${fqdn}:file ${file_index}] download failed (${file_target}, ${file_source})"
             fi
           fi
         fi
