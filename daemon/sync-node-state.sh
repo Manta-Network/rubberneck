@@ -3,7 +3,6 @@
 # usage: curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/sync-node-state.sh | bash
 
 tmp=$(mktemp -d)
-subl ${tmp}
 
 _decode_property() {
   echo ${1} | base64 --decode | jq -r ${2}
@@ -63,21 +62,55 @@ for domain in ${domain_list[@]}; do
       for command_as_base64 in ${command_list_as_base64[@]}; do
         command=$(echo ${command_as_base64} | base64 --decode)
         if [ "${action}" = "sync" ]; then
-          echo "command ${command_index}" >> ${tmp}/${fqdn}.log
-          echo "${command}" >> ${tmp}/${fqdn}.log
-          echo >> ${tmp}/${fqdn}.log
-          ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "${command}" &>> ${tmp}/${fqdn}.log
+          ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "${command}" &> /dev/null
           command_exit_code=$?
-          echo >> ${tmp}/${fqdn}.log
-          echo "[${fqdn}:command ${command_index}] ${command}"
-          echo "exit code ${command_index}: ${command_exit_code}" >> ${tmp}/${fqdn}.log
-          echo >> ${tmp}/${fqdn}.log
-          echo >> ${tmp}/${fqdn}.log
-          echo "[${fqdn}:command ${command_index}] ${command_exit_code}"
+          echo "[${fqdn}:command ${command_index}] exit code: ${command_exit_code}, command: ${command}"
         else
           echo "[${fqdn}:command ${command_index}] skipped"
         fi
         command_index=$((command_index+1))
+      done
+
+      file_list_as_base64=$(yq -r  '.file//empty' ${tmp}/${fqdn}-config.yml | jq -r '.[] | @base64')
+      file_index=0
+      for file_as_base64 in ${file_list_as_base64[@]}; do
+        file_source=$(_decode_property ${file_as_base64} .source)
+        file_target=$(_decode_property ${file_as_base64} .target)
+        file_sha256=$(_decode_property ${file_as_base64} .sha256)
+        actual_sha256=$(ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "sha256sum ${file_target} 2> /dev/null | cut -d ' ' -f 1")
+
+        echo "[${fqdn}:file ${file_index}] target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256}, actual: ${actual_sha256}"
+        if [ "${file_sha256}" != "${actual_sha256}" ]; then
+          file_pre_command_list_as_base64=$(_decode_property ${file_as_base64} '(.command.pre//empty)|.[]|@base64')
+          command_index=0
+          for file_pre_command_as_base64 in ${file_pre_command_list_as_base64[@]}; do
+            command=$(echo ${file_pre_command_as_base64} | base64 --decode)
+            echo "[${fqdn}:file ${file_index}, pre command ${command_index}] ${command}"
+            if [ "${action}" = "sync" ]; then
+              ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "${command}" &> /dev/null
+              command_exit_code=$?
+              echo "[${fqdn}:file ${file_index}, pre command ${command_index}] exit code: ${command_exit_code}, command: ${command}"
+            else
+              echo "[${fqdn}:file ${file_index}, pre command ${command_index}] skipped"
+            fi
+            command_index=$((command_index+1))
+          done
+          if [ "${action}" = "sync" ]; then
+            if ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} sudo curl -sLo ${file_target} ${file_source}; then
+              echo "      ${fg_dim}download:${reset} ${fg_green}succeeded${reset}"
+              echo "      ${fg_dim}commands (post):${reset}"
+              file_post_command_list_as_base64=$(_decode_property ${file_as_base64} '(.command.post//empty)|.[]|@base64')
+              command_index=0
+              for file_post_command_as_base64 in ${file_post_command_list_as_base64[@]}; do
+                command=$(echo ${file_post_command_as_base64} | base64 --decode)
+                ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "${command}" &> /dev/null
+                command_exit_code=$?
+                echo "[${fqdn}:file ${file_index}, post command ${command_index}] exit code: ${command_exit_code}, command: ${command}"
+                command_index=$((command_index+1))
+              done
+            fi
+          fi
+        fi
       done
     else
       echo "[${fqdn}] config fetch failed"
