@@ -23,6 +23,7 @@ curl -sL \
 rubberneck_github_latest_sha=$(jq -r .[0].sha ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-commits.json)
 rubberneck_github_latest_date=$(jq -r .[0].commit.committer.date ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-commits.json)
 
+ops_username=mobula
 ops_private_key=${HOME}/.ssh/id_manta_ci
 
 curl -sL \
