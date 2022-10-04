@@ -38,6 +38,10 @@ export function dateDiff(a, b, output = 'object') {
                   : (diff.second > 0)
                     ? `${diff.second} second${(diff.second > 1) ? 's' : ''}`
                     : '';
+    case 'day':
+      return ((diff.year * seconds.year / seconds.day) + (diff.month * seconds.month / seconds.day) + (diff.week * seconds.week / seconds.day) + diff.day);
+    case 'hour':
+      return ((diff.year * seconds.year / seconds.hour) + (diff.month * seconds.month / seconds.hour) + (diff.week * seconds.week / seconds.hour) + (diff.day * seconds.day / seconds.hour) + diff.hour);
     case 2:
     default:
       return Object.keys(diff).map((period) => `${(diff[period] > 0) ? `${diff[period]} ${period}${(diff[period] > 1) ? 's' : ''}`: ''}`).filter((x) => !!x).join(', ');

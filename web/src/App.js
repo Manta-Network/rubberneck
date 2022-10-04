@@ -10,6 +10,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Dashboard from './Dashboard';
 import Chain from './Chain';
+import Platform from './Platform';
 import Node from './Node';
 
 
@@ -63,6 +64,7 @@ function App() {
           <Route path='/chain/:relaychain/:parachain' element={<Chain />} />
           <Route path='/chain/:relaychain' element={<Chain />} />
           <Route path='/node/:fqdn' element={<Node />} />
+          <Route path='/platform/:platform' element={<Platform />} />
         </Routes>
       </Router>
     </Container>

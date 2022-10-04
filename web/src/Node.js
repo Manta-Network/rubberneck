@@ -8,7 +8,6 @@ import Spinner from 'react-bootstrap/Spinner';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Table from 'react-bootstrap/Table';
-import palette from 'google-palette';
 import { dateDiff } from './utils';
 import {
   Chart as ChartJS,
@@ -171,13 +170,6 @@ const lineOptions = {
     }
   }
 };
-const doughnutOptions = {
-  ...options,
-  //maintainAspectRatio: false,
-  //circumference: Math.PI + 1,
-  //rotation: -Math.PI - 0.5,
-  //cutoutPercentage: 65,
-}
 const tabs = {
   node: 'node',
   para: 'parachain',
