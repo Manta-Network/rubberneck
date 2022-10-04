@@ -1,6 +1,6 @@
 ---
-hostname: a1
-domain: dolphin.engineering
+hostname: kwaltz
+domain: rococo.dolphin.engineering
 action: sync
 launch: '2022-09-08T11:21:00Z'
 provider: shock-dedicated
