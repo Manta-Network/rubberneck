@@ -1,0 +1,62 @@
+---
+hostname: olkhon
+domain: kusama-internal.calamari.systems
+action: sync
+provider: aws-dev
+dns:
+  alias:
+    -
+      name: ws.kusama-internal.calamari.systems
+      weight: 200
+    -
+      name: ws.archive.kusama-internal.calamari.systems
+      weight: 200
+user:
+  -
+    username: root
+    authorized:
+      keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGhEy3dlSZZtj9RI+g7Q7K5n01cvTQryCMCDpkTqfF3/
+  -
+    username: mobula
+    authorized:
+      users:
+        - manta-ops
+        - stechu
+        - garandor
+        - ghzlatarev
+command:
+  - sudo passwd -l root
+  - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
+  - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
+  - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
+file:
+  -
+    source: 'https://gist.githubusercontent.com/grenade/cc6f567219f328f0aa468b4744230ffe/raw/prometheus-node-exporter.service'
+    target: /etc/systemd/system/prometheus-node-exporter.service
+    sha256: 4e551485c07fb89f348fd154f264a52cded39e87b6b8f8aad9115b1d353ede05
+    command:
+      pre:
+        - ( systemctl is-active --quiet prometheus-node-exporter.service && sudo systemctl stop prometheus-node-exporter.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet prometheus-node-exporter.service || sudo systemctl enable prometheus-node-exporter.service
+        - systemctl is-active --quiet prometheus-node-exporter.service || sudo systemctl start prometheus-node-exporter.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.yml'
+    target: /etc/go-audit.yml
+    sha256: 8267a422d920a249b9d744a322c0824a14f2fd8acc0f88aa9caf0fae604f5ef1
+    command:
+      post:
+        - systemctl is-active --quiet go-audit.service && sudo systemctl restart go-audit.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.service'
+    target: /etc/systemd/system/go-audit.service
+    sha256: bd5536398fd1fb4b18fbbb951d86960851d47cc68a41d5bbb5ea591f9d635cf8
+    command:
+      pre:
+        - ( systemctl is-active --quiet go-audit.service && sudo systemctl stop go-audit.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
+        - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
