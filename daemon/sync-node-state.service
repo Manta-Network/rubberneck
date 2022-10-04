@@ -1,0 +1,16 @@
+[Unit]
+Description=sync node state
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=HOME=/root
+ExecStartPre=curl -sLo /usr/local/bin/sync-node-state.sh https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/sync-node-state.sh
+ExecStartPre=chmod +x /usr/local/bin/sync-node-state.sh
+ExecStart=/usr/local/bin/sync-node-state.sh
+Restart=always
+RestartSec=600
+
+[Install]
+WantedBy=multi-user.target
