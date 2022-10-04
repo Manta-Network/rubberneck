@@ -131,8 +131,11 @@ for domain in ${domain_list[@]}; do
         file_sha256=$(_decode_property ${file_as_base64} .sha256)
         actual_sha256=$(ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "sha256sum ${file_target} 2> /dev/null | cut -d ' ' -f 1")
 
-        echo "[${fqdn}:file ${file_index}] target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256}, actual: ${actual_sha256}"
-        if [ "${file_sha256}" != "${actual_sha256}" ]; then
+        
+        if [ "${file_sha256}" = "${actual_sha256}" ]; then
+          echo "[${fqdn}:file ${file_index}] validation succeeded. target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256}, actual: ${actual_sha256}"
+        else
+          echo "[${fqdn}:file ${file_index}] validation failed. target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256}, actual: ${actual_sha256}"
           file_pre_command_list_as_base64=$(_decode_property ${file_as_base64} '(.command.pre//empty)|.[]|@base64')
           command_index=0
           for file_pre_command_as_base64 in ${file_pre_command_list_as_base64[@]}; do
