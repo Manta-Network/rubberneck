@@ -1,13 +1,7 @@
 ---
-hostname: c4
+hostname: f4
 domain: dolphin.engineering
 action: sync
-launch: '2022-09-08T11:21:00Z'
-provider: shock-dedicated
-price:
-  amount: 170.98
-  currency: usd
-  term: quarterly
 dns:
   alias:
     -
@@ -93,9 +87,9 @@ file:
       post:
         - systemctl is-active --quiet dolphin.service && sudo systemctl restart dolphin.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/c4/usr/lib/systemd/system/dolphin.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f4/usr/lib/systemd/system/dolphin.service'
     target: /usr/lib/systemd/system/dolphin.service
-    sha256: 5f351e4a1e844108997619ca90f16d03b6deaeec3014261e7e1d191f91c9121d
+    sha256: dc58375f1148a8f4c447df82bf9cab85f77515db5a8ec3d9ab4ab0153783aad7
     command:
       pre:
         - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
@@ -133,9 +127,9 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/c4/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f4/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 255a5f182c9d4fd0c132f757ffe2e6cc976242403d1b86d478c4fadab3e69643
+    sha256: 0b01bdc6b508f5c3a4e700cb276e8b6451167a0c473b6e6bc5d4eeaa9b751da8
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
