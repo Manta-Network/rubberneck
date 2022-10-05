@@ -14,22 +14,34 @@ function NodeObservations(props) {
   const [data, setData] = useState(undefined);
   useEffect(() => {
     fetch(`https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/node/${fqdn}/observations`)
-      .then(response => response.json())
-      .then((container) => {
-        if (!!container.error) {
-          console.error(container.error);
+      .then(r => r.json())
+      .then((oc) => {
+        if (!!oc.error) {
+          console.error(oc.error);
         } else {
-          setData({
-            outages: container.observations.filter((o) => !((o.cert_validity_days > 0) && (o.peers_connected > 0) && (o.websocket_redponsive))).length,
-            first: new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' }).format(new Date(container.observations[0].observed)).toLowerCase(),
-            last: new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' }).format(new Date(container.observations.slice(-1)[0].observed)).toLowerCase(),
-            observations: container.observations
-          });
+          fetch(`https://${fqdn}/health`)
+            .then(r => r.json())
+            .then((health) => {
+              setData({
+                health,
+                outages: oc.observations.filter((o) => !((o.cert_validity_days > 0) && (o.peers_connected > 0) && (o.websocket_redponsive))).length,
+                first: new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' }).format(new Date(oc.observations[0].observed)).toLowerCase(),
+                last: new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' }).format(new Date(oc.observations.slice(-1)[0].observed)).toLowerCase(),
+                observations: oc.observations
+              });
+            })
+            .catch((he) => {
+              console.error(he);
+              setData({
+                outages: oc.observations.filter((o) => !((o.cert_validity_days > 0) && (o.peers_connected > 0) && (o.websocket_redponsive))).length,
+                first: new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' }).format(new Date(oc.observations[0].observed)).toLowerCase(),
+                last: new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' }).format(new Date(oc.observations.slice(-1)[0].observed)).toLowerCase(),
+                observations: oc.observations
+              });
+            });
         }
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch(console.error);
   }, [fqdn]);
   return (
     (!!data)
@@ -92,14 +104,15 @@ function NodeObservations(props) {
                         : (o.peers_connected > 0)
                             ? color.amber
                             : color.red,
-                      fill: 'white'
+                      fill: 'white',
+                      opacity: (!!data.health && data.health.isSyncing) ? 0.1 : 1,
                     };
                     const inner = {
                       cx: outer.cx,
                       cy: outer.cy,
                       r: outer.r - 1,
                       fill: outer.stroke,
-                      opacity: 0.5
+                      opacity: (!!data.health && data.health.isSyncing) ? 0.1 : 0.5,
                     };
                     return (
                       <Fragment key={oI}>

@@ -12,6 +12,7 @@ import { faAws } from '@fortawesome/free-brands-svg-icons'
 import { faH } from '@fortawesome/free-solid-svg-icons';
 import ChainHead from './ChainHead';
 import ChainMetrics from './ChainMetrics';
+import NodeHealth from './NodeHealth';
 import NodeObservations from './NodeObservations';
 import RunningCost from './RunningCost';
 import badge from './badge';
@@ -176,8 +177,9 @@ function Chain(props) {
                           <span className="text-muted">
                             .{node.domain}
                           </span>
-                          <ChainHead url={`wss://${node.fqdn}`} />
                         </Link>
+                        <ChainHead url={`wss://${node.fqdn}`} />
+                        <NodeHealth fqdn={node.fqdn} style={{marginLeft: '0.5em'}} />
                       </td>
                       <td>
                         {
