@@ -43,6 +43,13 @@ function NodeObservations(props) {
       })
       .catch(console.error);
   }, [fqdn]);
+  const [health, setHealth] = useState(undefined);
+  useEffect(() => {
+    fetch(`https://${fqdn}/health`)
+      .then(r => r.json())
+      .then(setHealth)
+      .catch(console.error);
+  }, [fqdn]);
   return (
     (!!data)
       ? (
@@ -105,14 +112,14 @@ function NodeObservations(props) {
                             ? color.amber
                             : color.red,
                       fill: 'white',
-                      opacity: (!!data.health && data.health.isSyncing) ? 0.1 : 1,
+                      opacity: (!!health && health.isSyncing) ? 0.1 : 0.7,
                     };
                     const inner = {
                       cx: outer.cx,
                       cy: outer.cy,
                       r: outer.r - 1,
                       fill: outer.stroke,
-                      opacity: (!!data.health && data.health.isSyncing) ? 0.1 : 0.5,
+                      opacity: (!!health && health.isSyncing) ? 0.1 : 0.3,
                     };
                     return (
                       <Fragment key={oI}>

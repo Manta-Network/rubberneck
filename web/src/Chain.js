@@ -178,10 +178,10 @@ function Chain(props) {
                             .{node.domain}
                           </span>
                         </Link>
-                        <ChainHead url={`wss://${node.fqdn}`} />
-                        <NodeHealth fqdn={node.fqdn} style={{marginLeft: '0.5em'}} />
                       </td>
                       <td>
+                        <ChainHead url={`wss://${node.fqdn}`} />
+                        <NodeHealth fqdn={node.fqdn} style={{marginLeft: '0.5em'}} />
                         {
                           (!!node.metrics)
                             ? Object.entries(node.metrics).map(([name, target], tI) => {
@@ -196,7 +196,7 @@ function Chain(props) {
                                     ? 'text-warning'
                                     : 'text-danger';
                                 return (
-                                  <i key={tI} title={`${secondsSinceLastScrape} seconds since last ${name} metrics scrape`} className={`bi bi-${badge[name][state]} ${clue}`} style={{marginRight: '0.5em'}} />
+                                  <i key={tI} title={`${secondsSinceLastScrape} seconds since last ${name} metrics scrape`} className={`bi bi-${badge[name][state]} ${clue}`} style={{marginLeft: '0.5em'}} />
                                 );
                               })
                             : (
