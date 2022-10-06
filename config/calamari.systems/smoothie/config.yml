@@ -76,7 +76,7 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/smoothie.calamari.systems.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/smoothie/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/smoothie/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
     sha256: 0e5ca0ac5d56bdb3fe83d3727657a00017ff0787135876dc4a2b300edbb1026e
     command:
@@ -116,17 +116,17 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/smoothie/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/smoothie/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: ac358c7df7a61f2b4a2222e6c8e64a596f23e6e08a57f179421092234073f642
+    sha256: e72f6d38fc6e7ea51ff540b1705b1cbc785e29c75c9607732a13ab1907df8ac6
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - 'sudo sed -i "s/\${fqdn}/$(hostname -f)/i" /etc/nginx/sites-available/substrate.conf'
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.calamari.systems.conf'
     target: /etc/nginx/sites-available/ws.calamari.systems.conf

@@ -69,9 +69,9 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/f4.calamari.systems.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/f4/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/f4/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
-    sha256: b6a004396619f542b947a077b0edce87937e21697078a6b77005b59b4864df7e
+    sha256: 6528f13fe999ed91a830fb89d9d347e6370fed927c35bef2802355e377ca92e8
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
@@ -109,17 +109,17 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/f4/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/f4/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: c750cab2e2b773873cfb1ed41660ab3951dfc1d6b8194a14b9810ba14e1bfb37
+    sha256: aaa38339c7a9163421d8e60dd284f57e491faac385dfd491a91756f59e37a18d
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - 'sudo sed -i "s/\${fqdn}/$(hostname -f)/i" /etc/nginx/sites-available/substrate.conf'
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.calamari.systems.conf'
     target: /etc/nginx/sites-available/ws.calamari.systems.conf

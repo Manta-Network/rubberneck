@@ -121,7 +121,8 @@ file:
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.calamari.systems.conf'
     target: /etc/nginx/sites-available/ws.calamari.systems.conf

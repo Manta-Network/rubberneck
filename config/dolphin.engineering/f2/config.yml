@@ -87,7 +87,7 @@ file:
       post:
         - systemctl is-active --quiet dolphin.service && sudo systemctl restart dolphin.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f2/usr/lib/systemd/system/dolphin.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f2/home/grenade/git/Manta-Network/rubberneck/config/dolphin.engineering/f2/usr/lib/systemd/system/dolphin.service'
     target: /usr/lib/systemd/system/dolphin.service
     sha256: 0fc4e94488b8d9198c1f8ae2d28cf6322b7fa37c7568de8e9a8c579ccea37dbc
     command:
@@ -127,16 +127,17 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f2/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f2/home/grenade/git/Manta-Network/rubberneck/config/dolphin.engineering/f2/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 8e9084e472663ea312597553270b6e974428595521afa059ba5f4c4f8571d273
+    sha256: 78b4037b17416643196dcde8aa21653880a5dbd8bfcf2981a12b39033a771fb8
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.dolphin.engineering.conf'
     target: /etc/nginx/sites-available/ws.dolphin.engineering.conf

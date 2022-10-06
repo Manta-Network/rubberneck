@@ -1,0 +1,37 @@
+[Unit]
+Description=Calamari Parachain Node
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/calamari \
+    --collator \
+    --chain /usr/share/substrate/calamari.json \
+    --name '🦑🛡️ c1 🛡️🦑' \
+    --base-path /var/lib/substrate \
+    --port 30333 \
+    --ws-port 9144 \
+    --ws-max-connections 100 \
+    --rpc-port 9133 \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --state-cache-size 0 \
+    --node-key-file /usr/share/substrate/node-key \
+    --bootnodes \
+        /dns/c2.calamari.systems/tcp/30333/p2p/12D3KooWL3ELxcoMGA6han3wPQoym5DKbYHqkWkCuqyjaCXpyJTt \
+        /dns/c3.calamari.systems/tcp/30333/p2p/12D3KooWMHdpUCCS9j8hvNLTV8PeqJ16KaVEjb5PVdYgAQUFUcCG \
+        /dns/c4.calamari.systems/tcp/30333/p2p/12D3KooWGs2hfnRQ3Y2eAoUyWKUL3g7Jmcsf8FpyhVYeNpXeBMSu \
+        /dns/c5.calamari.systems/tcp/30333/p2p/12D3KooWNXZeUSEKRPsp1yiDH99qSVawQSWHqG4umPjgHsn1joci \
+    -- \
+    --chain kusama \
+    --name '🦑🛡️ c1 🛡️🦑' \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
+User=manta
+Group=manta
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target

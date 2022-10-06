@@ -1,0 +1,30 @@
+[Unit]
+Description=Calamari Parachain Node
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/calamari \
+    --chain /usr/share/substrate/calamari.json \
+    --name '🦑 f1 🦑' \
+    --base-path /var/lib/substrate \
+    --port 31333 \
+    --ws-port 9144 \
+    --ws-max-connections 1000 \
+    --rpc-port 9133 \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --state-cache-size 0 \
+    -- \
+    --chain kusama \
+    --name '🦑 f1 🦑' \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
+User=manta
+Group=manta
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target
