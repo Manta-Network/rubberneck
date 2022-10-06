@@ -94,7 +94,7 @@ file:
       post:
         - systemctl is-active --quiet dolphin.service && sudo systemctl restart dolphin.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/c2/home/grenade/git/Manta-Network/rubberneck/config/dolphin.engineering/c2/usr/lib/systemd/system/dolphin.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/c2/usr/lib/systemd/system/dolphin.service'
     target: /usr/lib/systemd/system/dolphin.service
     sha256: 11af0eff6dd7d05fc83e1a6531a10a0aeade29bd4619c09c8d2c8cb1b3fecc30
     command:
@@ -134,7 +134,7 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/c2/home/grenade/git/Manta-Network/rubberneck/config/dolphin.engineering/c2/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/c2/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
     sha256: 371e19425ff2887b0fc440a703c4a6f04ee2595a78177a86db424e76a454aa77
     command:

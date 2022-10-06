@@ -72,7 +72,7 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/c1/usr/lib/systemd/system/calamari.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
     sha256: 7f3b5e1d94d7d9e961149c651e9a6cdddf0c79793ef20b0ad275d2ad4f7b11c1
     command:
@@ -112,7 +112,7 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/c1/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
     sha256: d06a556821463ec55bd40f048261066e69c5fd2d9e0984684544f109c86621cf
     command:

@@ -76,7 +76,7 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/smoothie/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/smoothie/usr/lib/systemd/system/calamari.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/smoothie/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
     sha256: 0e5ca0ac5d56bdb3fe83d3727657a00017ff0787135876dc4a2b300edbb1026e
     command:
@@ -116,7 +116,7 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/smoothie/home/grenade/git/Manta-Network/rubberneck/config/calamari.systems/smoothie/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/smoothie/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
     sha256: e72f6d38fc6e7ea51ff540b1705b1cbc785e29c75c9607732a13ab1907df8ac6
     command:
