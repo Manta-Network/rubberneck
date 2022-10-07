@@ -36,7 +36,8 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active dolphin.service || sudo systemctl start dolphin.service
+  - systemctl is-active dolphin.service || sudo systemctl restart dolphin.service
+  - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
   - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
