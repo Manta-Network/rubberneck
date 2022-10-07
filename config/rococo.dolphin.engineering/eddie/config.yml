@@ -40,6 +40,8 @@ command:
   - systemctl is-active dolphin.service || sudo systemctl restart dolphin.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
+  - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf || sudo certbot certonly --expand -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
+  - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
   - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
 file:
@@ -72,3 +74,65 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
+    target: /etc/letsencrypt/options-ssl-nginx.conf
+    sha256: 17baec778c05571beb0cdeb0bc1c6da3596d44d1fe567e7fee0efef80a860d01
+    command:
+      pre:
+        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
+      post:
+        - sudo chmod 644 /etc/letsencrypt/options-ssl-nginx.conf
+  -
+    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/ssl-dhparams.pem'
+    target: /etc/letsencrypt/ssl-dhparams.pem
+    sha256: 9ba6429597aeed2d8617a7705b56e96d044f64b07971659382e426675105654b
+    command:
+      pre:
+        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
+      post:
+        - sudo chmod 644 /etc/letsencrypt/ssl-dhparams.pem
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/status.conf'
+    target: /etc/nginx/sites-available/status.conf
+    sha256: c123caec7c2871afd3500875adb026cacffc16b7c7dde4375376d1b4fb3f1f14
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/eddie/etc/nginx/sites-available/substrate.conf'
+    target: /etc/nginx/sites-available/substrate.conf
+    sha256: 0b679a12b0113d35b46c4fb5c03b2cc3345cdd8013f8b68e04a8333806647751
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.dolphin.engineering.conf'
+    target: /etc/nginx/sites-available/ws.dolphin.engineering.conf
+    sha256: f87c44150fc3c43ecea5ae8f5439978d5d22accf74358600d167e997a4cc3c5e
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.dolphin.engineering.conf /etc/nginx/sites-enabled/ws.dolphin.engineering.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.dolphin.engineering.conf'
+    target: /etc/nginx/sites-available/ws.archive.dolphin.engineering.conf
+    sha256: 5c6bda0a57eabdbbff412bdd597a3f706201a5272eb3ac8325c6d456fd2ae305
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.dolphin.engineering.conf /etc/nginx/sites-enabled/ws.archive.dolphin.engineering.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
