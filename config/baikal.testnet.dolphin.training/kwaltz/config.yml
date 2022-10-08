@@ -96,7 +96,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/baikal.testnet.dolphin.training/kwaltz/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 17f1f28f2cb9d675cca1f1ebd8722d6f415da7b52e7415c365ba6b8ad9815bc5
+    sha256: b299be4b5c707c4e5138688fd6122d37848d4a39e9d84a95eaf8f057ff73d5d7
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
