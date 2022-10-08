@@ -98,7 +98,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/kusama-internal.testnet.calamari.systems/crispy/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 6adc27c933f86264d60a193c50d4c0a7f9b85bcd25ed4f7f52da35db3e23f42f
+    sha256: 136930e87e0faed8ddcd2fb2738c646094d68f3e89a3b9ca791bad1682942b08
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
