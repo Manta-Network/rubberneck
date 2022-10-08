@@ -105,7 +105,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/rococo.dolphin.engineering/frogstar/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 71d32de66fbaf7f8fe92cb090e91784c6c2b6b68e55fd23befdcc42866509a5d
+    sha256: 7f776799e39fdb1ef671a35699dcf4749b79040b86aca96b0a4821a24b511204
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
