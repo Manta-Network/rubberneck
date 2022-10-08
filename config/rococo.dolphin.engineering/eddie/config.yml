@@ -103,7 +103,7 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/eddie/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/rococo.dolphin.engineering/eddie/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
     sha256: 0b679a12b0113d35b46c4fb5c03b2cc3345cdd8013f8b68e04a8333806647751
     command:
