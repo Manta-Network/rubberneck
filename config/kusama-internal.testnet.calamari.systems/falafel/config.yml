@@ -115,14 +115,3 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/ws.kusama-internal.testnet.calamari.systems.conf /etc/nginx/sites-enabled/ws.kusama-internal.testnet.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.kusama-internal.testnet.calamari.systems.conf'
-    target: /etc/nginx/sites-available/ws.archive.kusama-internal.testnet.calamari.systems.conf
-    sha256: 20b2e209276e5b6d742e263a881368a05f162405af2384abe09e60e1515beed5
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.kusama-internal.testnet.calamari.systems.conf /etc/nginx/sites-enabled/ws.archive.kusama-internal.testnet.calamari.systems.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
