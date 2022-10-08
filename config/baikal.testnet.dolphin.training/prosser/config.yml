@@ -108,7 +108,7 @@ file:
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.baikal.testnet.dolphin.training.conf'
     target: /etc/nginx/sites-available/ws.baikal.testnet.dolphin.training.conf
-    sha256: 4984f9697b5740a25bec0ef0365cb9d1a32cae0abb053d3f102d0d96f0a078bb
+    sha256: ba2337f54a5aa68b49a423452dac4cdc06d62a84fc52962df88484a62cb5f091
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
