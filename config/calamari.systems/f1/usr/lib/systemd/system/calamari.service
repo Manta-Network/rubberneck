@@ -15,6 +15,9 @@ ExecStart=/usr/bin/calamari \
     --rpc-cors all \
     --rpc-methods safe \
     --state-cache-size 0 \
+    --bootnodes \
+        /dns/a1.calamari.systems/tcp/30333/p2p/12D3KooWBL5E61p9tdAq2LnZGgfgxArrb3T6KYdHSo4yaHy7KYku \
+        /dns/a2.calamari.systems/tcp/30333/p2p/12D3KooWDpx4LHzAyVHdQAZqEfdCpYkPaB83ZjHANCcACUU2xGDn \
     -- \
     --chain kusama \
     --name '🦑 f1 🦑' \
