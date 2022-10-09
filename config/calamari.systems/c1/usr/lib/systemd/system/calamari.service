@@ -18,10 +18,8 @@ ExecStart=/usr/bin/calamari \
     --state-cache-size 0 \
     --node-key-file /usr/share/substrate/node-key \
     --bootnodes \
-        /dns/c2.calamari.systems/tcp/30333/p2p/12D3KooWL3ELxcoMGA6han3wPQoym5DKbYHqkWkCuqyjaCXpyJTt \
-        /dns/c3.calamari.systems/tcp/30333/p2p/12D3KooWMHdpUCCS9j8hvNLTV8PeqJ16KaVEjb5PVdYgAQUFUcCG \
-        /dns/c4.calamari.systems/tcp/30333/p2p/12D3KooWGs2hfnRQ3Y2eAoUyWKUL3g7Jmcsf8FpyhVYeNpXeBMSu \
-        /dns/c5.calamari.systems/tcp/30333/p2p/12D3KooWNXZeUSEKRPsp1yiDH99qSVawQSWHqG4umPjgHsn1joci \
+        /dns/a1.calamari.systems/tcp/30333/p2p/12D3KooWBL5E61p9tdAq2LnZGgfgxArrb3T6KYdHSo4yaHy7KYku \
+        /dns/a2.calamari.systems/tcp/30333/p2p/12D3KooWDpx4LHzAyVHdQAZqEfdCpYkPaB83ZjHANCcACUU2xGDn \
     -- \
     --chain kusama \
     --name '🦑🛡️ c1 🛡️🦑' \
