@@ -81,7 +81,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/bokkeum/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
-    sha256: bd3620490edc867c2cd2a4ab3310b110b534c4689ca569bfb25aded9ec45402d
+    sha256: e292690f17198d106354b5b18baab1de664d3ce75bc4d4210e1a2f88cd973469
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service

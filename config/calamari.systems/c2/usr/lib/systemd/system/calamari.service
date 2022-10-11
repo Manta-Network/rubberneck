@@ -6,6 +6,7 @@ After=network-online.target
 [Service]
 ExecStart=/usr/bin/calamari \
     --chain /usr/share/substrate/calamari.json \
+    --collator \
     --name '🦑🛡️ c2 🛡️🦑' \
     --base-path /var/lib/substrate \
     --port 30333 \

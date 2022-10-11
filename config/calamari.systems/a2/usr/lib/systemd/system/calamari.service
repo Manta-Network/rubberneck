@@ -16,6 +16,7 @@ ExecStart=/usr/bin/calamari \
     --rpc-cors all \
     --rpc-methods safe \
     --state-cache-size 0 \
+    --in-peers 100 \
     -- \
     --chain kusama \
     --name '🦑🗃️ a2 🗃️🦑' \

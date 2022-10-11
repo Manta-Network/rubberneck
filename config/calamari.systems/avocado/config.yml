@@ -82,7 +82,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/avocado/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
-    sha256: 14dbbb3f8926ce23bfbbb88b0c8c3406ac91df516893993903cd0bdc82bcbdb4
+    sha256: 14a630a349c50695172bf940bb40ddeb37b787eb36ad58f85f6114bf530359f6
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
