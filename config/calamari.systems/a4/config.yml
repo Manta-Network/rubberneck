@@ -1,7 +1,7 @@
 ---
 hostname: a4
 domain: calamari.systems
-ip: 45.155.39.202
+ip: 43.230.163.98
 action: sync
 launch: '2022-09-08T11:21:00Z'
 provider: shock-dedicated
@@ -51,10 +51,29 @@ file:
     sha256: 4e551485c07fb89f348fd154f264a52cded39e87b6b8f8aad9115b1d353ede05
     command:
       pre:
-        - systemctl is-active --quiet prometheus-node-exporter.service && sudo systemctl stop prometheus-node-exporter.service
+        - ( systemctl is-active --quiet prometheus-node-exporter.service && sudo systemctl stop prometheus-node-exporter.service ) || true
       post:
         - sudo systemctl daemon-reload
-        - sudo systemctl enable --now prometheus-node-exporter.service
+        - systemctl is-enabled --quiet prometheus-node-exporter.service || sudo systemctl enable prometheus-node-exporter.service
+        - systemctl is-active --quiet prometheus-node-exporter.service || sudo systemctl start prometheus-node-exporter.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.yml'
+    target: /etc/go-audit.yml
+    sha256: 8267a422d920a249b9d744a322c0824a14f2fd8acc0f88aa9caf0fae604f5ef1
+    command:
+      post:
+        - systemctl is-active --quiet go-audit.service && sudo systemctl restart go-audit.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.service'
+    target: /etc/systemd/system/go-audit.service
+    sha256: bd5536398fd1fb4b18fbbb951d86960851d47cc68a41d5bbb5ea591f9d635cf8
+    command:
+      pre:
+        - ( systemctl is-active --quiet go-audit.service && sudo systemctl stop go-audit.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
+        - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
     source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta'
     target: /usr/bin/manta
@@ -78,7 +97,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a4/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
-    sha256: d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed
+    sha256: 1d911e5d8292619a0cdee687f2ee083817e67a0f904c3b33f401fef3d2de6222
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
@@ -118,7 +137,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a4/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: ade090a2617f8993dba7a59dc1e71d896004cca88a8b1bea1544aafe6c9321e9
+    sha256: 6343623ae096eb92ceb7d5d2d82f927ff4a9031a0fa2c197cfd4b884120d0084
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
