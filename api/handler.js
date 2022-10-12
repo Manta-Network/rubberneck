@@ -190,32 +190,43 @@ const blockchains = [
     tier: 'relaychain',
   },
   {
-    name: 'como',
+    name: 'kusama-internal',
     domains: [
-      'como.manta.systems',
+      'kusama-internal.calamari.systems',
     ],
     jobs: {
       invulnerable: [
-        'como invulnerable validator (ssl)'
+        'kusama-internal'
       ],
     },
     tier: 'relaychain',
   },
-  /*
   {
-    name: 'dolphin',
+    name: 'moonriver',
     domains: [
-      'dolphin.community',
+      'kusama-internal.moonriver-testnet.calamari.systems',
     ],
     jobs: {
       invulnerable: [
-        'dolphin/kusama invulnerable collator (ssl)'
+        'moonriver-testnet'
       ],
     },
     tier: 'parachain',
-    relay: 'kusama',
+    relay: 'kusama-internal',
   },
-  */
+  {
+    name: 'calamari-testnet',
+    domains: [
+      'kusama-internal.testnet.calamari.systems',
+    ],
+    jobs: {
+      invulnerable: [
+        'calamari-testnet'
+      ],
+    },
+    tier: 'parachain',
+    relay: 'kusama-internal',
+  },
   {
     name: 'dolphin',
     domains: [
@@ -313,6 +324,8 @@ const blockchains = [
     id: (b.tier === 'relay') ? b.name : `${b.relay}/${b.name}`,
   }))
   .sort((a, b) => (a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0);
+
+
 const response = {
   headers: {
     'Access-Control-Allow-Origin': '*',
@@ -528,6 +541,80 @@ const fetchShockDedicatedInstances = () => {
         },
         month: {
           amount: 170.98 * 4 / 12,
+          currency: 'USD',
+        }
+      },
+    },
+    {
+      provider: 's4y-dedicated',
+      profile: 'default',
+      project: 'default',
+      region: 'florida',
+      image: 'ubuntu-20-04',
+      fqdn: 'a3.calamari.systems',
+      hostname: 'a3',
+      domain: 'calamari.systems',
+      id: 'bravo939',
+      ip: '85.25.135.211',
+      machine: 'Opteron 3280',
+      launch: '2022-09-27T11:21:00Z',
+      location: {
+        az: 'SXB',
+        country: {
+          code: 'FR',
+          name: 'France',
+          flag: flag('FR'),
+        },
+        city: {
+          name: 'Strassbourg',
+        },
+        latitude: '48.5855',
+        longitude: '7.7418',
+      },
+      price: {
+        hour: {
+          amount: 39.59 * 12 / 365 / 24,
+          currency: 'EUR',
+        },
+        month: {
+          amount: 39.59,
+          currency: 'EUR',
+        }
+      },
+    },
+    {
+      provider: 'shock-dedicated',
+      profile: 'default',
+      project: 'default',
+      region: 'japan',
+      image: 'ubuntu-20-04',
+      fqdn: 'a4.calamari.systems',
+      hostname: 'a4',
+      domain: 'calamari.systems',
+      id: '29731',
+      ip: '43.230.163.98',
+      machine: 'JP-DS1',
+      launch: '2022-10-03T11:21:00Z',
+      location: {
+        az: 'jp-d17',
+        country: {
+          code: 'JP',
+          name: 'Japan',
+          flag: flag('JP'),
+        },
+        city: {
+          name: 'Tokyo',
+        },
+        latitude: '35.6893',
+        longitude: '139.6899',
+      },
+      price: {
+        hour: {
+          amount: 269.97 * 2 / 365 / 24,
+          currency: 'USD',
+        },
+        month: {
+          amount: 269.97 * 2 / 12,
           currency: 'USD',
         }
       },
