@@ -70,9 +70,9 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
-    source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.0/manta'
+    source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.2/manta'
     target: /usr/bin/manta
-    sha256: 09001214fd9b95f6671f0ab121c4e7d2982ba51625038bca90712b49a1ddddac
+    sha256: 68d4a42ee0acfc8cd8db3af2d25298db54459bb0d5843fc17c23de6d6d984249
     command:
       pre:
         - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
