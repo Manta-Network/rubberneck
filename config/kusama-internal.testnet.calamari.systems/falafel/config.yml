@@ -37,6 +37,29 @@ command:
   - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
 file:
   -
+    source: 'https://gist.githubusercontent.com/grenade/0ecdf893ee41662b8715c1ae29716272/raw/elastic-8.x.list'
+    target: /etc/apt/sources.list.d/elastic-8.x.list
+    sha256: 667c1933c6ccde264875fc734893da957294ec39ce5efc51d9eebc189efef4cc
+    command:
+      pre:
+        - sudo mkdir -p /root/.gnupg
+        - sudo chmod 700 /root/.gnupg
+        - sudo apt-get install -y dirmngr
+        - sudo gpg --keyserver hkps://pgp.mit.edu --no-default-keyring --keyring /usr/share/keyrings/elastic.gpg --recv-keys D88E42B4
+      post:
+        - sudo apt-get update
+  -
+    source: 'https://gist.githubusercontent.com/grenade/0ecdf893ee41662b8715c1ae29716272/raw/filebeat-calamari.yml'
+    target: /etc/filebeat/filebeat.yml
+    sha256: 6e7a3c56ee34340f5dabc7dbe3457d343bb9d829cb382953d19cc7c41e1dc8a5
+    command:
+      pre:
+        - sudo apt-get install -y filebeat
+      post:
+        - systemctl is-enabled filebeat.service || sudo systemctl enable filebeat.service
+        - systemctl is-active filebeat.service && sudo systemctl restart filebeat.service
+        - systemctl is-active filebeat.service || sudo systemctl start filebeat.service
+  -
     source: 'https://gist.githubusercontent.com/grenade/cc6f567219f328f0aa468b4744230ffe/raw/prometheus-node-exporter.service'
     target: /etc/systemd/system/prometheus-node-exporter.service
     sha256: 4e551485c07fb89f348fd154f264a52cded39e87b6b8f8aad9115b1d353ede05
