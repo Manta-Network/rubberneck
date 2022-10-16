@@ -96,7 +96,7 @@ file:
       post:
         - systemctl is-active --quiet dolphin.service && sudo systemctl restart dolphin.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/rococo.dolphin.engineering/c1/etc/systemd/system/dolphin.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/rococo.dolphin.engineering/ford/etc/systemd/system/dolphin.service'
     target: /etc/systemd/system/dolphin.service
     sha256: 41a221b9f51426d1075021a67c0f81f4595139bc1ae504fdc64a648b300ef841
     command:
