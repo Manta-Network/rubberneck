@@ -7,7 +7,7 @@ After=network-online.target
 User=root
 Group=root
 Type=simple
-ExecStart=/usr/local/bin/dolphin \
+ExecStart=/usr/bin/dolphin \
     --name '🐬📒 frogstar 📒🐬' \
     --base-path /var/lib/dolphin \
     --chain /usr/share/substrate/dolphin.json \
