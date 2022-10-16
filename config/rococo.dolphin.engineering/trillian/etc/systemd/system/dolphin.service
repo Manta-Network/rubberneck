@@ -8,21 +8,21 @@ User=root
 Group=root
 Type=simple
 ExecStart=/usr/local/bin/dolphin \
-     \
     --name '🐬📒 trillian 📒🐬' \
     --base-path /var/lib/dolphin \
-    --chain /usr/share/dolphin/dolphin-parachain-spec.json \
+    --chain /usr/share/substrate/dolphin.json \
+    --pruning archive \
     --port 30333 \
     --ws-port 9144 \
-    --ws-max-connections 2000 \
     --rpc-port 9133 \
     --rpc-cors all \
     --rpc-methods safe \
     --state-cache-size 0 \
-    --pruning archive \
+    --ws-max-connections 1000 \
     -- \
     --name '🐬📒 trillian 📒🐬' \
-    --chain /usr/share/dolphin/relaychain-spec.json --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0' 
+    --chain rococo \
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0' 
 Restart=always
 RestartSec=120
 
