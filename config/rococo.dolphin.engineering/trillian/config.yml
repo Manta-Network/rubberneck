@@ -98,7 +98,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/rococo.dolphin.engineering/trillian/etc/systemd/system/dolphin.service'
     target: /etc/systemd/system/dolphin.service
-    sha256: 8dc95c9ae6ddfb45884175cc0711431ad3f0d94b27b9d5d103f8e754a25ddf9e
+    sha256: 54afa4e6eec648ff5dbfbd64e3474e164a7582750be253bd8d28065b6adc71e6
     command:
       pre:
         - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service

@@ -22,7 +22,7 @@ ExecStart=/usr/bin/dolphin \
     -- \
     --name '🐬📒 ford 📒🐬' \
     --chain rococo \
-    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0' 
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
 Restart=always
 RestartSec=120
 

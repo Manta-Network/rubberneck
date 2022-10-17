@@ -7,11 +7,11 @@ After=network-online.target
 User=root
 Group=root
 Type=simple
-ExecStart=/usr/local/bin/dolphin \
+ExecStart=/usr/bin/dolphin \
     --collator \
     --name '🐬🛡️ kwaltz 🛡️🐬' \
     --base-path /var/lib/dolphin \
-    --chain /usr/share/dolphin/dolphin-parachain-spec.json \
+    --chain /usr/share/substrate/dolphin.json \
     --port 30333 \
     --ws-port 9144 \
     --ws-max-connections 1000 \
@@ -22,7 +22,8 @@ ExecStart=/usr/local/bin/dolphin \
     --node-key-file /usr/share/dolphin/node-key \
     -- \
     --name '🐬🛡️ kwaltz 🛡️🐬' \
-    --chain /usr/share/dolphin/relaychain-spec.json --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0' 
+    --chain rococo \
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
 Restart=always
 RestartSec=120
 

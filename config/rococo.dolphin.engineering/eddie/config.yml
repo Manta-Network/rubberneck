@@ -76,6 +76,38 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
+    source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.2/manta'
+    target: /usr/bin/manta
+    sha256: 68d4a42ee0acfc8cd8db3af2d25298db54459bb0d5843fc17c23de6d6d984249
+    command:
+      pre:
+        - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
+      post:
+        - sudo chmod +x /usr/bin/manta
+        - sudo ln -sfr /usr/bin/manta /usr/bin/dolphin
+        - systemctl is-active --quiet dolphin.service || sudo systemctl start dolphin.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/dolphin-testnet-genesis.json'
+    target: /usr/share/substrate/dolphin.json
+    sha256: d0edc2820d0f298cecde1731ac1aff9d0c4af29b5e6f67c330b5cc907054501c
+    command:
+      pre:
+        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+      post:
+        - systemctl is-active --quiet dolphin.service && sudo systemctl restart dolphin.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/rococo.dolphin.engineering/eddie/etc/systemd/system/dolphin.service'
+    target: /etc/systemd/system/dolphin.service
+    sha256: 466a00d7db84ab8d74379f599dfb74a919baaeab671d3fda8d38a9177adfae4e
+    command:
+      pre:
+        - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
+      post:
+        - getent passwd manta &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group manta
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet dolphin.service || sudo systemctl enable dolphin.service
+        - sudo systemctl start dolphin.service
+  -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
     sha256: 17baec778c05571beb0cdeb0bc1c6da3596d44d1fe567e7fee0efef80a860d01
