@@ -20,6 +20,9 @@ dns:
     -
       name: ws.asia.calamari.systems
       weight: 200
+    -
+      name: ws.archive.asia.calamari.systems
+      weight: 200
 package:
   - auditd
   - certbot
