@@ -17,6 +17,7 @@ import NodeObservations from './NodeObservations';
 import RunningCost from './RunningCost';
 import badge from './badge';
 import { ReactComponent as ShockLogo } from './shock.svg';
+import { ReactComponent as S4yLogo } from './s4y.svg';
 
 function Chain(props) {
   const { relaychain, parachain } = useParams();
@@ -252,14 +253,21 @@ function Chain(props) {
                                       {node.location.az}/{node.fqdn}
                                     </a>
                                   )
-                                : (
-                                    <a href={`https://console.aws.amazon.com/ec2/v2/home?region=${node.region}#InstanceDetails:instanceId=${node.id}`}>
-                                      <span style={{marginRight: '0.3em', color: 'rgb(255, 153, 0)', padding: '0 0.2em'}}>
-                                        <FontAwesomeIcon icon={faAws} />
-                                      </span>
-                                      {node.profile}/{node.region}/{node.id}
-                                    </a>
-                                  )
+                                : (node.provider === 's4y-dedicated')
+                                  ? (
+                                      <a href={`https://my.server4you.net/en/Dedicated/Contract/Index/show?server_name=${node.id}`}>
+                                        <S4yLogo style={{width: '20px', height: '20px', marginRight: '5px'}} />
+                                        {node.location.az}/{node.fqdn}
+                                      </a>
+                                    )
+                                  : (
+                                      <a href={`https://console.aws.amazon.com/ec2/v2/home?region=${node.region}#InstanceDetails:instanceId=${node.id}`}>
+                                        <span style={{marginRight: '0.3em', color: 'rgb(255, 153, 0)', padding: '0 0.2em'}}>
+                                          <FontAwesomeIcon icon={faAws} />
+                                        </span>
+                                        {node.profile}/{node.region}/{node.id}
+                                      </a>
+                                    )
                         }
                       </td>
                       <td style={{ textAlign: 'right' }}>
