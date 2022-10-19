@@ -47,7 +47,23 @@ curl -sL \
   -H "Authorization: Bearer ${rubberneck_github_token}" \
   https://api.github.com/repos/${rubberneck_github_org}/${rubberneck_github_repo}/contents/config
 
-domain_list=$(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config.json)
+if [ -z "${chain_list}" ]; then
+  declare –a domain_list=$(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config.json)
+else
+  curl -sL \
+    -o ${tmp}/blockchains.json \
+    https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/blockchains
+  declare –a domain_list=()
+  for chain in ${chain_list[@]}; do
+    if [[ ${chain} == *"/"* ]]; then
+      chain_domain_list=$(jq --arg name ${chain##*/} --arg relay ${chain%%/*} -r '.blockchains[] | select(.name == $name and .relay == $relay) | .domains[]' ${tmp}/blockchains.json)
+    else
+      chain_domain_list=$(jq --arg name ${chain} -r '.blockchains[] | select(.name == $name) | .domains[]' ${tmp}/blockchains.json)
+    fi
+    domain_list+=( "${chain_domain_list[@]}" )
+  done
+fi
+
 for domain in ${domain_list[@]}; do
   curl -sL \
     -o ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config-${domain}.json \
