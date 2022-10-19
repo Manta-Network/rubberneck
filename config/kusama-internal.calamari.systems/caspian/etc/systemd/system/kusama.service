@@ -1,0 +1,26 @@
+[Unit]
+Description=kusama
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/kusama \
+  --validator \
+  --name caspian-kusama-internal \
+  --base-path /var/lib/kusama \
+  --node-key-file /usr/share/kusama/node-key \
+  --chain /usr/share/kusama/kusama-chain-spec.json \
+  --port 30333 \
+  --ws-port 9944 \
+  --rpc-cors all \
+  --rpc-methods safe --ws-max-connections 100
+Restart=always
+RestartSec=120
+StandardOutput=file:/var/log/kusama/stdout.log
+StandardError=file:/var/log/kusama/stderr.log
+
+[Install]
+WantedBy=multi-user.target
