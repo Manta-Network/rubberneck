@@ -90,6 +90,17 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/kusama-internal.calamari.systems/balaton/etc/systemd/system/kusama.service'
+    target: /etc/systemd/system/kusama.service
+    sha256: 5c3469b4b2b476e1955bd68a1a3a916df3b15cb555c7f5ecc33553fb8bb54e3e
+    command:
+      pre:
+        - systemctl is-active --quiet kusama.service && sudo systemctl stop kusama.service
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet kusama.service || sudo systemctl enable kusama.service
+        - sudo systemctl start kusama.service
+  -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
     sha256: 17baec778c05571beb0cdeb0bc1c6da3596d44d1fe567e7fee0efef80a860d01
