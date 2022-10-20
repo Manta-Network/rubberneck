@@ -40,7 +40,7 @@ file:
   -
     source: 'https://gist.githubusercontent.com/grenade/0ecdf893ee41662b8715c1ae29716272/raw/elastic-8.x.list'
     target: /etc/apt/sources.list.d/elastic-8.x.list
-    sha256: 667c1933c6ccde264875fc734893da957294ec39ce5efc51d9eebc189efef4cc
+    sha256: b35d6eebad5395d73ca10f67c179dbf90c14717497898d28f74b1b16b9320e1f
     command:
       pre:
         - sudo mkdir -p /root/.gnupg
