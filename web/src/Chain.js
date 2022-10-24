@@ -63,12 +63,12 @@ function Chain(props) {
             !!parachain
               ? (
                   <h2>
-                    {parachain} <sup><em className="text-muted">{relaychain}</em></sup>
+                    {parachain.replace('-testnet', 'ᵗ').replace('-internal', 'ᶤ')} <sup><em className="text-muted">{relaychain.replace('-testnet', 'ᵗ').replace('-internal', 'ᶤ')}</em></sup>
                   </h2>
                 )
               : (
                   <h2>
-                    {relaychain}
+                    {relaychain.replace('-testnet', 'ᵗ').replace('-internal', 'ᶤ')}
                   </h2>
                 )
           }

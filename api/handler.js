@@ -193,6 +193,7 @@ const blockchains = [
     name: 'kusama-internal',
     domains: [
       'kusama-internal.calamari.systems',
+      'internal.kusama.systems',
     ],
     jobs: {
       invulnerable: [
@@ -218,10 +219,37 @@ const blockchains = [
     name: 'calamari-testnet',
     domains: [
       'kusama-internal.testnet.calamari.systems',
+      'calamari.seabird.systems',
     ],
     jobs: {
       invulnerable: [
         'calamari-testnet'
+      ],
+    },
+    tier: 'parachain',
+    relay: 'kusama-internal',
+  },
+  {
+    name: 'acala',
+    domains: [
+      'acala.seabird.systems',
+    ],
+    jobs: {
+      invulnerable: [
+        'acala'
+      ],
+    },
+    tier: 'parachain',
+    relay: 'kusama-internal',
+  },
+  {
+    name: 'moonriver',
+    domains: [
+      'moonriver.seabird.systems',
+    ],
+    jobs: {
+      invulnerable: [
+        'moonriver'
       ],
     },
     tier: 'parachain',

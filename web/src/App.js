@@ -46,12 +46,12 @@ function App() {
                   (blockchain.tier === 'parachain')
                     ? (
                         <Nav.Link key={bI} as={Link} to={`/chain/${blockchain.relay}/${blockchain.name}`}>
-                          <strong>{blockchain.name}</strong> <sup><em className="text-muted">{blockchain.relay}</em></sup>
+                          <strong>{blockchain.name.replace('-testnet', 'ᵗ').replace('-internal', 'ᶤ')}</strong> <sup><em className="text-muted">{blockchain.relay.replace('-testnet', 'ᵗ').replace('-internal', 'ᶤ')}</em></sup>
                         </Nav.Link>
                       )
                     : (
                         <Nav.Link key={bI} as={Link} to={`/chain/${blockchain.name}`}>
-                          <strong>{blockchain.name}</strong>
+                          <strong>{blockchain.name.replace('-testnet', 'ᵗ').replace('-internal', 'ᶤ')}</strong>
                         </Nav.Link>
                       )
                 ))
