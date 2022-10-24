@@ -110,7 +110,7 @@ file:
       post:
         - systemctl is-active --quiet acala.service && sudo systemctl restart acala.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c2/etc/systemd/system/acala.service
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c1/etc/systemd/system/acala.service
     target: /etc/systemd/system/acala.service
     sha256: 2d4dc906f7bee80484fa3dd7268d386325c7ba51f5acf6c590be622d9175575e
     command:
