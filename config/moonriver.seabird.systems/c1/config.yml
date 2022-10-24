@@ -94,7 +94,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/moonriver.json
     target: /usr/share/substrate/moonriver.json
-    sha256: 7f529a2e726f59ea59a0b448a95cdd4eb66c4264eaddfe13894019df223c8643
+    sha256: 86c6b048b8d6ff94f72f756885c396315745a9cae64c41b532e2d2ad5cafcbf0
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
