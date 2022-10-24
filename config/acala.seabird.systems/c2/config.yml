@@ -92,9 +92,9 @@ file:
         - sudo chmod +x /usr/local/bin/acala
         - systemctl is-active --quiet acala.service || sudo systemctl start acala.service
   -
-    source: para_genesis_url
-    target: para_genesis_target
-    sha256: para_genesis_sha
+    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/acala.json
+    target: /usr/share/substrate/acala.json
+    sha256: fa7c430761f9a467d6c92d11eeaa67b21eb5607f0b6400b7139c9c6bacd25410
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
