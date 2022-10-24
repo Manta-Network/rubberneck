@@ -110,8 +110,8 @@ file:
       post:
         - systemctl is-active --quiet moonriver.service && sudo systemctl restart moonriver.service
   -
-    source: unit_url
-    target: unit_target
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c5/etc/systemd/system/moonriver.service
+    target: /etc/systemd/system/moonriver.service
     sha256: cc074d941aef7dccb0b21e969a75a5d371efa6ab342ebdbc401ed14fd927cb6d
     command:
       pre:

@@ -110,8 +110,8 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: unit_url
-    target: unit_target
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c2/etc/systemd/system/calamari.service
+    target: /etc/systemd/system/calamari.service
     sha256: 22aaca8b5e94b86e6aa99594b698b18d931cf486808b60efa5698c92b1e61fd7
     command:
       pre:
