@@ -65,6 +65,7 @@ else
 fi
 
 for domain in ${domain_list[@]}; do
+  echo "[sync] domain: ${domain}"
   curl -sL \
     -o ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config-${domain}.json \
     -H "Accept: application/vnd.github+json" \
