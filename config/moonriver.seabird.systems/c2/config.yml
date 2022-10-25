@@ -81,46 +81,46 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
-  -
-    source: https://manta-ops.s3.amazonaws.com/kusama-v0.9.28-staging/moonbeam
-    target: /usr/local/bin/moonriver
-    sha256: e8b715d264f9533bd1f1b18c57011af750e730ae8ac673a5910f8f7ce4ba9a52
-    command:
-      pre:
-        - systemctl is-active --quiet moonriver.service && sudo systemctl stop moonriver.service
-      post:
-        - sudo chmod +x /usr/local/bin/moonriver
-        - systemctl is-active --quiet moonriver.service || sudo systemctl start moonriver.service
-  -
-    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/moonriver.json
-    target: /usr/share/substrate/moonriver.json
-    sha256: 86c6b048b8d6ff94f72f756885c396315745a9cae64c41b532e2d2ad5cafcbf0
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet moonriver.service && sudo systemctl restart moonriver.service
-  -
-    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
-    target: /usr/share/substrate/seabird.json
-    sha256: bf6280b356b64dc37cee3688336df34bf8f7497b0c711d0f4e73f2141c91138a
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet moonriver.service && sudo systemctl restart moonriver.service
-  -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c2/etc/systemd/system/moonriver.service
-    target: /etc/systemd/system/moonriver.service
-    sha256: cc074d941aef7dccb0b21e969a75a5d371efa6ab342ebdbc401ed14fd927cb6d
-    command:
-      pre:
-        - systemctl is-active --quiet moonriver.service && sudo systemctl stop moonriver.service
-      post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet moonriver.service || sudo systemctl enable moonriver.service
-        - sudo systemctl start moonriver.service
+#  -
+#    source: https://manta-ops.s3.amazonaws.com/kusama-v0.9.28-staging/moonbeam
+#    target: /usr/local/bin/moonriver
+#    sha256: e8b715d264f9533bd1f1b18c57011af750e730ae8ac673a5910f8f7ce4ba9a52
+#    command:
+#      pre:
+#        - systemctl is-active --quiet moonriver.service && sudo systemctl stop moonriver.service
+#      post:
+#        - sudo chmod +x /usr/local/bin/moonriver
+#        - systemctl is-active --quiet moonriver.service || sudo systemctl start moonriver.service
+#  -
+#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/moonriver.json
+#    target: /usr/share/substrate/moonriver.json
+#    sha256: 86c6b048b8d6ff94f72f756885c396315745a9cae64c41b532e2d2ad5cafcbf0
+#    command:
+#      pre:
+#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+#      post:
+#        - systemctl is-active --quiet moonriver.service && sudo systemctl restart moonriver.service
+#  -
+#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
+#    target: /usr/share/substrate/seabird.json
+#    sha256: bf6280b356b64dc37cee3688336df34bf8f7497b0c711d0f4e73f2141c91138a
+#    command:
+#      pre:
+#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+#      post:
+#        - systemctl is-active --quiet moonriver.service && sudo systemctl restart moonriver.service
+#  -
+#    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c2/etc/systemd/system/moonriver.service
+#    target: /etc/systemd/system/moonriver.service
+#    sha256: cc074d941aef7dccb0b21e969a75a5d371efa6ab342ebdbc401ed14fd927cb6d
+#    command:
+#      pre:
+#        - systemctl is-active --quiet moonriver.service && sudo systemctl stop moonriver.service
+#      post:
+#        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+#        - sudo systemctl daemon-reload
+#        - systemctl is-enabled --quiet moonriver.service || sudo systemctl enable moonriver.service
+#        - sudo systemctl start moonriver.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf

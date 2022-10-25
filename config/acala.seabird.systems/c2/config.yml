@@ -81,46 +81,46 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
-  -
-    source: https://manta-ops.s3.amazonaws.com/kusama-v0.9.28-staging/acala
-    target: /usr/local/bin/acala
-    sha256: 5f6653127d3b4662a618a7a25bc1a5746dca927bbb992478b7bfe46bff82f3f7
-    command:
-      pre:
-        - systemctl is-active --quiet acala.service && sudo systemctl stop acala.service
-      post:
-        - sudo chmod +x /usr/local/bin/acala
-        - systemctl is-active --quiet acala.service || sudo systemctl start acala.service
-  -
-    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/acala.json
-    target: /usr/share/substrate/acala.json
-    sha256: fa7c430761f9a467d6c92d11eeaa67b21eb5607f0b6400b7139c9c6bacd25410
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet acala.service && sudo systemctl restart acala.service
-  -
-    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
-    target: /usr/share/substrate/seabird.json
-    sha256: bf6280b356b64dc37cee3688336df34bf8f7497b0c711d0f4e73f2141c91138a
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet acala.service && sudo systemctl restart acala.service
-  -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c2/etc/systemd/system/acala.service
-    target: /etc/systemd/system/acala.service
-    sha256: 9deebe45bd848eead828561283f0c6f7cd41d84247d6bdbca95a71492134cbfd
-    command:
-      pre:
-        - systemctl is-active --quiet acala.service && sudo systemctl stop acala.service
-      post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet acala.service || sudo systemctl enable acala.service
-        - sudo systemctl start acala.service
+#  -
+#    source: https://manta-ops.s3.amazonaws.com/kusama-v0.9.28-staging/acala
+#    target: /usr/local/bin/acala
+#    sha256: 5f6653127d3b4662a618a7a25bc1a5746dca927bbb992478b7bfe46bff82f3f7
+#    command:
+#      pre:
+#        - systemctl is-active --quiet acala.service && sudo systemctl stop acala.service
+#      post:
+#        - sudo chmod +x /usr/local/bin/acala
+#        - systemctl is-active --quiet acala.service || sudo systemctl start acala.service
+#  -
+#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/acala.json
+#    target: /usr/share/substrate/acala.json
+#    sha256: fa7c430761f9a467d6c92d11eeaa67b21eb5607f0b6400b7139c9c6bacd25410
+#    command:
+#      pre:
+#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+#      post:
+#        - systemctl is-active --quiet acala.service && sudo systemctl restart acala.service
+#  -
+#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
+#    target: /usr/share/substrate/seabird.json
+#    sha256: bf6280b356b64dc37cee3688336df34bf8f7497b0c711d0f4e73f2141c91138a
+#    command:
+#      pre:
+#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+#      post:
+#        - systemctl is-active --quiet acala.service && sudo systemctl restart acala.service
+#  -
+#    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c2/etc/systemd/system/acala.service
+#    target: /etc/systemd/system/acala.service
+#    sha256: 9deebe45bd848eead828561283f0c6f7cd41d84247d6bdbca95a71492134cbfd
+#    command:
+#      pre:
+#        - systemctl is-active --quiet acala.service && sudo systemctl stop acala.service
+#      post:
+#        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+#        - sudo systemctl daemon-reload
+#        - systemctl is-enabled --quiet acala.service || sudo systemctl enable acala.service
+#        - sudo systemctl start acala.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf

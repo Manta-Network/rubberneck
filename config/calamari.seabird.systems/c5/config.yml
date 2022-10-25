@@ -81,46 +81,46 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
-  -
-    source: https://github.com/Manta-Network/Manta/releases/download/v3.4.2/manta
-    target: /usr/local/bin/calamari
-    sha256: 68d4a42ee0acfc8cd8db3af2d25298db54459bb0d5843fc17c23de6d6d984249
-    command:
-      pre:
-        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
-      post:
-        - sudo chmod +x /usr/local/bin/calamari
-        - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
-  -
-    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/calamari.json
-    target: /usr/share/substrate/calamari.json
-    sha256: e8bb119ad961a882cb9d7d980eeac7fb47a1d0c64e408233270ac95148bb75c0
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
-  -
-    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
-    target: /usr/share/substrate/seabird.json
-    sha256: bf6280b356b64dc37cee3688336df34bf8f7497b0c711d0f4e73f2141c91138a
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
-  -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c5/etc/systemd/system/calamari.service
-    target: /etc/systemd/system/calamari.service
-    sha256: 82401b0acefd57b2d131c846b2eecfa4a79e888046479ab9f4617ae78ac1bc54
-    command:
-      pre:
-        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
-      post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet calamari.service || sudo systemctl enable calamari.service
-        - sudo systemctl start calamari.service
+#  -
+#    source: https://github.com/Manta-Network/Manta/releases/download/v3.4.2/manta
+#    target: /usr/local/bin/calamari
+#    sha256: 68d4a42ee0acfc8cd8db3af2d25298db54459bb0d5843fc17c23de6d6d984249
+#    command:
+#      pre:
+#        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
+#      post:
+#        - sudo chmod +x /usr/local/bin/calamari
+#        - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
+#  -
+#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/calamari.json
+#    target: /usr/share/substrate/calamari.json
+#    sha256: e8bb119ad961a882cb9d7d980eeac7fb47a1d0c64e408233270ac95148bb75c0
+#    command:
+#      pre:
+#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+#      post:
+#        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
+#  -
+#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
+#    target: /usr/share/substrate/seabird.json
+#    sha256: bf6280b356b64dc37cee3688336df34bf8f7497b0c711d0f4e73f2141c91138a
+#    command:
+#      pre:
+#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+#      post:
+#        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
+#  -
+#    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c5/etc/systemd/system/calamari.service
+#    target: /etc/systemd/system/calamari.service
+#    sha256: 82401b0acefd57b2d131c846b2eecfa4a79e888046479ab9f4617ae78ac1bc54
+#    command:
+#      pre:
+#        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
+#      post:
+#        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+#        - sudo systemctl daemon-reload
+#        - systemctl is-enabled --quiet calamari.service || sudo systemctl enable calamari.service
+#        - sudo systemctl start calamari.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
