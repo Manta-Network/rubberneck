@@ -48,12 +48,12 @@ curl -sL \
   https://api.github.com/repos/${rubberneck_github_org}/${rubberneck_github_repo}/contents/config
 
 if [ -z "${chain_list}" ]; then
-  declare –a domain_list=$(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config.json)
+  domain_list=( $(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config.json) )
 else
   curl -sL \
     -o ${tmp}/blockchains.json \
     https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/blockchains
-  declare –a domain_list=()
+  domain_list=()
   for chain in ${chain_list[@]}; do
     if [[ ${chain} == *"/"* ]]; then
       chain_domain_list=$(jq --arg name ${chain##*/} --arg relay ${chain%%/*} -r '.blockchains[] | select(.name == $name and .relay == $relay) | .domains[]' ${tmp}/blockchains.json)
