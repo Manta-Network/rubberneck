@@ -44,7 +44,7 @@ file:
   -
     source: 'https://gist.githubusercontent.com/grenade/0ecdf893ee41662b8715c1ae29716272/raw/filebeat-substrate.yml'
     target: /etc/filebeat/filebeat.yml
-    sha256: aac1619280377332758683ba2f18a6ab56a459c3aada1e9d3fae506613ac773f
+    sha256: 3fe7fa9a28dee883586ae6025c8943e351ad7c54e495b5402004860bc85c94e8
     command:
       pre:
         - sudo apt-get install -y filebeat
