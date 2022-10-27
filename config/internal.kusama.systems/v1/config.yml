@@ -42,9 +42,9 @@ file:
       post:
         - sudo apt-get update
   -
-    source: 'https://gist.githubusercontent.com/grenade/0ecdf893ee41662b8715c1ae29716272/raw/filebeat-kusama.yml'
+    source: 'https://gist.githubusercontent.com/grenade/0ecdf893ee41662b8715c1ae29716272/raw/filebeat-substrate.yml'
     target: /etc/filebeat/filebeat.yml
-    sha256: 2755d2a1366e58a1a92dfebe7e24b7af1e776f3080de5ce490a9fb8efbc96d26
+    sha256: aac1619280377332758683ba2f18a6ab56a459c3aada1e9d3fae506613ac773f
     command:
       pre:
         - sudo apt-get install -y filebeat
