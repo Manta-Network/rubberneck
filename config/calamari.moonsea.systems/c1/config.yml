@@ -23,6 +23,7 @@ user:
     authorized:
       keys:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN6aq+HBqx3NWg8qWh9p62KV+A4UCx0Cr5fskpPqGWuF
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIBSdR9Wy3S4L+Zdcu8waYe5vW2VzMoi+QafgV3IIFj
       users:
         - stechu
         - garandor
