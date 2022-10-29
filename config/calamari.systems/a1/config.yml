@@ -82,7 +82,7 @@ file:
   -
     source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.2/manta'
     target: /usr/bin/manta
-    sha256: 68d4a42ee0acfc8cd8db3af2d25298db54459bb0d5843fc17c23de6d6d984249
+    sha256: 33d31e22f08ec948173cf982ce8e34ed26ef540a1e5880fdb331db24294a5f60
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
