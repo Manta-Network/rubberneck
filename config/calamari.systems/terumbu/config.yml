@@ -59,7 +59,7 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now prometheus-node-exporter.service
   -
-    source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.2/manta'
+    source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.3/manta'
     target: /usr/bin/manta
     sha256: 33d31e22f08ec948173cf982ce8e34ed26ef540a1e5880fdb331db24294a5f60
     command:
