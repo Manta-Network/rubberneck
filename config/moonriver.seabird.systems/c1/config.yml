@@ -152,7 +152,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c1/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 912f3107d930af1f5ba4fb360226e0c2e4d289f224103929484360a5bb7f256d
+    sha256: dfacdc37c0a810c775bfd00e1da7cc9a6b364fe3015d1c3233cf8c77b584ac11
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
