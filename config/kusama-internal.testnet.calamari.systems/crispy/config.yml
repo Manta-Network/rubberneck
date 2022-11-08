@@ -47,7 +47,7 @@ file:
     sha256: 35ab9c5313c3729bf7cdedde972cf7b6e566d75bc5789edd88ab034a4e14096a
     command:
       pre:
-        - mkdir -p /etc/promtail
+        - sudo mkdir -p /etc/promtail
         - ( systemctl is-active --quiet promtail.service && sudo systemctl stop promtail.service ) || true
       post:
         - sudo systemctl daemon-reload
