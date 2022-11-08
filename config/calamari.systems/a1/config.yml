@@ -51,13 +51,24 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.service
     target: /etc/systemd/system/promtail.service
-    sha256: 700abc279f784767f6f3627eaf83ebbdb57512fc80a18c4eac44b560e7326589
+    sha256: 35ab9c5313c3729bf7cdedde972cf7b6e566d75bc5789edd88ab034a4e14096a
     command:
       pre:
         - ( systemctl is-active --quiet promtail.service && sudo systemctl stop promtail.service ) || true
       post:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet promtail.service || sudo systemctl enable promtail.service
+        - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
+  -
+    source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
+    target: /etc/promtail/promtail.yml
+    sha256: 35ab9c5313c3729bf7cdedde972cf7b6e566d75bc5789edd88ab034a4e14096a
+    command:
+      pre:
+        - mkdir -p /etc/promtail
+        - ( systemctl is-active --quiet promtail.service && sudo systemctl stop promtail.service ) || true
+      post:
+        - sudo systemctl daemon-reload
         - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
   -
     source: 'https://gist.githubusercontent.com/grenade/0ecdf893ee41662b8715c1ae29716272/raw/elastic-8.x.list'
