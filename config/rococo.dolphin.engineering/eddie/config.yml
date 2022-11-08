@@ -62,7 +62,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 35ab9c5313c3729bf7cdedde972cf7b6e566d75bc5789edd88ab034a4e14096a
+    sha256: bc036b36d8732c551e32588de05b0079b80bbf7f117615ec537f4a507968766b
     command:
       pre:
         - sudo mkdir -p /etc/promtail
