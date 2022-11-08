@@ -34,7 +34,10 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.service
     target: /etc/systemd/system/promtail.service
+    sha256: 700abc279f784767f6f3627eaf83ebbdb57512fc80a18c4eac44b560e7326589
     command:
+      pre:
+        - ( systemctl is-active --quiet promtail.service && sudo systemctl stop promtail.service ) || true
       post:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet promtail.service || sudo systemctl enable promtail.service
