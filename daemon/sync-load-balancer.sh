@@ -210,6 +210,8 @@ for domain in ${domain_list[@]}; do
                 else
                   unset updated_alias_weight
                 fi
+              else
+                unset updated_alias_weight
               fi
             else
               unset observed_alias_weight
