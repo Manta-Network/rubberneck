@@ -13,7 +13,7 @@ dns:
   alias:
     -
       name: ws.calamari.systems
-      weight: 25
+      weight: 100
     -
       name: ws.archive.calamari.systems
       weight: 200
