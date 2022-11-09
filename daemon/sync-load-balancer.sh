@@ -65,7 +65,7 @@ for domain in ${domain_list[@]}; do
     if curl -sL \
       -o ${tmp}/${fqdn}-config.yml \
       https://raw.githubusercontent.com/${rubberneck_github_org}/${rubberneck_github_repo}/${rubberneck_github_latest_sha}/config/${domain}/${hostname}/config.yml; then
-      echo "[${fqdn}] config fetch suceeded"
+      #echo "[${fqdn}] config fetch suceeded"
       action=$(yq -r .action ${tmp}/${fqdn}-config.yml)
       
       # todo: handle multi-node instances
@@ -106,6 +106,58 @@ for domain in ${domain_list[@]}; do
           fi
         else
           echo "[${fqdn}] observed health check id: ${health_check_id}"
+        fi
+        if [ "${#health_check_id}" = "36" ]; then
+          if [ "${health_response_code}" = "200" ]; then
+            is_syncing=$(curl --silent ${health_endpoint} | jq -r .isSyncing)
+          else
+            is_syncing=possible
+          fi
+          observed_tcp_connection_count=$(curl -s https://${fqdn}/node/metrics | egrep 'node_netstat_Tcp_CurrEstab [[:digit:]]+' | cut -d ' ' -f 2)
+
+          curl -s \
+            -o ${tmp}/${fqdn}-etc-units-contents.json \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${rubberneck_github_token}" \
+            https://api.github.com/repos/${rubberneck_github_org}/${rubberneck_github_repo}/contents/config/${domain}/${hostname}/etc/systemd/system
+          curl -s \
+            -o ${tmp}/${fqdn}-lib-units-contents.json \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${rubberneck_github_token}" \
+            https://api.github.com/repos/${rubberneck_github_org}/${rubberneck_github_repo}/contents/config/${domain}/${hostname}/usr/lib/systemd/system
+
+          declare -a units_urls=()
+          for units_file in ${tmp}/${fqdn}-etc-units-contents.json ${tmp}/${fqdn}-lib-units-contents.json; do
+            if [ "$(head -c 1 ${units_file})" = "[" ]; then
+              units_urls+=( $(jq -r '.[] | select(.name | endswith(".service")) | .download_url' ${units_file}) )
+            fi
+          done
+          for unit_url in ${units_urls[@]}; do
+            configured_ws_max_connections=$(curl -s ${unit_url} | egrep -o 'ws-max-connections [[:digit:]]+ ' | egrep -o '[[:digit:]]+')
+            if [ -n "${configured_ws_max_connections}" ]; then
+              #echo "[${fqdn}] observed ws-max-connections (${unit_url}): ${configured_ws_max_connections}"
+              break
+            fi
+          done
+          if [ -z "${configured_ws_max_connections}" ]; then
+            configured_ws_max_connections=100
+            #echo "[${fqdn}] default ws-max-connections: ${configured_ws_max_connections}"
+          fi
+
+          computed_resource_availability=$(bc -l <<< "scale=3; 1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}")
+
+          alias_list_as_base64=$(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null)
+          for alias_as_base64 in ${alias_list_as_base64[@]}; do
+            alias_name=$(_decode_property ${alias_as_base64} .name)
+            configured_alias_weight=$(_decode_property ${alias_as_base64} .weight)
+            if [ "${health_response_code}" = "200" ] && [ "${is_syncing}" = "false" ]; then
+              computed_alias_weight=$(bc -l <<< "(${configured_alias_weight} * (1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}))")
+              computed_alias_weight=${computed_alias_weight%%.*}
+            else
+              computed_alias_weight=0
+            fi
+            echo "[${fqdn}] alias: ${alias_name}, computed resource availability: ${computed_resource_availability}, configured max connections: ${configured_ws_max_connections}, observed connections: ${observed_tcp_connection_count}, configured weight: ${configured_alias_weight}, computed weight: ${computed_alias_weight}, syncing: ${is_syncing}"
+          done
         fi
       fi
     else
