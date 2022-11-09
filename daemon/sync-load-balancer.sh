@@ -204,7 +204,8 @@ for domain in ${domain_list[@]}; do
                 if aws route53 change-resource-record-sets \
                   --profile pelagos-ops \
                   --hosted-zone-id ${zone} \
-                  --change-batch=file://${tmp}/change-resource-record-set-${fqdn}.json; then
+                  --change-batch=file://${tmp}/change-resource-record-set-${fqdn}.json > ${tmp}/change-resource-record-set-${fqdn}-result.json; then
+                  jq -c . ${tmp}/change-resource-record-set-${fqdn}-result.json
                   updated_alias_weight=${computed_alias_weight}
                 else
                   unset updated_alias_weight
