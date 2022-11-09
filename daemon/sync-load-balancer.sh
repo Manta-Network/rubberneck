@@ -73,7 +73,7 @@ for domain in ${domain_list[@]}; do
         health_resource_path=/health
         health_endpoint=https://${fqdn}${health_resource_path}
         health_response_code=$(curl --write-out '%{http_code}' --silent --output /dev/null ${health_endpoint})
-        echo "[${fqdn}] observed health response code (${health_endpoint}): ${health_response_code}"
+        #echo "[${fqdn}] observed health response code (${health_endpoint}): ${health_response_code}"
         health_check_id=$(aws route53 list-health-checks --profile pelagos-ops --output text --query "HealthChecks[?HealthCheckConfig.FullyQualifiedDomainName=='${fqdn}'].Id")
         if [ -z "${health_check_id}" ]; then
           if [ "${health_response_code}" = "200" ]; then
@@ -104,8 +104,8 @@ for domain in ${domain_list[@]}; do
           else
             echo "[${fqdn}] health check creation skipped"
           fi
-        else
-          echo "[${fqdn}] observed health check id: ${health_check_id}"
+        #else
+        #  echo "[${fqdn}] observed health check id: ${health_check_id}"
         fi
         if [ "${#health_check_id}" = "36" ]; then
           if [ "${health_response_code}" = "200" ]; then
@@ -156,7 +156,7 @@ for domain in ${domain_list[@]}; do
             else
               computed_alias_weight=0
             fi
-            echo "[${fqdn}] alias: ${alias_name}, computed resource availability: ${computed_resource_availability}, configured max connections: ${configured_ws_max_connections}, observed connections: ${observed_tcp_connection_count}, configured weight: ${configured_alias_weight}, computed weight: ${computed_alias_weight}, syncing: ${is_syncing}"
+            echo "[${fqdn}] alias: ${alias_name}, computed resource availability: ${computed_resource_availability}, configured max connections: ${configured_ws_max_connections}, observed connections: ${observed_tcp_connection_count}, configured weight: ${configured_alias_weight}, computed weight: ${computed_alias_weight}, health check: ${health_check_id}, health response: ${health_response_code}, syncing: ${is_syncing}"
           done
         fi
       fi
