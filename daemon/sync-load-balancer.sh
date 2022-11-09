@@ -102,7 +102,7 @@ for domain in ${domain_list[@]}; do
               echo "[${fqdn}] health check creation failed"
             fi
           else
-            echo "[${fqdn}] health check creation skipped"
+            echo "[${fqdn}] health check creation skipped. health check response code: ${health_response_code}"
           fi
         #else
         #  echo "[${fqdn}] observed health check id: ${health_check_id}"
@@ -133,7 +133,7 @@ for domain in ${domain_list[@]}; do
             fi
           done
           for unit_url in ${units_urls[@]}; do
-            configured_ws_max_connections=$(curl -s ${unit_url} | egrep -o 'ws-max-connections [[:digit:]]+ ' | egrep -o '[[:digit:]]+')
+            configured_ws_max_connections=$(curl -s ${unit_url} | egrep -o 'ws-max-connections [[:digit:]]+ ' | head -n 1 | egrep -o '[[:digit:]]+')
             if [ -n "${configured_ws_max_connections}" ]; then
               #echo "[${fqdn}] observed ws-max-connections (${unit_url}): ${configured_ws_max_connections}"
               break
@@ -143,17 +143,22 @@ for domain in ${domain_list[@]}; do
             configured_ws_max_connections=100
             #echo "[${fqdn}] default ws-max-connections: ${configured_ws_max_connections}"
           fi
-
-          computed_resource_availability=$(echo "scale=3; 1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}" | bc -l)
-
+          computed_resource_availability=$(echo "scale=3; 1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}" | bc -l | head -n 1)
           alias_list_as_base64=$(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null)
           for alias_as_base64 in ${alias_list_as_base64[@]}; do
             alias_name=$(_decode_property ${alias_as_base64} .name)
             configured_alias_weight=$(_decode_property ${alias_as_base64} .weight)
-            if [ "${health_response_code}" = "200" ] && [ "${is_syncing}" = "false" ]; then
-              computed_alias_weight=$(echo "(${configured_alias_weight} * (1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}))" | bc -l)
-              computed_alias_weight=${computed_alias_weight%%.*}
+            if [ "${computed_resource_availability:0:1}" = "-" ]; then
+              # resource availability is negative
+              computed_alias_weight=0
+            elif [ "${health_response_code}" = "200" ] && [ "${is_syncing}" = "false" ]; then
+              # resource availability is positive, node is healthy and not syncing
+              computed_alias_weight=$(echo "(${configured_alias_weight} * (1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}))" | bc -l | head -n 1)
+              if [[ ${computed_alias_weight} == *"."* ]]; then
+                computed_alias_weight=${computed_alias_weight%%.*}
+              fi
             else
+              # node is unhealthy or syncing
               computed_alias_weight=0
             fi
             tld=$(echo ${fqdn} | rev | cut -d "." -f1-2 | rev)
