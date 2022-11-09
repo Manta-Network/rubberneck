@@ -1,0 +1,16 @@
+[Unit]
+Description=sync load balancer
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=HOME=/root
+ExecStartPre=curl -sLo /usr/local/bin/sync-load-balancer.sh https://raw.githubusercontent.com/Manta-Network/rubberneck/main/daemon/sync-load-balancer.sh
+ExecStartPre=chmod +x /usr/local/bin/sync-load-balancer.sh
+ExecStart=/usr/local/bin/sync-load-balancer.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
