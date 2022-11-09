@@ -144,14 +144,14 @@ for domain in ${domain_list[@]}; do
             #echo "[${fqdn}] default ws-max-connections: ${configured_ws_max_connections}"
           fi
 
-          computed_resource_availability=$(bc -l <<< "scale=3; 1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}")
+          computed_resource_availability=$(echo "scale=3; 1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}" | bc -l)
 
           alias_list_as_base64=$(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null)
           for alias_as_base64 in ${alias_list_as_base64[@]}; do
             alias_name=$(_decode_property ${alias_as_base64} .name)
             configured_alias_weight=$(_decode_property ${alias_as_base64} .weight)
             if [ "${health_response_code}" = "200" ] && [ "${is_syncing}" = "false" ]; then
-              computed_alias_weight=$(bc -l <<< "(${configured_alias_weight} * (1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}))")
+              computed_alias_weight=$(echo "(${configured_alias_weight} * (1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}))" | bc -l)
               computed_alias_weight=${computed_alias_weight%%.*}
             else
               computed_alias_weight=0
