@@ -156,7 +156,66 @@ for domain in ${domain_list[@]}; do
             else
               computed_alias_weight=0
             fi
-            echo "[${fqdn}] alias: ${alias_name}, computed resource availability: ${computed_resource_availability}, configured max connections: ${configured_ws_max_connections}, observed connections: ${observed_tcp_connection_count}, configured weight: ${configured_alias_weight}, computed weight: ${computed_alias_weight}, health check: ${health_check_id}, health response: ${health_response_code}, syncing: ${is_syncing}"
+            tld=$(echo ${fqdn} | rev | cut -d "." -f1-2 | rev)
+            zone=$(basename $(aws route53 list-hosted-zones --profile pelagos-ops | jq --arg tld ${tld}. -r '.HostedZones[] | select(.Name == $tld) | .Id'))
+            if [ -n "${zone}" ]; then
+              observed_alias_weight=$(aws route53 list-resource-record-sets \
+                --profile pelagos-ops \
+                --hosted-zone-id ${zone} \
+                --output text \
+                --query "ResourceRecordSets[? AliasTarget.DNSName=='${fqdn}.' && Name=='${alias_name}.'].Weight")
+              if [ "${action}" = "sync" ] && [ "${observed_alias_weight}" != "${computed_alias_weight}" ]; then
+                echo '
+                  {
+                    "Changes": [
+                      {
+                        "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                          "Name": "",
+                          "SetIdentifier": "",
+                          "Weight": 0,
+                          "Type": "A",
+                          "AliasTarget": {
+                            "HostedZoneId": "",
+                            "DNSName": "",
+                            "EvaluateTargetHealth": true
+                          },
+                          "HealthCheckId": ""
+                        }
+                      }
+                    ]
+                  }
+                ' | jq \
+                    --arg name ${alias_name} \
+                    --arg id ${hostname} \
+                    --arg fqdn ${fqdn} \
+                    --arg zone ${zone} \
+                    --arg hci ${health_check_id} \
+                    --arg weight ${computed_alias_weight} \
+                    '
+                      .
+                      | .Changes[0].ResourceRecordSet.Name = $name
+                      | .Changes[0].ResourceRecordSet.SetIdentifier = $id
+                      | .Changes[0].ResourceRecordSet.AliasTarget.DNSName = $fqdn
+                      | .Changes[0].ResourceRecordSet.AliasTarget.HostedZoneId = $zone
+                      | .Changes[0].ResourceRecordSet.HealthCheckId = $hci
+                      | .Changes[0].ResourceRecordSet.Weight = ($weight|tonumber)
+                    ' > ${tmp}/change-resource-record-set-${fqdn}.json
+                if aws route53 change-resource-record-sets \
+                  --profile pelagos-ops \
+                  --hosted-zone-id ${zone} \
+                  --change-batch=file://${tmp}/change-resource-record-set-${fqdn}.json; then
+                  updated_alias_weight=${computed_alias_weight}
+                else
+                  unset updated_alias_weight
+                fi
+              fi
+            else
+              unset observed_alias_weight
+              unset updated_alias_weight
+              echo "[${fqdn}] failed to determine zone for tld: ${tld}"
+            fi
+            echo "[${fqdn}] alias: ${alias_name}, computed resource availability: ${computed_resource_availability}, configured max connections: ${configured_ws_max_connections}, observed connections: ${observed_tcp_connection_count}, observed weight: ${observed_alias_weight}, configured weight: ${configured_alias_weight}, computed weight: ${computed_alias_weight}, updated weight: ${updated_alias_weight}, health check: ${health_check_id}, health response: ${health_response_code}, syncing: ${is_syncing}"
           done
         fi
       fi
