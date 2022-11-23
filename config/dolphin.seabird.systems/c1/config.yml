@@ -3,6 +3,10 @@ hostname: c1
 domain: dolphin.seabird.systems
 action: sync
 provider: shock-dedicated
+package:
+  - auditd
+  - certbot
+  - nginx
 user:
   -
     username: root
