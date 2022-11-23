@@ -41,12 +41,6 @@ curl -sL \
 echo "[init] repo: ${rubberneck_github_org}/${rubberneck_github_repo}"
 echo "[init] commit: ${rubberneck_github_latest_sha} ${rubberneck_github_latest_date}"
 
-curl -sL \
-  -o ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config.json \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer ${rubberneck_github_token}" \
-  https://api.github.com/repos/${rubberneck_github_org}/${rubberneck_github_repo}/contents/config
-
 if [ -z "${chain_list}" ]; then
   domain_list=( $(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config.json) )
 else
@@ -125,6 +119,24 @@ for domain in ${domain_list[@]}; do
           echo "[${fqdn}:${remote_path}authorized_keys] sync skipped"
         fi
       done
+
+      package_list=$(yq -r '(.package//empty)|.[]' ${tmp}/${fqdn}-config.yml)
+      package_index=0
+      for package in ${package_list[@]}; do
+        if ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} dpkg-query -W ${package} &> /dev/null; then
+          echo "[${fqdn}:package ${package_index}] install detected, package: ${package}"
+        elif [ "${action}" = "sync" ]; then
+          if ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} sudo apt-get install -y ${package}; then
+            echo "[${fqdn}:package ${package_index}] install succeeded, package: ${package}"
+          else
+            echo "[${fqdn}:package ${package_index}] install failed, package: ${package}"
+          fi
+        else
+          echo "[${fqdn}:package ${package_index}] install skipped, package: ${package}"
+        fi
+        package_index=$((package_index+1))
+      done
+
 
       command_list_as_base64=$(yq -r '(.command//empty)|.[]|@base64' ${tmp}/${fqdn}-config.yml)
       command_index=0
