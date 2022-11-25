@@ -1,6 +1,6 @@
 service: rubberneck
 
-frameworkVersion: '2'
+frameworkVersion: '3'
 variablesResolutionMode: 20210326
 
 provider:
@@ -98,6 +98,7 @@ functions:
         - subnet-0d992d72b76b84264
     environment:
       rubberneck_db_readwrite: ${ssm:/rubberneck_db_readwrite}
+      blockchain_db_read: ${ssm:/rubberneck_blockchain_db_read}
     events:
       -
         http:

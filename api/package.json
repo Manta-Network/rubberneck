@@ -7,8 +7,8 @@
     "node-fetch": "2"
   },
   "devDependencies": {
-    "serverless": "2",
-    "serverless-offline": "8",
+    "serverless": "3",
+    "serverless-offline": "^11.5.0",
     "serverless-offline-ssm": "^6.2.0"
   }
 }

@@ -1,86 +1,12 @@
 'use strict';
 
-//const { ApiPromise, WsProvider } = require("@polkadot/api");
-//const Client = require('jsonrpc-websocket-client').JsonRpcWebSocketClient;
-//import Client from "jsonrpc-websocket-client";
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 const sslCertificate = require('get-ssl-certificate');
 
 const rubberneckDbReadWrite = (process.env.rubberneck_db_readwrite);
-const hetzner = {
-  cloud: {
-    calamari: (process.env.rubberneck_hetzner_calamari),
-    dolphin: (process.env.rubberneck_hetzner_dolphin),
-  },
-  robot: {
-    default: {
-      username: (process.env.rubberneck_hetzner_robot_default_username),
-      password: (process.env.rubberneck_hetzner_robot_default_password),
-    }
-  },
-};
-const country = {
-  DE: 'Germany',
-  FI: 'Finland',
-  US: 'United States',
-};
-const project = {
-  calamari: 1418177,
-  dolphin: 1418181,
-  manta: 1418182,
-  infrastructure: 1418381,
-};
-const machine = {
-  'AX41-NVMe': {
-    price: {
-      '2022-07-19': {
-        hour: {
-          amount: 36 * 12 / 365 / 24,
-          currency: 'EUR'
-        },
-        month: {
-          amount: 36,
-          currency: 'EUR'
-        },
-      },
-    },
-  }
-}
-const history = {
-  1813287: {
-    launch: '2022-07-19T11:41:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-  1813297: {
-    launch: '2022-07-19T11:41:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-  1814187: {
-    launch: '2022-07-19T11:41:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-  1814199: {
-    launch: '2022-07-19T11:41:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-  1814728: {
-    launch: '2022-07-19T11:42:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-  1814734: {
-    launch: '2022-07-19T11:42:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-  1814736: {
-    launch: '2022-07-19T11:43:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-  1814737: {
-    launch: '2022-07-19T11:51:00Z',
-    price: machine['AX41-NVMe'].price['2022-07-19'],
-  },
-}
+const blockchainDbRead = (process.env.blockchain_db_read);
+
 const cache = {
   lifetime: 3600
 };
@@ -90,92 +16,6 @@ const cacheAppend = (key, value) => {
     value
   };
 }
-const flag = (countryCode) => (
-  String.fromCodePoint(...countryCode
-    .toUpperCase()
-    .split('')
-    .map(char =>  127397 + char.charCodeAt()))
-);
-const datacenter = {
-  'HEL1-DC3': {
-    country: {
-      code: 'FI',
-      name: 'Finland',
-      flag: flag('FI'),
-    },
-    city: {
-      name: 'Helsinki',
-    },
-    latitude: 60.1719,
-    longitude: 24.9347,
-  },
-  'HEL1-DC4': {
-    country: {
-      code: 'FI',
-      name: 'Finland',
-      flag: flag('FI'),
-    },
-    city: {
-      name: 'Helsinki',
-    },
-    latitude: 60.1719,
-    longitude: 24.9347,
-  },
-  'HEL1-DC6': {
-    country: {
-      code: 'FI',
-      name: 'Finland',
-      flag: flag('FI'),
-    },
-    city: {
-      name: 'Helsinki',
-    },
-    latitude: 60.1719,
-    longitude: 24.9347,
-  },
-  'FSN1-DC5': {
-    country: {
-      code: 'DE',
-      name: 'Germany',
-      flag: flag('DE'),
-    },
-    city: {
-      name: 'Falkenstein',
-    },
-    latitude: 50.4777,
-    longitude: 12.3649,
-  },
-  'FSN1-DC7': {
-    country: {
-      code: 'DE',
-      name: 'Germany',
-      flag: flag('DE'),
-    },
-    city: {
-      name: 'Falkenstein',
-    },
-    latitude: 50.4777,
-    longitude: 12.3649,
-  },
-  'FSN1-DC16': {
-    country: {
-      code: 'DE',
-      name: 'Germany',
-      flag: flag('DE'),
-    },
-    city: {
-      name: 'Falkenstein',
-    },
-    latitude: 50.4777,
-    longitude: 12.3649,
-  },
-};
-const endpoints = {
-  ops: 'https://7p1eol9lz4.execute-api.us-east-1.amazonaws.com/prod/instances',
-  dev: 'https://mab48pe004.execute-api.us-east-1.amazonaws.com/prod/instances',
-  service: 'https://l7ff90u0lf.execute-api.us-east-1.amazonaws.com/prod/instances',
-  prod: 'https://hzhmt0krm0.execute-api.us-east-1.amazonaws.com/prod/instances'
-};
 const blockchains = [
   {
     name: 'baikal',
@@ -197,7 +37,7 @@ const blockchains = [
     ],
     jobs: {
       invulnerable: [
-        'kusama-internal'
+        'seabird'
       ],
     },
     tier: 'relaychain',
@@ -206,6 +46,7 @@ const blockchains = [
     name: 'moonriver',
     domains: [
       'kusama-internal.moonriver-testnet.calamari.systems',
+      'moonriver.seabird.systems',
     ],
     jobs: {
       invulnerable: [
@@ -216,7 +57,7 @@ const blockchains = [
     relay: 'kusama-internal',
   },
   {
-    name: 'calamari-testnet',
+    name: 'calamari',
     domains: [
       'kusama-internal.testnet.calamari.systems',
       'calamari.seabird.systems',
@@ -243,17 +84,30 @@ const blockchains = [
     relay: 'kusama-internal',
   },
   {
-    name: 'moonriver',
+    name: 'dolphin',
     domains: [
-      'moonriver.seabird.systems',
+      'dolphin.seabird.systems',
     ],
     jobs: {
       invulnerable: [
-        'moonriver'
+        'dolphin'
       ],
     },
     tier: 'parachain',
     relay: 'kusama-internal',
+  },
+  {
+    name: 'calamari',
+    domains: [
+      'calamari.moonsea.systems',
+    ],
+    jobs: {
+      invulnerable: [
+        'moonsea-calamari'
+      ],
+    },
+    tier: 'parachain',
+    relay: 'moonsea',
   },
   {
     name: 'dolphin',
@@ -381,475 +235,74 @@ const invulnerables = [
   'zaphod',
 ];
 
-const getRandomIntInclusive = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-const connectToDatabase = async () => {
-  if (cache.db && cache.db.expires < Date.now()) {
-    return cache.db.value;
+const connectToDatabase = async (databaseName) => {
+  if (cache[`db-${databaseName}`] && cache[`db-${databaseName}`].expires < Date.now()) {
+    return cache[`db-${databaseName}`].value;
   }
-  //console.log(rubberneckDbReadWrite);
-  const client = await MongoClient.connect(rubberneckDbReadWrite);
-  const db = await client.db('rubberneck');
-  cacheAppend('db', db);
+  let connectionString;
+  switch (databaseName) {
+    case 'infrastructure':
+      connectionString = blockchainDbRead;
+      break;
+    default:
+      connectionString = rubberneckDbReadWrite;
+  }
+  const client = await MongoClient.connect(connectionString);
+  const db = await client.db(databaseName);
+  cacheAppend(`db-${databaseName}`, db);
   return db;
 }
-const fetchMachinePrices = async (machine) => {
-  if (cache[machine] && cache[machine].expires < Date.now()) {
-    return cache[machine].value;
+
+const consoleLink = (node) => {
+  switch (node.provider) {
+    case 'amazon-ec2':
+      return {
+        url: `https://console.aws.amazon.com/ec2/v2/home?region=${node.metadata.region}#InstanceDetails:instanceId=${node.metadata.id}`,
+        text: `${node.metadata.region}/${node.metadata.id}`,
+      };
+    case 'hetzner-cloud':
+      return {
+        url: `https://console.hetzner.cloud/projects/${node.metadata.profile}/servers/${node.metadata.id}/overview`,
+        text: `${node.metadata.dc}/${node.metadata.id}`,
+      };
+    case 'hetzner-robot':
+      return {
+        url: `https://robot.hetzner.com/server`,
+        text: `${node.metadata.dc}/${node.metadata.id}`,
+      };
+    case 's4y-dedicated':
+      return {
+        url: `https://my.server4you.net/en/Dedicated/Contract/Index/show?server_name=${node.metadata.id}`,
+        text: `${node.metadata.dc}/${node.metadata.id}`,
+      };
+    case 'shock-dedicated':
+      return {
+        url: `https://shockhosting.net/portal/clientarea.php?action=productdetails&id=${node.metadata.id}`,
+        text: `${node.metadata.dc}/${node.metadata.id}`,
+      };
+    default:
+      return null;
   }
-  const response = await fetch(`https://gist.githubusercontent.com/grenade/b03edb28bba5d3542a6b50b742318061/raw/price-${machine}.json`);
-  const prices = await response.json();
-  cacheAppend(machine, prices);
-  return prices;
-};
-const fetchProfileInstances = async (profile) => {
-  const response = await fetch(endpoints[profile]);
-  const json = await response.json();
-  return Promise.all(json.instances.map(async (i) => {
-    const prices = await fetchMachinePrices(i.machine);
-    return {
-      provider: 'amazon',
-      profile,
-      ...i,
-      price: {
-        hour: {
-          amount: prices.find((p) => p.region === i.region).price,
-          currency: 'USD',
-        }
-      }
-    };
-  }));
-};
-const fetchShockDedicatedInstances = () => {
-  return [
-    {
-      provider: 'shock-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'singapore',
-      image: 'ubuntu-20-04',
-      fqdn: 'c5.calamari.systems',
-      hostname: 'c5',
-      domain: 'calamari.systems',
-      id: '29005',
-      ip: '210.16.67.146',
-      machine: 'SG-DH2',
-      launch: '2022-08-25T07:12:00Z',
-      location: {
-        az: 'singapore',
-        country: {
-          code: 'SG',
-          name: 'Singapore',
-          flag: flag('SG'),
-        },
-        city: {
-          name: 'Singapore',
-        },
-        latitude: '1.3036',
-        longitude: '103.8554',
-      },
-      price: {
-        hour: {
-          amount: 60 * 12 / 365 / 24,
-          currency: 'USD',
-        },
-        month: {
-          amount: 60,
-          currency: 'USD',
-        }
-      },
-    },
-    {
-      provider: 'shock-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'singapore',
-      image: 'ubuntu-20-04',
-      fqdn: 'f5.calamari.systems',
-      hostname: 'f5',
-      domain: 'calamari.systems',
-      id: '29008',
-      ip: '210.16.67.186',
-      machine: 'SG-DS2',
-      launch: '2022-08-25T07:33:00Z',
-      location: {
-        az: 'singapore',
-        country: {
-          code: 'SG',
-          name: 'Singapore',
-          flag: flag('SG'),
-        },
-        city: {
-          name: 'Singapore',
-        },
-        latitude: '1.3036',
-        longitude: '103.8554',
-      },
-      price: {
-        hour: {
-          amount: 60 * 12 / 365 / 24,
-          currency: 'USD',
-        },
-        month: {
-          amount: 60,
-          currency: 'USD',
-        }
-      },
-    },
-    {
-      provider: 'shock-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'london',
-      image: 'ubuntu-20-04',
-      fqdn: 'a1.calamari.systems',
-      hostname: 'a1',
-      domain: 'calamari.systems',
-      id: '29223',
-      ip: '45.155.39.202',
-      machine: 'UK-DH2',
-      launch: '2022-09-08T11:21:00Z',
-      location: {
-        az: 'uk-d11',
-        country: {
-          code: 'GB',
-          name: 'United Kingdom',
-          flag: flag('GB'),
-        },
-        city: {
-          name: 'London',
-        },
-        latitude: '51.5164',
-        longitude: '0.093',
-      },
-      price: {
-        hour: {
-          amount: 170.98 * 4 / 365 / 24,
-          currency: 'USD',
-        },
-        month: {
-          amount: 170.98 * 4 / 12,
-          currency: 'USD',
-        }
-      },
-    },
-    {
-      provider: 'shock-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'florida',
-      image: 'ubuntu-20-04',
-      fqdn: 'a2.calamari.systems',
-      hostname: 'a2',
-      domain: 'calamari.systems',
-      id: '29225',
-      ip: '104.225.131.146',
-      machine: 'FL-DH2',
-      launch: '2022-09-08T11:21:00Z',
-      location: {
-        az: 'fl-d9',
-        country: {
-          code: 'US',
-          name: 'United States',
-          flag: flag('US'),
-        },
-        city: {
-          name: 'Jacksonville',
-        },
-        latitude: '30.3341',
-        longitude: '-81.6544',
-      },
-      price: {
-        hour: {
-          amount: 170.98 * 4 / 365 / 24,
-          currency: 'USD',
-        },
-        month: {
-          amount: 170.98 * 4 / 12,
-          currency: 'USD',
-        }
-      },
-    },
-    {
-      provider: 's4y-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'florida',
-      image: 'ubuntu-20-04',
-      fqdn: 'a3.calamari.systems',
-      hostname: 'a3',
-      domain: 'calamari.systems',
-      id: 'bravo939',
-      ip: '85.25.135.211',
-      machine: 'Opteron 3280',
-      launch: '2022-09-27T11:21:00Z',
-      location: {
-        az: 'SXB',
-        country: {
-          code: 'FR',
-          name: 'France',
-          flag: flag('FR'),
-        },
-        city: {
-          name: 'Strassbourg',
-        },
-        latitude: '48.5855',
-        longitude: '7.7418',
-      },
-      price: {
-        hour: {
-          amount: 39.59 * 12 / 365 / 24,
-          currency: 'EUR',
-        },
-        month: {
-          amount: 39.59,
-          currency: 'EUR',
-        }
-      },
-    },
-    {
-      provider: 'shock-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'japan',
-      image: 'ubuntu-20-04',
-      fqdn: 'a4.calamari.systems',
-      hostname: 'a4',
-      domain: 'calamari.systems',
-      id: '29731',
-      ip: '43.230.163.98',
-      machine: 'JP-DS1',
-      launch: '2022-10-03T11:21:00Z',
-      location: {
-        az: 'jp-d17',
-        country: {
-          code: 'JP',
-          name: 'Japan',
-          flag: flag('JP'),
-        },
-        city: {
-          name: 'Tokyo',
-        },
-        latitude: '35.6893',
-        longitude: '139.6899',
-      },
-      price: {
-        hour: {
-          amount: 269.97 * 2 / 365 / 24,
-          currency: 'USD',
-        },
-        month: {
-          amount: 269.97 * 2 / 12,
-          currency: 'USD',
-        }
-      },
-    },
-    {
-      provider: 'shock-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'london',
-      image: 'ubuntu-20-04',
-      fqdn: 'c1.dolphin.engineering',
-      hostname: 'c1',
-      domain: 'dolphin.engineering',
-      id: '29224',
-      ip: '45.155.39.210',
-      machine: 'UK-DS1',
-      launch: '2022-09-08T11:21:00Z',
-      location: {
-        az: 'uk-d18',
-        country: {
-          code: 'GB',
-          name: 'United Kingdom',
-          flag: flag('GB'),
-        },
-        city: {
-          name: 'London',
-        },
-        latitude: '51.5164',
-        longitude: '0.093',
-      },
-      price: {
-        hour: {
-          amount: 142.48 * 4 / 365 / 24,
-          currency: 'USD',
-        },
-        month: {
-          amount: 142.48 * 4 / 12,
-          currency: 'USD',
-        }
-      },
-    },
-    {
-      provider: 'shock-dedicated',
-      profile: 'default',
-      project: 'default',
-      region: 'new york',
-      image: 'ubuntu-20-04',
-      fqdn: 'c2.dolphin.engineering',
-      hostname: 'c2',
-      domain: 'dolphin.engineering',
-      id: '29226',
-      ip: '52.129.44.90',
-      machine: 'NJ-DH2',
-      launch: '2022-09-08T11:21:00Z',
-      location: {
-        az: 'nj-d43',
-        country: {
-          code: 'US',
-          name: 'United States',
-          flag: flag('US'),
-        },
-        city: {
-          name: 'New York',
-        },
-        latitude: '40.7597',
-        longitude: '-73.981',
-      },
-      price: {
-        hour: {
-          amount: 170.98 * 4 / 365 / 24,
-          currency: 'USD',
-        },
-        month: {
-          amount: 170.98 * 4 / 12,
-          currency: 'USD',
-        }
-      },
-    },
-  ];
-};
-const fetchHetznerCloudInstances = async (profile) => {
-  /*
-  curl \
-    -H "Authorization: Bearer $(pass manta/hetzner/api-token/calamari/manta-ci)" \
-    https://api.hetzner.cloud/v1/servers
-  */
-  let servers;
-  try {
-    const response = await fetch(
-      `https://api.hetzner.cloud/v1/servers`,
-      {
-        headers:  {
-          Authorization: `Bearer ${hetzner.cloud[profile]}`
-        }
-      }
-    );
-    const json = await response.json();
-    servers = json.servers;
-  } catch {
-    servers = undefined;
-  }
-  if (!servers || !servers.length) {
-    return [];
-  }
-  return servers.map((server) => {
-    const instance = {
-      provider: 'hetzner-cloud',
-      profile,
-      project: project[profile],
-      launch: server.created,
-      hostname: server.name.split('.')[0],
-      domain: server.name.split('.').slice(1).join('.'),
-      fqdn: server.name,
-      id: server.id,
-      ip: server.public_net.ipv4.ip,
-      state: server.status,
-      machine: server.server_type.name,
-      region: `${server.datacenter.location.network_zone}-${server.datacenter.location.id}`,
-      image: server.image,
-      location: {
-        az: server.datacenter.location.name,
-        country: {
-          code: server.datacenter.location.country,
-          name: country[server.datacenter.location.country],
-          flag: flag(server.datacenter.location.country),
-        },
-        city: {
-          name: server.datacenter.location.city,
-        },
-        latitude: server.datacenter.location.latitude,
-        longitude: server.datacenter.location.longitude,
-      },
-      price: {
-        hour: {
-          amount: server.server_type.prices.find((p) => p.location === server.datacenter.location.name).price_hourly.gross,
-          currency: 'EUR',
-        },
-        month: {
-          amount: server.server_type.prices.find((p) => p.location === server.datacenter.location.name).price_monthly.gross,
-          currency: 'EUR',
-        }
-      },
-    };
-    return instance;
-  });
-};
-const fetchHetznerRobotInstances = async (profile) => {
-  /*
-  curl \
-    -u $(pass manta/hetzner/robot/default/username):$(pass manta/hetzner/robot/default/password) \
-    https://robot-ws.your-server.de/server
-  */
-  let items;
-  try {
-    const response = await fetch(
-      `https://robot-ws.your-server.de/server`,
-      {
-        method: 'GET',
-        headers:  {
-          Authorization: `Basic ${Buffer.from(`${hetzner.robot[profile].username}:${hetzner.robot[profile].password}`).toString('base64')}`
-        }
-      }
-    );
-    items = await response.json();
-  } catch {
-    items = [];
-  }
-  if (items === undefined || !!items.error) {
-    return [];
-  }
-  return items.map((item) => {
-    const { server } = item;
-    const instance = {
-      provider: 'hetzner-robot',
-      profile,
-      ...(!!server.server_name) && {
-        hostname: server.server_name.split('.')[0],
-        domain: server.server_name.split('.').slice(1).join('.'),
-        fqdn: server.server_name,
-      },
-      id: server.server_number,
-      ip: server.server_ip,
-      state: server.status,
-      machine: server.product,
-      region: `eu-central-${server.dc.split('-')[0]}`,
-      location: {
-        az: server.dc,
-        ...datacenter[server.dc],
-      },
-      ...history[server.server_number],
-    };
-    return instance;
-  });
 };
 const fetchInstances = async () => {
   if (!cache.instances || !cache.instances.length || cache.instances.expires < Date.now()) {
-    const [ awsInstances, hetznerRobotInstances, hetznerCloudInstances ] = await Promise.all([
-      Promise.all(Object.keys(endpoints).map((profile) => fetchProfileInstances(profile))),
-      Promise.all([fetchHetznerRobotInstances('default')]),
-      Promise.all(Object.keys(hetzner.cloud).map((profile) => fetchHetznerCloudInstances(profile))),
-    ]);
-    const instances = [
-      ...awsInstances.reduce((a, b) => [...a, ...b], []),
-      ...hetznerRobotInstances.reduce((a, b) => [...a, ...b], []),
-      ...hetznerCloudInstances.reduce((a, b) => [...a, ...b], []),
-      ...fetchShockDedicatedInstances(),
-    ];
+    const db = await connectToDatabase('infrastructure');
+    const nodes = await db.collection('node').find().toArray();
+    const instances = await Promise.all(nodes.map(async (node) => ({
+      provider: node.provider,
+      profile: node.metadata.profile,
+      fqdn: node.fqdn,
+      hostname: node.fqdn.split('.')[0],
+      domain: node.fqdn.split('.').slice(1).join('.'),
+      ip: node.ip[0],
+      launch: (!!node.metadata && !!node.metadata.launch) ? node.metadata.launch : (new Date().toISOString()),
+      location: node.location,
+      certificate: node.certificate,
+      chain: node.chain,
+      price: (!!node.metadata && !!node.metadata.price) ? node.metadata.price : { hour: { currency: 'USD', amount: 0 } },
+      console: consoleLink(node),
+      //metadata: node.metadata,
+    })));
     cacheAppend('instances', instances);
   }
   return cache.instances.value;
@@ -870,11 +323,14 @@ const fetchChainNodes = async (relaychain, parachain) => {
   const blockchain = (!!parachain)
     ? blockchains.find((b) => b.name === parachain && b.relay === relaychain)
     : blockchains.find((b) => b.name === relaychain);
+  const chain = (!!parachain)
+    ? `${blockchain.relay}/${blockchain.name}`
+    : blockchain.name;
   const [ instances, targets ] = [ await fetchInstances(), await fetchTargets() ];
   const jobs = Object.values(blockchain.jobs).reduce((a, b) => [...a, ...b], []);
   const chainTargets = targets.filter(t => jobs.includes(t.scrapePool));
   const nodes = instances
-    .filter(i => blockchain.domains.includes(i.domain))
+    .filter(i => i.chain === chain)
     .map(i => ({
       ...i,
       roles: invulnerables.includes(i.hostname) ? ['invulnerable'] : ['full'],
@@ -1022,8 +478,7 @@ const fetchNode = async (fqdn) => {
   return node;
 };
 const fetchObservations = async (fqdn) => {
-  //console.log(`fetchObservations('${fqdn}')`);
-  const db = await connectToDatabase();
+  const db = await connectToDatabase('rubberneck');
   const observations = await db.collection('observation').aggregate([
     {
       $match: {
@@ -1044,89 +499,8 @@ const fetchObservations = async (fqdn) => {
       }
     }
   ]).sort({observed:-1}).limit(60).sort({observed:1}).toArray();
-  /*
-  const observationCount = 90;
-  const observations = [...Array(observationCount).keys()].map((i) => {
-    const [ peers_connected, cert_validity_days ] = [
-      getRandomIntInclusive(0, 12),
-      (observationCount - i),
-    ];
-    return {
-      //observed: new Date('2022-07-05T09:14:19.562Z'),
-      cert_validity_days,
-      peers_connected,
-      websocket_redponsive: (peers_connected > 0) && !!getRandomIntInclusive(0, 7)
-    };
-  });
-  */
   return observations;
 };
-/*
-const fetchWebsocketResponses = async (fqdn, requests) => {
-  const client = new Client(`wss://${fqdn}/`);
-  client.on("notification", (notification) => {
-    console.log("notification", notification);
-  });
-  console.log(client.status);
-  await client.open();
-  console.log(client.status);
-  //const responses = await Promise.all(requests.map(r => client.call(r.method, r.params)));
-  const responses = [ await client.call(requests[0].method, requests[0].params) ];
-  await client.close();
-  console.log(client.status);
-  return {
-    fqdn,
-    responses,
-  };
-};
-const fetchHealth = async () => {
-  const instances = await fetchInstances();
-  const blockchainNodes = instances
-    .map(i => {
-      const { fqdn } = i;
-      const blockchain = blockchains.find((b) => b.domains.includes(i.domain));
-      return (!!blockchain)
-        ? {
-            fqdn,
-            blockchain: {
-              id: blockchain.id,
-              name: blockchain.name,
-              tier: blockchain.tier,
-              relay: blockchain.relay,
-            },
-          }
-        : i;
-    })
-    .filter((i) => !!i.blockchain);
-
-  const [ certificates, wsResponseSets ] = await Promise.all([
-    Promise.all(blockchainNodes.map((n) => sslCertificate.get(n.fqdn))),
-    Promise.all(blockchainNodes.map((n) => fetchWebsocketResponses(n.fqdn, [{ method: 'system_localPeerId' }, { method: 'system_health' }]))),
-  ]);
-
-  const health = blockchainNodes
-    .map(n => {
-      const certificate = certificates.find((c) => c.subject.CN === n.fqdn);
-      const wsResponses = wsResponseSets.find((x) => x.fqdn === n.fqdn);
-      return {
-        ...n,
-        wsResponses,
-        ...(!!certificate) && {
-          certificate: {
-            name: certificate.subject.CN,
-            valid: {
-              from: new Date(certificate.valid_from).toISOString(),
-              to: new Date(certificate.valid_to).toISOString(),
-              for: certificate.subjectaltname.replace(/DNS:/g, '').split(', ')
-            }
-          },
-          apis
-        },
-      }
-    });
-  return health;
-};
-*/
 
 module.exports.blockchains = async (event) => {
   let error;
