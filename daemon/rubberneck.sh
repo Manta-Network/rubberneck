@@ -236,12 +236,14 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
 
-    is_relay_syncing=$(curl -sL ${relay_health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end' 2> /dev/null)
-    if [ "${is_relay_syncing}" = true ]; then
-      _echo_to_stderr "    relay sync in progress (${node_fqdn})"
-      _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node relay observed in syncing state (${relay_health_endpoint})"
-      mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: true }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
-      continue
+    if [ -n "${relay_health_endpoint}" ]; then
+      is_relay_syncing=$(curl -sL ${relay_health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end' 2> /dev/null)
+      if [ "${is_relay_syncing}" = true ]; then
+        _echo_to_stderr "    relay sync in progress (${node_fqdn})"
+        _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node relay observed in syncing state (${relay_health_endpoint})"
+        mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: false, relay: true }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
+        continue
+      fi
     fi
 
     observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc ${ws_endpoint} | jq -r .result)
