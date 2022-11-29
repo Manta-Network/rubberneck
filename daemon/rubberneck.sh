@@ -201,13 +201,16 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     fi
 
     if getent hosts rpc.${node_fqdn} &> /dev/null; then
+      unset node_index
       health_endpoint=https://rpc.${node_fqdn}/health
       relay_health_endpoint=https://rpc.${node_fqdn}/relay/health
       ws_endpoint=wss://${node_fqdn}
     elif [ ${node_domain} = "internal.kusama.systems" ]; then
-      health_endpoint=https://${node_fqdn}/0/health
-      ws_endpoint=wss://${node_fqdn}/0
+      node_index=$((${RANDOM} % 3))
+      health_endpoint=https://${node_fqdn}/${node_index}/health
+      ws_endpoint=wss://${node_fqdn}/${node_index}
     else
+      unset node_index
       health_endpoint=https://${node_fqdn}/health
       relay_health_endpoint=https://${node_fqdn}/relay/health
       ws_endpoint=wss://${node_fqdn}
