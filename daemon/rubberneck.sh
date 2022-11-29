@@ -202,9 +202,15 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     if getent hosts rpc.${node_fqdn} &> /dev/null; then
       health_endpoint=https://rpc.${node_fqdn}/health
       relay_health_endpoint=https://rpc.${node_fqdn}/relay/health
+      ws_endpoint=wss://${node_fqdn}
+    elif [ ${node_domain} = "internal.kusama.systems" ]; then
+      health_endpoint=https://${node_fqdn}/0/health
+      unset relay_health_endpoint
+      ws_endpoint=wss://${node_fqdn}/0
     else
       health_endpoint=https://${node_fqdn}/health
       relay_health_endpoint=https://${node_fqdn}/relay/health
+      ws_endpoint=wss://${node_fqdn}
     fi
     is_syncing=$(curl -sL ${health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end')
     if [ "${is_syncing}" = true ]; then
@@ -238,7 +244,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
 
-    observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
+    observed_peer_id=$(echo system_localPeerId | ${HOME}/.local/bin/websocat --jsonrpc ${ws_endpoint} | jq -r .result)
     observed_peer_id_length=${#observed_peer_id}
     if (( observed_peer_id_length = 52 )) && [[ ${observed_peer_id} == 12* ]]; then
       _echo_to_stderr "    peer id verified (${observed_peer_id})"
@@ -250,7 +256,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     fi
 
 
-    observed_peer_count=$(echo system_health | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result.peers)
+    observed_peer_count=$(echo system_health | ${HOME}/.local/bin/websocat --jsonrpc ${ws_endpoint} | jq -r .result.peers)
     executables_as_base64=( $(curl -sL https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json | jq --arg fqdn ${node_fqdn} -r '.[] | select (.fqdn == $fqdn) | @base64') )
     _echo_to_stderr "    observed ${#executables_as_base64[@]} executable version configurations in https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/executable-version.json"
     for executable_as_base64 in ${executables_as_base64[@]}; do
@@ -279,7 +285,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
 
-    observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc wss://${node_fqdn} | jq -r .result)
+    observed_system_version=$(echo system_version | ${HOME}/.local/bin/websocat --jsonrpc ${ws_endpoint} | jq -r .result)
     #if [ ${node_domain} = "calamari.systems" ]; then
     #  if [ -n ${observed_system_version} ]; then
     #    if [ -n "${latest_manta_release_version}" ] && ; then
