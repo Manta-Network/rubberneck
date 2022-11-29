@@ -116,6 +116,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     nodes_path=/tmp/5eklk8knsd-nodes-${relaychain_name}-${blockchain_name}.json
     blockchain_id=${relaychain_name}/${blockchain_name}
   else
+    unset relaychain_name
     nodes_url=https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${blockchain_name}
     nodes_path=/tmp/5eklk8knsd-nodes-${blockchain_name}.json
     blockchain_id=${blockchain_name}
@@ -205,7 +206,6 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       ws_endpoint=wss://${node_fqdn}
     elif [ ${node_domain} = "internal.kusama.systems" ]; then
       health_endpoint=https://${node_fqdn}/0/health
-      unset relay_health_endpoint
       ws_endpoint=wss://${node_fqdn}/0
     else
       health_endpoint=https://${node_fqdn}/health
@@ -236,7 +236,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
       continue
     fi
 
-    if [ -n "${relay_health_endpoint}" ]; then
+    if [ "${blockchain_tier}" = "1" ]; then
       is_relay_syncing=$(curl -sL ${relay_health_endpoint} | jq 'if has("result") then .result.isSyncing else .isSyncing end' 2> /dev/null)
       if [ "${is_relay_syncing}" = true ]; then
         _echo_to_stderr "    relay sync in progress (${node_fqdn})"
