@@ -37,6 +37,9 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
+  - sudo rm /etc/nginx/sites-enabled/*.metrics.* && sudo systemctl reload nginx.service
+  - sudo rm /etc/nginx/sites-enabled/rpc.* && sudo systemctl reload nginx.service
+  - sudo rm /etc/nginx/sites-enabled/status && sudo systemctl reload nginx.service
   - systemctl is-active dolphin.service || sudo systemctl restart dolphin.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
