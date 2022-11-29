@@ -110,7 +110,7 @@ _echo_to_stderr "    observed ${#blockchains_as_base64[@]} blockchain configurat
 for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
   blockchain_name=$(_decode_property ${blockchain_as_base64} .name)
   blockchain_tier=$(_decode_property ${blockchain_as_base64} .tier)
-  if [ ${blockchain_tier} = "parachain" ]; then
+  if [ "${blockchain_tier}" = "1" ]; then
     relaychain_name=$(_decode_property ${blockchain_as_base64} .relay)
     nodes_url=https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${relaychain_name}/${blockchain_name}
     nodes_path=/tmp/5eklk8knsd-nodes-${relaychain_name}-${blockchain_name}.json
@@ -210,7 +210,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     if [ "${is_syncing}" = true ]; then
       _echo_to_stderr "    sync in progress (${node_fqdn})"
       _post_to_discord ${webhook_debug} health ${color_warn} ${node_fqdn} "node observed in syncing state (${health_endpoint})"
-      if [ ${blockchain_tier} = "parachain" ]; then
+      if [ "${blockchain_tier}" = "1" ]; then
         mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: true }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       else
         mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { relay: true }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
@@ -222,7 +222,7 @@ for blockchain_as_base64 in ${blockchains_as_base64[@]}; do
     else
       _echo_to_stderr "    node health rpc endpoint unreachable (${health_endpoint})"
       _post_to_discord ${webhook_path} health ${color_danger} ${node_fqdn} "node health rpc endpoint unreachable (${health_endpoint})"
-      if [ ${blockchain_tier} = "parachain" ]; then
+      if [ "${blockchain_tier}" = "1" ]; then
         mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { para: '${is_syncing}' }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
       else
         mongosh --eval "db.observation.insertOne( { fqdn: '${node_fqdn}', node: { chain: '${blockchain_id}' }, cert: { issued: new Date('${observed_not_before}'), expiry: new Date('${observed_not_after}') }, syncing: { relay: '${is_syncing}' }, observer: { ip: '${observer_ip}' }, observed: new Date() } )" ${mongo_connection} &> /dev/null
