@@ -27,6 +27,7 @@ user:
     username: root
     authorized:
       keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZ/7EBrBGj975hyT5sNROd9FTym7yGoiX4wUL+DcDpY
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGhEy3dlSZZtj9RI+g7Q7K5n01cvTQryCMCDpkTqfF3/
   -
     username: mobula
