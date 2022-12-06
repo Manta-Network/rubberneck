@@ -16,6 +16,7 @@
     "chart.js": "^3.8.0",
     "google-palette": "https://github.com/google/palette.js",
     "react": "^18.1.0",
+    "react-auth-kit": "^2.7.0",
     "react-bootstrap": "^2.4.0",
     "react-chartjs-2": "^4.2.0",
     "react-dom": "^18.1.0",

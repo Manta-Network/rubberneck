@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import Spinner from 'react-bootstrap/Spinner';
+import apiBaseUrl from './apiBaseUrl';
 
 const color = {
   green: '#41986a',
@@ -13,7 +14,7 @@ function NodeObservations(props) {
   const { fqdn } = props;
   const [data, setData] = useState(undefined);
   useEffect(() => {
-    fetch(`https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/node/${fqdn}/observations`)
+    fetch(`${apiBaseUrl}/node/${fqdn}/observations`)
       .then(r => r.json())
       .then((oc) => {
         if (!!oc.error) {

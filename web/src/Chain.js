@@ -18,6 +18,55 @@ import RunningCost from './RunningCost';
 import badge from './badge';
 import { ReactComponent as ShockLogo } from './shock.svg';
 import { ReactComponent as S4yLogo } from './s4y.svg';
+import apiBaseUrl from './apiBaseUrl';
+
+const consoleLink = (node) => {
+  switch (node.provider) {
+    case 'amazon-ec2':
+      return (
+        <a href={`https://console.aws.amazon.com/ec2/v2/home?region=${node.region}#InstanceDetails:instanceId=${node.id}`}>
+          <span style={{marginRight: '0.3em', color: 'rgb(255, 153, 0)', padding: '0 0.2em'}}>
+            <FontAwesomeIcon icon={faAws} />
+          </span>
+          {node.console.text.toLowerCase()}
+        </a>
+      );
+    case 'hetzner-cloud':
+      return (
+        <a href={node.console.url}>
+          <span style={{marginRight: '0.3em', backgroundColor: 'red', color: 'white', padding: '0 0.2em'}}>
+            <FontAwesomeIcon icon={faH} />
+          </span>
+          {node.console.text.toLowerCase()}
+        </a>
+      );
+    case 'hetzner-robot':
+      return (
+        <a href={node.console.url}>
+          <span style={{marginRight: '0.3em', backgroundColor: 'red', color: 'white', padding: '0 0.2em'}}>
+            <FontAwesomeIcon icon={faH} />
+          </span>
+          {node.console.text.toLowerCase()}
+        </a>
+      );
+    case 's4y-dedicated':
+      return (
+        <a href={node.console.url}>
+          <S4yLogo style={{width: '20px', height: '20px', marginRight: '5px'}} />
+          {node.console.text.toLowerCase()}
+        </a>
+      );
+    case 'shock-dedicated':
+      return (
+        <a href={node.console.url}>
+          <ShockLogo style={{width: '20px', height: '20px', marginRight: '5px'}} />
+          {node.console.text.toLowerCase()}
+        </a>
+      );
+    default:
+      return null;
+  }
+};
 
 function Chain(props) {
   const { relaychain, parachain } = useParams();
@@ -25,8 +74,8 @@ function Chain(props) {
   const [nodes, setNodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiUrl = (parachain !== undefined)
-    ? `https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${relaychain}/${parachain}`
-    : `https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/nodes/${relaychain}`;
+    ? `${apiBaseUrl}/nodes/${relaychain}/${parachain}`
+    : `${apiBaseUrl}/nodes/${relaychain}`;
   useEffect(() => {
     setLoading(true);
     fetch(apiUrl)
@@ -227,48 +276,7 @@ function Chain(props) {
                         }
                       </td>
                       <td>
-                        {
-                          (node.provider === 'hetzner-cloud')
-                            ? (
-                                <a href={`https://console.hetzner.cloud/projects/${node.project}/servers/${node.id}/overview`}>
-                                  <span style={{marginRight: '0.3em', backgroundColor: 'red', color: 'white', padding: '0 0.2em'}}>
-                                    <FontAwesomeIcon icon={faH} />
-                                  </span>
-                                  {node.profile}/{node.location.az}/{node.fqdn}
-                                </a>
-                              )
-                            : (node.provider === 'hetzner-robot')
-                              ? (
-                                  <a href={`https://console.hetzner.cloud/projects/${node.project}/servers/${node.id}/overview`}>
-                                    <span style={{marginRight: '0.3em', backgroundColor: 'red', color: 'white', padding: '0 0.2em'}}>
-                                      <FontAwesomeIcon icon={faH} />
-                                    </span>
-                                    {node.profile}/{node.location.az}/{node.fqdn}
-                                  </a>
-                                )
-                              : (node.provider === 'shock-dedicated')
-                                ? (
-                                    <a href={`https://shockhosting.net/portal/clientarea.php?action=productdetails&id=${node.id}`}>
-                                      <ShockLogo style={{width: '20px', height: '20px', marginRight: '5px'}} />
-                                      {node.location.az}/{node.fqdn}
-                                    </a>
-                                  )
-                                : (node.provider === 's4y-dedicated')
-                                  ? (
-                                      <a href={`https://my.server4you.net/en/Dedicated/Contract/Index/show?server_name=${node.id}`}>
-                                        <S4yLogo style={{width: '20px', height: '20px', marginRight: '5px'}} />
-                                        {node.location.az}/{node.fqdn}
-                                      </a>
-                                    )
-                                  : (
-                                      <a href={`https://console.aws.amazon.com/ec2/v2/home?region=${node.region}#InstanceDetails:instanceId=${node.id}`}>
-                                        <span style={{marginRight: '0.3em', color: 'rgb(255, 153, 0)', padding: '0 0.2em'}}>
-                                          <FontAwesomeIcon icon={faAws} />
-                                        </span>
-                                        {node.profile}/{node.region}/{node.id}
-                                      </a>
-                                    )
-                        }
+                        {consoleLink(node)}
                       </td>
                       <td style={{ textAlign: 'right' }}>
                         <RunningCost node={node} />

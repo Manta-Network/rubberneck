@@ -9,6 +9,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import Table from 'react-bootstrap/Table';
 import { dateDiff } from './utils';
+import apiBaseUrl from './apiBaseUrl';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -190,7 +191,7 @@ function Node(props) {
   const [node, setNode] = useState(false);
   const [data, setData] = useState({});
   useEffect(() => {
-    fetch(`https://5eklk8knsd.execute-api.eu-central-1.amazonaws.com/prod/node/${fqdn}`)
+    fetch(`${apiBaseUrl}/node/${fqdn}`)
       .then(response => response.json())
       .then((container) => {
         if (!!container.error) {
