@@ -33,12 +33,12 @@ function ChunkSummary(props) {
                           <a
                             style={{marginRight: '0.5em'}}
                             href={`https://${observation.fqdn}/${(observation.fqdn.endsWith('.internal.kusama.systems')) ? '0/health' : 'health'}`}>
-                            <i title={`no peers`} className={`bi bi-heart-pulse`} />
+                            <i title={`node health`} className={`bi bi-heart-pulse`} />
                           </a>
                           <a
                             style={{marginRight: '0.5em'}}
                             href={`https://polkadot.js.org/apps/?rpc=wss%3A%2F%2F${observation.fqdn}/${(observation.fqdn.endsWith('.internal.kusama.systems')) ? '/0' : ''}`}>
-                            <i title={`no peers`} className={`bi bi-plug`} />
+                            <i title={`polkadot.js`} className={`bi bi-plug`} />
                           </a>
                           <Badge
                             title={(!!observation.peers) ? `${observation.peers} connected peers` : 'no connected peers'}
