@@ -2,6 +2,7 @@ service: rubberneck
 
 frameworkVersion: '3'
 variablesResolutionMode: 20210326
+useDotenv: true
 
 provider:
   name: aws
@@ -110,12 +111,50 @@ functions:
                paths:
                  fqdn: true
 
-#  health:
-#    timeout: 29
-#    handler: handler.health
-#    events:
-#      -
-#        http:
-#          path: health
-#          method: get
-#          cors: true
+  nodeHealth:
+    timeout: 29
+    handler: health.node
+    environment:
+      blockchain_db_read: ${ssm:/rubberneck_blockchain_db_read}
+    events:
+      -
+        http:
+          path: node/{fqdn}/health/{from}/{to}
+          method: get
+          cors: true
+          request:
+            parameters:
+               paths:
+                 fqdn: true
+                 from: true
+                 to: true
+
+  chainHealth:
+    timeout: 29
+    handler: health.chain
+    environment:
+      blockchain_db_read: ${ssm:/rubberneck_blockchain_db_read}
+    events:
+      -
+        http:
+          path: chain/{relaychain}/{parachain}/health/{from}/{to}
+          method: get
+          cors: true
+          request:
+            parameters:
+               paths:
+                 relaychain: true
+                 parachain: true
+                 from: true
+                 to: true
+      -
+        http:
+          path: chain/{relaychain}/health/{from}/{to}
+          method: get
+          cors: true
+          request:
+            parameters:
+               paths:
+                 relaychain: true
+                 from: true
+                 to: true

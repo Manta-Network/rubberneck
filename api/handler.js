@@ -4,8 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 const sslCertificate = require('get-ssl-certificate');
 
-const rubberneckDbReadWrite = (process.env.rubberneck_db_readwrite);
-const blockchainDbRead = (process.env.blockchain_db_read);
+const blockchainDbRead = (process.env.blockchain_db_read || 'mongodb+srv://chainreader:LG9YHNLfYCcpJisW@chaincluster.oulrzox.mongodb.net');
 
 const cache = {
   lifetime: 3600
@@ -16,197 +15,6 @@ const cacheAppend = (key, value) => {
     value
   };
 }
-const blockchains = [
-  {
-    name: 'baikal',
-    domains: [
-      'baikal.manta.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'baikal invulnerable validator (ssl)'
-      ],
-    },
-    tier: 'relaychain',
-  },
-  {
-    name: 'kusama-internal',
-    domains: [
-      'kusama-internal.calamari.systems',
-      'internal.kusama.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'seabird'
-      ],
-    },
-    tier: 'relaychain',
-  },
-  {
-    name: 'moonriver',
-    domains: [
-      'kusama-internal.moonriver-testnet.calamari.systems',
-      'moonriver.seabird.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'moonriver-testnet'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'kusama-internal',
-  },
-  {
-    name: 'calamari',
-    domains: [
-      'kusama-internal.testnet.calamari.systems',
-      'calamari.seabird.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'calamari-testnet'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'kusama-internal',
-  },
-  {
-    name: 'acala',
-    domains: [
-      'acala.seabird.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'acala'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'kusama-internal',
-  },
-  {
-    name: 'dolphin',
-    domains: [
-      'dolphin.seabird.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'dolphin'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'kusama-internal',
-  },
-  {
-    name: 'calamari',
-    domains: [
-      'calamari.moonsea.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'moonsea-calamari'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'moonsea',
-  },
-  {
-    name: 'dolphin',
-    domains: [
-      'rococo.dolphin.engineering',
-      'dolphin.engineering',
-    ],
-    jobs: {
-      invulnerable: [
-        'dolphin invulnerable collator (ssl)'
-      ],
-      full: [
-        'dolphin full node (ssl)'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'rococo',
-  },
-  {
-    name: 'dolphin',
-    domains: [
-      'baikal.testnet.dolphin.training',
-    ],
-    jobs: {
-      invulnerable: [
-      ],
-      full: [
-      ],
-    },
-    tier: 'parachain',
-    relay: 'baikal',
-  },
-  {
-    name: 'calamari',
-    domains: [
-      'calamari.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'calamari invulnerable collator (ssl)',
-        'calamari invulnerable collator (ssl) - node',
-        'calamari invulnerable collator (ssl) - para',
-        'calamari invulnerable collator (ssl) - relay'
-      ],
-      full: [
-        'calamari full node (ssl)',
-        'calamari full node (ssl) - node',
-        'calamari full node (ssl) - para',
-        'calamari full node (ssl) - relay'
-      ],
-      active: [
-        'calamari community collator (ssl)',
-        'calamari community collator',
-      ],
-      applicant: [
-        'calamari experimental community collator (ssl)',
-        'calamari experimental community collator',
-      ],
-    },
-    tier: 'parachain',
-    relay: 'kusama',
-  },
-  /*
-  {
-    name: 'manta',
-    domains: [
-      'manta.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'manta invulnerable collator (ssl)'
-      ],
-      full: [
-        'manta full node (ssl)'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'polkadot',
-  },
-  */
-  {
-    name: 'calamari-testnet',
-    domains: [
-      'baikal.testnet.calamari.systems',
-    ],
-    jobs: {
-      invulnerable: [
-        'calamari-testnet invulnerable collator (ssl)'
-      ],
-    },
-    tier: 'parachain',
-    relay: 'baikal',
-  },
-].map((b) => ({
-    ...b,
-    id: (b.tier === 'relay') ? b.name : `${b.relay}/${b.name}`,
-  }))
-  .sort((a, b) => (a.id > b.id) ? 1 : (a.id < b.id) ? -1 : 0);
-
 
 const response = {
   headers: {
@@ -241,11 +49,12 @@ const connectToDatabase = async (databaseName) => {
   }
   let connectionString;
   switch (databaseName) {
+    case 'health':
     case 'infrastructure':
-      connectionString = blockchainDbRead;
+      connectionString = `${blockchainDbRead.replace('/test', '')}/${databaseName}`;
       break;
     default:
-      connectionString = rubberneckDbReadWrite;
+      connectionString = blockchainDbRead;
   }
   const client = await MongoClient.connect(connectionString);
   const db = await client.db(databaseName);
@@ -307,55 +116,76 @@ const fetchInstances = async () => {
   }
   return cache.instances.value;
 };
+const fetchBlockchains = async () => {
+  if (!cache.blockchains || !cache.blockchains.length || cache.blockchains.expires < Date.now()) {
+    const db = await connectToDatabase('infrastructure');
+    const chains = await db.collection('node').distinct('chain');
+    //const chains = await db.collection('node').find({}, { projection: { _id: false, chain: true } }).distinct().toArray();
+    const blockchains = (await db.collection('blockchain').find({}, { projection: { _id: false } }).toArray())
+      .map((blockchain) => ({
+        ...blockchain,
+        chain: (!!blockchain.tier) ? `${blockchain.relay}/${blockchain.name}` : blockchain.name,
+      }))
+      .filter((blockchain) => chains.includes(blockchain.chain))
+      .sort((a, b) => (a.chain > b.chain) ? 1 : (a.chain < b.chain) ? -1 : 0)
+      .map((blockchain) => ({
+        ...blockchain,
+        network: ['kusama/calamari'].includes(blockchain.chain)
+          ? 'mainnet'
+          : (!!blockchain.tier)
+            ? `testnet (${blockchain.relay})`
+            : `testnet (${blockchain.name})`,
+      }));
+    cacheAppend('blockchains', blockchains);
+  }
+  return cache.blockchains.value;
+};
 const fetchTargets = async () => {
   if (!cache.targets || !cache.targets.length || cache.targets.expires < Date.now()) {
     const response = await fetch(`https://pulse.pelagos.systems/api/v1/targets`);
     const json = await response.json();
-    const targets = json.data.activeTargets.map(t => ({
-      ...t,
-      fqdn: t.labels.instance.split(':')[0].replace(/(para|relay|calamari|kusama|dolphin|rococo|manta|polkadot)\.metrics\./, '')
+    const targets = json.data.activeTargets.map((target) => ({
+      ...target,
+      fqdn: target.labels.instance.split(':')[0].replace(/(para|relay|calamari|kusama|dolphin|rococo|manta|polkadot)\.metrics\./, '')
     }));
     cacheAppend('targets', targets);
   }
   return cache.targets.value;
 };
 const fetchChainNodes = async (relaychain, parachain) => {
+  const blockchains = await fetchBlockchains();
   const blockchain = (!!parachain)
     ? blockchains.find((b) => b.name === parachain && b.relay === relaychain)
     : blockchains.find((b) => b.name === relaychain);
-  const chain = (!!parachain)
-    ? `${blockchain.relay}/${blockchain.name}`
-    : blockchain.name;
+  const chain = (!!parachain) ? `${blockchain.relay}/${blockchain.name}` : blockchain.name;
   const [ instances, targets ] = [ await fetchInstances(), await fetchTargets() ];
-  const jobs = Object.values(blockchain.jobs).reduce((a, b) => [...a, ...b], []);
-  const chainTargets = targets.filter(t => jobs.includes(t.scrapePool));
   const nodes = instances
-    .filter(i => i.chain === chain)
-    .map(i => ({
-      ...i,
-      roles: invulnerables.includes(i.hostname) ? ['invulnerable'] : ['full'],
+    .filter((instance) => instance.chain === chain)
+    .map((instance) => ({
+      ...instance,
+      roles: invulnerables.includes(instance.hostname) ? ['invulnerable'] : ['full'],
       metrics: {
-        node: chainTargets.find(t => t.fqdn === i.fqdn && (
-            t.discoveredLabels.__metrics_path__ === '/node/metrics'
+        node: targets.find((target) => target.fqdn === instance.fqdn && (
+            target.discoveredLabels.__metrics_path__ === '/node/metrics'
             ||
-            (t.discoveredLabels.__metrics_path__ === '/metrics' && t.discoveredLabels.__address__ === t.fqdn)
+            (target.discoveredLabels.__metrics_path__ === '/metrics' && target.discoveredLabels.__address__ === target.fqdn)
           )),
-        ...(blockchain.tier === 'parachain') && {
-          para: chainTargets.find(t => t.fqdn === i.fqdn && (
-            t.discoveredLabels.__metrics_path__ === '/para/metrics'
+        ...(!!blockchain.tier) && {
+          para: targets.find((target) => target.fqdn === instance.fqdn && (
+            target.discoveredLabels.__metrics_path__ === '/para/metrics'
             ||
-            t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`
+            target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`
             ||
-            (new RegExp(`/${blockchain.name}.*\\.${t.fqdn}/`)).test(t.fqdn)
+            (new RegExp(`/${blockchain.name}.*\\.${target.fqdn}/`)).test(target.fqdn)
           ))
         },
-        ...(blockchain.tier === 'parachain') && {
-          relay: chainTargets.find(t => t.fqdn === i.fqdn && (
-            t.discoveredLabels.__metrics_path__ === '/relay/metrics'
+        ...(!!blockchain.tier) && {
+          relay: targets.find((target) => target.fqdn === instance.fqdn && (
+            target.discoveredLabels.__metrics_path__ === '/relay/metrics'
             ||
-            t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`
+            target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`
             || 
-            (new RegExp(`/${blockchain.relay}.*\\.${t.fqdn}/`)).test(t.fqdn)
+            (new RegExp(`/${blockchain.relay}.*\\.${target.fqdn}/`)).test(target.fqdn)
           ))
         },
       }
@@ -363,41 +193,41 @@ const fetchChainNodes = async (relaychain, parachain) => {
   return nodes;
 };
 const fetchAllNodes = async () => {
-  const [ instances, targets ] = [ await fetchInstances(), await fetchTargets() ];
+  const [ blockchains, instances, targets ] = [ await fetchBlockchains(), await fetchInstances(), await fetchTargets() ];
   const nodes = instances
-    .map(i => {
-      const blockchain = blockchains.find((b) => b.domains.includes(i.domain));
+    .map((instance) => {
+      const blockchain = blockchains.find((b) => b.domains.includes(instance.domain));
       return {
-        ...i,
-        roles: invulnerables.includes(i.hostname)
+        ...instance,
+        roles: invulnerables.includes(instance.hostname)
           ? ['invulnerable']
           : (!!blockchain)
             ? ['full']
-            : (!!i.domain.split('.').includes('telemetry'))
+            : (!!instance.domain.split('.').includes('telemetry'))
               ? ['telemetry']
               : [],
         metrics: {
-          node: targets.find(t => (
-            (t.discoveredLabels.__metrics_path__ === '/metrics' && t.discoveredLabels.__address__ === t.fqdn)
+          node: targets.find((target) => (
+            (target.discoveredLabels.__metrics_path__ === '/metrics' && target.discoveredLabels.__address__ === target.fqdn)
             ||
-            (t.discoveredLabels.__metrics_path__ === '/node/metrics')
+            (target.discoveredLabels.__metrics_path__ === '/node/metrics')
           )),
-          ...((!!blockchain) && (blockchain.tier === 'parachain')) && {
-            para: targets.find(t => t.fqdn === i.fqdn && (
-              t.discoveredLabels.__metrics_path__ === '/para/metrics'
+          ...((!!blockchain) && (!!blockchain.tier)) && {
+            para: targets.find((target) => target.fqdn === instance.fqdn && (
+              target.discoveredLabels.__metrics_path__ === '/para/metrics'
               ||
-              t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`
+              target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`
               ||
-              (new RegExp(`/${blockchain.name}.*\\.${t.fqdn}/`)).test(t.fqdn)
+              (new RegExp(`/${blockchain.name}.*\\.${target.fqdn}/`)).test(target.fqdn)
             ))
           },
-          ...((!!blockchain) && (blockchain.tier === 'parachain')) && {
-            relay: targets.find(t => t.fqdn === i.fqdn && (
-              t.discoveredLabels.__metrics_path__ === '/relay/metrics'
+          ...((!!blockchain) && (!!blockchain.tier)) && {
+            relay: targets.find((target) => target.fqdn === instance.fqdn && (
+              target.discoveredLabels.__metrics_path__ === '/relay/metrics'
               ||
-              t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`
+              target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`
               || 
-              (new RegExp(`/${blockchain.relay}.*\\.${t.fqdn}/`)).test(t.fqdn)
+              (new RegExp(`/${blockchain.relay}.*\\.${target.fqdn}/`)).test(target.fqdn)
             ))
           },
         }
@@ -433,21 +263,22 @@ const fetchParsedMetrics = async (key, fqdn) => {
 };
 const fetchNode = async (fqdn) => {
   const certificate = await sslCertificate.get(fqdn);
-  const [ instance, targets ] = [
-    (await fetchInstances()).find(t => t.fqdn === fqdn),
-    (await fetchTargets()).filter(t => t.fqdn === fqdn),
+  const [ blockchains, instance, targets ] = [
+    await fetchBlockchains(),
+    (await fetchInstances()).find((instance) => instance.fqdn === fqdn),
+    (await fetchTargets()).filter((target) => target.fqdn === fqdn),
   ];
   //const wsResponses = await fetchWebsocketResponses(instance.fqdn, [{ method: 'system_localPeerId' }, { method: 'system_health' }]);
   const blockchain = blockchains.find((b) => b.domains.includes(instance.domain));
   const metrics = {
-    ...targets.some((t) => t.discoveredLabels.__address__ === t.fqdn) && {
-      node: targets.find((t) => t.discoveredLabels.__address__ === t.fqdn)
+    ...targets.some((target) => target.discoveredLabels.__address__ === target.fqdn) && {
+      node: targets.find((target) => target.discoveredLabels.__address__ === target.fqdn)
     },
-    ...targets.some((t) => t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`) && {
-      para: targets.find((t) => t.discoveredLabels.__address__ === `para.metrics.${t.fqdn}`)
+    ...targets.some((target) => target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`) && {
+      para: targets.find((target) => target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`)
     },
-    ...targets.some((t) => t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`) && {
-      relay: targets.find((t) => t.discoveredLabels.__address__ === `relay.metrics.${t.fqdn}`)
+    ...targets.some((target) => target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`) && {
+      relay: targets.find((target) => target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`)
     },
   };
   const latestMetrics = await Promise.all(Object.keys(metrics).map((key) => fetchInstanceMetrics(key, metrics[key].labels.instance)));
@@ -478,7 +309,7 @@ const fetchNode = async (fqdn) => {
   return node;
 };
 const fetchObservations = async (fqdn) => {
-  const db = await connectToDatabase('rubberneck');
+  const db = await connectToDatabase('health');
   const observations = await db.collection('observation').aggregate([
     {
       $match: {
@@ -503,6 +334,7 @@ const fetchObservations = async (fqdn) => {
 };
 
 module.exports.blockchains = async (event) => {
+  const blockchains = await fetchBlockchains();
   let error;
   const body = {
     blockchains,
