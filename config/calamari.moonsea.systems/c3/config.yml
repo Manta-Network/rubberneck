@@ -4,6 +4,12 @@ domain: calamari.moonsea.systems
 action: sync
 launch: '2022-10-22T08:14:00Z'
 provider: shock-dedicated
+dns:
+  alias:
+    -
+      name: ws.calamari.moonsea.systems
+    -
+      name: ws.archive.calamari.moonsea.systems
 price:
   amount: 269.97
   currency: usd

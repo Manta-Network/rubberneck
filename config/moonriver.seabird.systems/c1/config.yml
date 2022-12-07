@@ -3,6 +3,12 @@ hostname: c1
 domain: moonriver.seabird.systems
 action: sync
 provider: shock-dedicated
+dns:
+  alias:
+    -
+      name: ws.moonriver.seabird.systems
+    -
+      name: ws.archive.moonriver.seabird.systems
 user:
   -
     username: root

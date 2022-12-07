@@ -3,6 +3,12 @@ hostname: c1
 domain: dolphin.seabird.systems
 action: sync
 provider: shock-dedicated
+dns:
+  alias:
+    -
+      name: ws.dolphin.seabird.systems
+    -
+      name: ws.archive.dolphin.seabird.systems
 package:
   - auditd
   - certbot

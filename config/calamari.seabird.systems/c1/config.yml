@@ -3,6 +3,12 @@ hostname: c1
 domain: calamari.seabird.systems
 action: sync
 provider: shock-dedicated
+dns:
+  alias:
+    -
+      name: ws.calamari.seabird.systems
+    -
+      name: ws.archive.calamari.seabird.systems
 user:
   -
     username: root

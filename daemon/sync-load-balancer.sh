@@ -83,6 +83,7 @@ for domain in ${domain_list[@]}; do
   for hostname in ${host_list[@]}; do
     fqdn=${hostname}.${domain}
     tld=$(echo ${fqdn} | rev | cut -d "." -f1-2 | rev)
+    unset alias_list_as_base64
     if curl -sL \
       -o ${tmp}/${fqdn}-config.yml \
       https://raw.githubusercontent.com/${rubberneck_github_org}/${rubberneck_github_repo}/${rubberneck_github_latest_sha}/config/${domain}/${hostname}/config.yml; then
@@ -205,7 +206,7 @@ for domain in ${domain_list[@]}; do
               #echo "[${fqdn}] default ws-max-connections: ${configured_ws_max_connections}"
             fi
             computed_resource_availability=$(echo "scale=3; 1 - ${observed_tcp_connection_count} / ${configured_ws_max_connections}" | bc -l | head -n 1)
-            alias_list_as_base64=$(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null)
+            alias_list_as_base64=($(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null))
             for alias_as_base64 in ${alias_list_as_base64[@]}; do
               alias_name=$(_decode_property ${alias_as_base64} .name)
               configured_alias_weight=$(_decode_property ${alias_as_base64} .weight)
