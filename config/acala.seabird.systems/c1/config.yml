@@ -3,6 +3,12 @@ hostname: c1
 domain: acala.seabird.systems
 action: sync
 provider: shock-dedicated
+dns:
+  alias:
+    -
+      name: ws.acala.seabird.systems
+    -
+      name: ws.archive.acala.seabird.systems
 user:
   -
     username: root
