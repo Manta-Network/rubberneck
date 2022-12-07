@@ -70,7 +70,15 @@ for domain in ${domain_list[@]}; do
             else
               echo "[${fqdn}:/etc/letsencrypt/${cert_target}/${alias_name}] sync not attempted due to missing cert"
               if [ "$(hostname -s)" = "kavula" ]; then
-                test -f /etc/letsencrypt/renewal/${alias_name}.conf || certbot certonly -m ops@manta.network --agree-tos --no-eff-email --dns-route53 -d ${alias_name}
+                case $(echo ${alias_name} | rev | cut -d "." -f1-2 | rev) in
+                  kusama.systems|moonsea.systems|seabird.systems)
+                    # requires: sudo dnf install python3-certbot-dns-cloudflare
+                    test -f /etc/letsencrypt/renewal/${alias_name}.conf || certbot certonly -m ops@manta.network --agree-tos --no-eff-email --dns-cloudflare --dns-cloudflare-credentials ~/.cloudflare -d ${alias_name}
+                    ;;
+                  *)
+                    test -f /etc/letsencrypt/renewal/${alias_name}.conf || certbot certonly -m ops@manta.network --agree-tos --no-eff-email --dns-route53 -d ${alias_name}
+                    ;;
+                esac
               fi
             fi
           else
