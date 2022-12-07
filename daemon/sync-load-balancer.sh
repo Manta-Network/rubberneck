@@ -29,6 +29,12 @@ rubberneck_github_token=$(yq -r .github.token ${HOME}/.rubberneck.yml)
 if [ -z "${rubberneck_github_token}" ] && which pass 2> /dev/null; then
   rubberneck_github_token=$(pass github/grenade/hub-workstation)
 fi
+
+cloudflare_api_token=$(yq -r .cloudflare.token ${HOME}/.rubberneck.yml)
+if [ -z "${cloudflare_api_token}" ] && which pass 2> /dev/null; then
+  cloudflare_api_token=$(pass cloudflare/sync-load-balancer)
+fi
+
 curl -sL \
   -o ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-commits.json \
   -H "Accept: application/vnd.github+json" \
@@ -67,13 +73,13 @@ else
 fi
 
 for domain in ${domain_list[@]}; do
-  echo "[sync] domain: ${domain}"
   curl -sL \
     -o ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config-${domain}.json \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${rubberneck_github_token}" \
     https://api.github.com/repos/${rubberneck_github_org}/${rubberneck_github_repo}/contents/config/${domain}
-  host_list=$(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config-${domain}.json)
+  host_list=( $(jq -r '.[] | select(.type == "dir") | .name' ${tmp}/${rubberneck_github_org}-${rubberneck_github_repo}-contents-config-${domain}.json) )
+  echo "[sync] domain: ${domain}, instance count: ${#host_list[@]}"
   for hostname in ${host_list[@]}; do
     fqdn=${hostname}.${domain}
     tld=$(echo ${fqdn} | rev | cut -d "." -f1-2 | rev)
@@ -86,7 +92,7 @@ for domain in ${domain_list[@]}; do
         seabird.systems|moonsea.systems)
           ip=$(getent hosts ${fqdn} | cut -d ' ' -f 1)
           if _valid_ip ${ip}; then
-            alias_list_as_base64=$(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null)
+            alias_list_as_base64=($(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null))
             for alias_as_base64 in ${alias_list_as_base64[@]}; do
               alias_name=$(_decode_property ${alias_as_base64} .name)
               if host ${alias_name} 1.1.1.1 | grep 'has address' | grep ${ip}; then
@@ -103,7 +109,7 @@ for domain in ${domain_list[@]}; do
                   continue
                 fi
                 if curl -s \
-                  -o ${tmp}/cloudflare-dns-record-create-response-${fqdn}-${alias_name}-${ip}.json
+                  -o ${tmp}/cloudflare-dns-record-create-response-${fqdn}-${alias_name}-${ip}.json \
                   -X POST \
                   -H "Content-Type: application/json" \
                   -H "Authorization: Bearer ${cloudflare_api_token}" \
