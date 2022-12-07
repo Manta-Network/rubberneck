@@ -152,3 +152,25 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.internal.kusama.systems.conf'
+    target: /etc/nginx/sites-available/ws.internal.kusama.systems.conf
+    sha256: fb0f5dfafcff600c53fdcee6ae644a4c34629ffd7412633565dc881f042d98f3
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.internal.kusama.systems.conf /etc/nginx/sites-enabled/ws.internal.kusama.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.internal.kusama.systems.conf'
+    target: /etc/nginx/sites-available/ws.archive.internal.kusama.systems.conf
+    sha256: a54a9e3940d06f57b1ac39163230374fd154e2978788703542a63913e6dfbcf7
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.internal.kusama.systems.conf /etc/nginx/sites-enabled/ws.archive.internal.kusama.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
