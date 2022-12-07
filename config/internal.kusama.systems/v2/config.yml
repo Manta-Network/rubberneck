@@ -3,6 +3,12 @@ hostname: v2
 domain: internal.kusama.systems
 action: sync
 provider: shock-dedicated
+dns:
+  alias:
+    -
+      name: ws.internal.kusama.systems
+    -
+      name: ws.archive.internal.kusama.systems
 user:
   -
     username: root
