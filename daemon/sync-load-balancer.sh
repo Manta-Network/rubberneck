@@ -90,7 +90,7 @@ for domain in ${domain_list[@]}; do
       #echo "[${fqdn}] config fetch suceeded"
       action=$(yq -r .action ${tmp}/${fqdn}-config.yml)
       case ${tld} in
-        seabird.systems|moonsea.systems)
+        kusama.systems|moonsea.systems|seabird.systems)
           ip=$(getent hosts ${fqdn} | cut -d ' ' -f 1)
           if _valid_ip ${ip}; then
             alias_list_as_base64=($(yq -r '.dns.alias[] | @base64' ${tmp}/${fqdn}-config.yml 2>/dev/null))
@@ -126,10 +126,6 @@ for domain in ${domain_list[@]}; do
           else
             echo "[${fqdn}] alias checks skipped. failed to determine ip address"
           fi
-          ;;
-        kusama.systems)
-          # todo: handle multi-node instances
-          echo "[${fqdn}] alias checks skipped. multi-node instance"
           ;;
         *)
           health_resource_path=/health
