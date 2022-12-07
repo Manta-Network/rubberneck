@@ -192,3 +192,25 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.calamari.seabird.systems.conf'
+    target: /etc/nginx/sites-available/ws.calamari.seabird.systems.conf
+    sha256: 5836dece65986fc1de0a654ab18f37f03e0b236dd3390fad17a945bbbd92eb5d
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.calamari.seabird.systems.conf /etc/nginx/sites-enabled/ws.calamari.seabird.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.calamari.seabird.systems.conf'
+    target: /etc/nginx/sites-available/ws.archive.calamari.seabird.systems.conf
+    sha256: 371a5f194574975a7738bc837be8f03ae71ce16d5bde7e59e1f84d8ee0cc9242
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.calamari.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.calamari.seabird.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service

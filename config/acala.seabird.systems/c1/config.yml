@@ -192,3 +192,25 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.acala.seabird.systems.conf'
+    target: /etc/nginx/sites-available/ws.acala.seabird.systems.conf
+    sha256: 8d47c2570e4194b122b0e2b172eaa94d882acbcc9177dec8e1e8fe7c0f4cf2d9
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.acala.seabird.systems.conf /etc/nginx/sites-enabled/ws.acala.seabird.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.acala.seabird.systems.conf'
+    target: /etc/nginx/sites-available/ws.archive.acala.seabird.systems.conf
+    sha256: 0087bf0a64a5e7c14ab9f2a81701e7f16f1c13368d32d840d40b1290eca325d6
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.acala.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.acala.seabird.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service

@@ -192,3 +192,25 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.moonriver.seabird.systems.conf'
+    target: /etc/nginx/sites-available/ws.moonriver.seabird.systems.conf
+    sha256: a5598c813bc17c49a82fac900912d5e69d7d278b85b20afb865cb403c39dc0c1
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.moonriver.seabird.systems.conf /etc/nginx/sites-enabled/ws.moonriver.seabird.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.moonriver.seabird.systems.conf'
+    target: /etc/nginx/sites-available/ws.archive.moonriver.seabird.systems.conf
+    sha256: 83a22646bd70658572ec9467d16f83327b3ae711d69f20407898c275b358d784
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.moonriver.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.moonriver.seabird.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
