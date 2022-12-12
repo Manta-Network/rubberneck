@@ -28,6 +28,7 @@ user:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIBSdR9Wy3S4L+Zdcu8waYe5vW2VzMoi+QafgV3IIFj
       users:
         - stechu
+        - ferrell-code
         - garandor
         - ghzlatarev
 command:
