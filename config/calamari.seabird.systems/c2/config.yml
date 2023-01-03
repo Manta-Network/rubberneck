@@ -53,7 +53,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 13231e756005d363a740266af988af8531db6c971b2e7d56a65ece65e09e00ce
+    sha256: 349c582a0efed63d30b5eb5877bff8fe13968e8f0bd320265d9b476469e8d224
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -118,18 +118,18 @@ file:
 #        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
 #      post:
 #        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
-#  -
-#    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c2/etc/systemd/system/calamari.service
-#    target: /etc/systemd/system/calamari.service
-#    sha256: 2338c8869a67646d13ee26513ddc458c0bb8fe011996d92abd62dc4ef8936309
-#    command:
-#      pre:
-#        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
-#      post:
-#        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-#        - sudo systemctl daemon-reload
-#        - systemctl is-enabled --quiet calamari.service || sudo systemctl enable calamari.service
-#        - sudo systemctl start calamari.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c2/etc/systemd/system/calamari.service
+    target: /etc/systemd/system/calamari.service
+    sha256: e7f49e9a600798fb19cd96daba945d47824bf50b03523ec04bb7dfba29154a4f
+    command:
+      pre:
+        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet calamari.service || sudo systemctl enable calamari.service
+        - sudo systemctl start calamari.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
