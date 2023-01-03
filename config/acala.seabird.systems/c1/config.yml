@@ -53,7 +53,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 13231e756005d363a740266af988af8531db6c971b2e7d56a65ece65e09e00ce
+    sha256: 349c582a0efed63d30b5eb5877bff8fe13968e8f0bd320265d9b476469e8d224
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -96,10 +96,10 @@ file:
 #    sha256: 5f6653127d3b4662a618a7a25bc1a5746dca927bbb992478b7bfe46bff82f3f7
 #    command:
 #      pre:
-#        - systemctl is-active --quiet acala.service && sudo systemctl stop acala.service
+#        - systemctl is-active --quiet karura.service && sudo systemctl stop karura.service
 #      post:
 #        - sudo chmod +x /usr/local/bin/acala
-#        - systemctl is-active --quiet acala.service || sudo systemctl start acala.service
+#        - systemctl is-active --quiet karura.service || sudo systemctl start karura.service
 #  -
 #    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/acala.json
 #    target: /usr/share/substrate/acala.json
@@ -108,7 +108,7 @@ file:
 #      pre:
 #        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
 #      post:
-#        - systemctl is-active --quiet acala.service && sudo systemctl restart acala.service
+#        - systemctl is-active --quiet karura.service && sudo systemctl restart karura.service
 #  -
 #    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
 #    target: /usr/share/substrate/seabird.json
@@ -117,19 +117,19 @@ file:
 #      pre:
 #        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
 #      post:
-#        - systemctl is-active --quiet acala.service && sudo systemctl restart acala.service
-#  -
-#    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c1/etc/systemd/system/acala.service
-#    target: /etc/systemd/system/acala.service
-#    sha256: 2d4dc906f7bee80484fa3dd7268d386325c7ba51f5acf6c590be622d9175575e
-#    command:
-#      pre:
-#        - systemctl is-active --quiet acala.service && sudo systemctl stop acala.service
-#      post:
-#        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-#        - sudo systemctl daemon-reload
-#        - systemctl is-enabled --quiet acala.service || sudo systemctl enable acala.service
-#        - sudo systemctl start acala.service
+#        - systemctl is-active --quiet karura.service && sudo systemctl restart karura.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c1/etc/systemd/system/karura.service
+    target: /etc/systemd/system/karura.service
+    sha256: 528ef5b3ae340c8ae3e4cdd382e48ca5dd94df80a4aa4e30404c92093babee57
+    command:
+      pre:
+        - systemctl is-active --quiet karura.service && sudo systemctl stop karura.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet karura.service || sudo systemctl enable karura.service
+        - sudo systemctl start karura.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf

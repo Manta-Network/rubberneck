@@ -11,21 +11,23 @@ Group=root
 Type=simple
 Restart=on-failure
 ExecStart=/usr/local/bin/karura \
-  --pruning archive \
-  --alice \
-  --name 'c1-acala-calamari-staging' \
-  --base-path /var/lib/karura \
-  --node-key-file /usr/share/karura/node-key \
-  --chain /usr/share/karura/parachain-spec.json \
-  --port 30333 \
-  --ws-port 9944 \
-  --rpc-port 9933 \
-  --rpc-cors all \
-  --state-cache-size 0 \
-  --rpc-methods safe \
-  -- \
-  --name 'c1-acala-calamari-staging' \
-  --chain /usr/share/karura/relaychain-spec.json  
+    --pruning archive \
+    --alice \
+    --name c1 \
+    --base-path /var/lib/karura \
+    --node-key-file /usr/share/karura/node-key \
+    --chain /usr/share/karura/parachain-spec.json \
+    --port 30333 \
+    --ws-port 9944 \
+    --rpc-port 9933 \
+    --rpc-cors all \
+    --state-cache-size 0 \
+    --rpc-methods safe \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
+    -- \
+    --name c1 \
+    --chain /usr/share/karura/relaychain-spec.json \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 Restart=always
 RestartSec=120
 
