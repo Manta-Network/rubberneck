@@ -4,24 +4,26 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=substrate
-Group=substrate
+User=root
+Group=root
 Type=simple
 ExecStart=/usr/local/bin/calamari \
+    --name c4 \
     --collator \
-    --name 'c4' \
-    --base-path /var/lib/substrate \
-    --node-key-file /usr/share/substrate/node-key \
-    --chain /usr/share/substrate/calamari.json \
+    --pruning archive \
+    --base-path /var/lib/calamari \
+    --node-key-file /usr/share/calamari/node-key \
+    --chain /usr/share/calamari/parachain-spec.json \
     --port 30333 \
     --ws-port 9944 \
     --rpc-port 9933 \
     --rpc-cors all \
     --state-cache-size 0 \
     --rpc-methods safe \
+    --log=parachain::collation-generation=debug,cumulus-collator=debug,filtering-consensus=debug \
     -- \
-    --name 'calamari c4' \
-    --chain /usr/share/substrate/seabird.json
+    --name 'c4 calamari seabird' \
+    --chain /usr/share/calamari/relaychain-spec.json  
 Restart=always
 RestartSec=120
 
