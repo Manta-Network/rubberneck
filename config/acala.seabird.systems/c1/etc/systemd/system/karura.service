@@ -25,7 +25,7 @@ ExecStart=/usr/local/bin/karura \
     --rpc-methods safe \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
-    --name c1 \
+    --name 'c1 karura seabird' \
     --chain /usr/share/karura/relaychain-spec.json \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 Restart=always
