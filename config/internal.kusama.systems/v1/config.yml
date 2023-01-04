@@ -28,7 +28,9 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active kusama.service || sudo systemctl restart kusama.service
+  - systemctl is-active kusama0.service || sudo systemctl restart kusama0.service
+  - systemctl is-active kusama1.service || sudo systemctl restart kusama1.service
+  - systemctl is-active kusama2.service || sudo systemctl restart kusama2.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
