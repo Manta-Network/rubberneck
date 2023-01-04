@@ -121,7 +121,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c2/etc/systemd/system/karura.service
     target: /etc/systemd/system/karura.service
-    sha256: edc40fee3e99db268ad1cd34efe5cbfb1390fd58ad696edf5ceb7cab7babc719
+    sha256: 877ea98e1c5e9c15ae5a1670886ed4a3a177e404c38dd934402963c67eb961c3
     command:
       pre:
         - systemctl is-active --quiet karura.service && sudo systemctl stop karura.service
