@@ -121,7 +121,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c2/etc/systemd/system/moonriver.service
     target: /etc/systemd/system/moonriver.service
-    sha256: 1ee31f278672fa93a91208f779389eb3b75fb9ae4d1fc7db04db68f21f6fab3a
+    sha256: 73464c2a52dc2d51656c9fc1c8119e938ceac6b936da8ab15786ec128a293a65
     command:
       pre:
         - systemctl is-active --quiet moonriver.service && sudo systemctl stop moonriver.service
