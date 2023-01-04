@@ -53,7 +53,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 13231e756005d363a740266af988af8531db6c971b2e7d56a65ece65e09e00ce
+    sha256: 349c582a0efed63d30b5eb5877bff8fe13968e8f0bd320265d9b476469e8d224
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -90,6 +90,18 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v1/etc/systemd/system/kusama2.service'
+    target: /etc/systemd/system/kusama2.service
+    sha256: ddf9dea8aaeedf2f5a2f4129fd5fed8264409037a1d036b2951b60601cf832e7
+    command:
+      pre:
+        - systemctl is-active --quiet kusama2.service && sudo systemctl stop kusama2.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet kusama2.service || sudo systemctl enable kusama2.service
+        - sudo systemctl start kusama2.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
