@@ -91,6 +91,18 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v5/etc/systemd/system/kusama1.service'
+    target: /etc/systemd/system/kusama1.service
+    sha256: beb28fa56f2a0b0974b106e7dc52e6fdcdbd3be72e7d081db3b09a8cfa083f35
+    command:
+      pre:
+        - systemctl is-active --quiet kusama1.service && sudo systemctl stop kusama1.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet kusama1.service || sudo systemctl enable kusama1.service
+        - sudo systemctl start kusama1.service
+  -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v5/etc/systemd/system/kusama2.service'
     target: /etc/systemd/system/kusama2.service
     sha256: 27433bcc87f5e80f0d5d16c3b3088ef43030a9951c22906611a4e517fc59fc4d
