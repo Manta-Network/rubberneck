@@ -53,7 +53,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 13231e756005d363a740266af988af8531db6c971b2e7d56a65ece65e09e00ce
+    sha256: 349c582a0efed63d30b5eb5877bff8fe13968e8f0bd320265d9b476469e8d224
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -118,18 +118,18 @@ file:
 #        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
 #      post:
 #        - systemctl is-active --quiet moonriver.service && sudo systemctl restart moonriver.service
-#  -
-#    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c1/etc/systemd/system/moonriver.service
-#    target: /etc/systemd/system/moonriver.service
-#    sha256: c2753e1efdef3caeb787810d14ff2fbec3641a8eb38a096dc665e6cb2ca1c878
-#    command:
-#      pre:
-#        - systemctl is-active --quiet moonriver.service && sudo systemctl stop moonriver.service
-#      post:
-#        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-#        - sudo systemctl daemon-reload
-#        - systemctl is-enabled --quiet moonriver.service || sudo systemctl enable moonriver.service
-#        - sudo systemctl start moonriver.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c1/etc/systemd/system/moonriver.service
+    target: /etc/systemd/system/moonriver.service
+    sha256: 09329d4a550071ebf02ec41b67ae2df8d1363b9566d9981b9128fb72db101c67
+    command:
+      pre:
+        - systemctl is-active --quiet moonriver.service && sudo systemctl stop moonriver.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet moonriver.service || sudo systemctl enable moonriver.service
+        - sudo systemctl start moonriver.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
