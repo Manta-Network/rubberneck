@@ -91,7 +91,7 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v1/etc/systemd/system/kusama2.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v5/etc/systemd/system/kusama2.service'
     target: /etc/systemd/system/kusama2.service
     sha256: 27433bcc87f5e80f0d5d16c3b3088ef43030a9951c22906611a4e517fc59fc4d
     command:
