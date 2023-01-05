@@ -8,7 +8,7 @@ dns:
   alias:
     -
       name: ws.manta.systems
-      weight: 100
+      weight: 200
     -
       name: ws.archive.manta.systems
       weight: 200
@@ -17,6 +17,7 @@ package:
   - certbot
   - dirmngr
   - nginx
+  - python3-certbot-nginx
 user:
   -
     username: root
@@ -37,8 +38,8 @@ command:
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
-  #- 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
-  #- 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
+  - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
+  - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
   - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
   - test -x /usr/bin/unzip || sudo apt-get install -y unzip
@@ -58,7 +59,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 349c582a0efed63d30b5eb5877bff8fe13968e8f0bd320265d9b476469e8d224
+    sha256: 7d012c53e91df1c741ed9d5763b91cbb68e82385a1556057c24966ec4634f7ae
     command:
       pre:
         - sudo mkdir -p /etc/promtail
