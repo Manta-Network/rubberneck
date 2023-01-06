@@ -57,7 +57,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 7d012c53e91df1c741ed9d5763b91cbb68e82385a1556057c24966ec4634f7ae
+    sha256: 2982dcbd658d72560bb79f1d163f8032c3290a9cf110d3c6126f8a58dd923824
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -199,7 +199,7 @@ file:
   -
     source: 'https://manta-ops.s3.amazonaws.com/manta-indexer/v4.0.0/manta-indexer'
     target: /usr/local/bin/manta-indexer
-    sha256: a285c559fa70c761bda4def13b7010d2287936c78fac2434a5784e3d10a415c1
+    sha256: c6b4afd811e363291245c26ec995a7709bdeb43732e89720527b8a3f1b58ac22
     command:
       pre:
         - test -d /usr/local/bin || sudo mkdir -p /usr/local/bin
