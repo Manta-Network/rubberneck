@@ -9,6 +9,13 @@ dns:
       name: ws.calamari.seabird.systems
     -
       name: ws.archive.calamari.seabird.systems
+package:
+  - auditd
+  - certbot
+  - dirmngr
+  - nginx
+  - python3-certbot-nginx
+  - sqlite3
 user:
   -
     username: root
@@ -29,6 +36,7 @@ user:
 command:
   - sudo passwd -l root
   - systemctl is-active calamari.service || sudo systemctl restart calamari.service
+  - systemctl is-active manta-indexer.service || sudo systemctl manta-indexer calamari.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
@@ -53,7 +61,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 349c582a0efed63d30b5eb5877bff8fe13968e8f0bd320265d9b476469e8d224
+    sha256: 2982dcbd658d72560bb79f1d163f8032c3290a9cf110d3c6126f8a58dd923824
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -161,7 +169,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c4/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 2c53b4838f1c872562a2ac10aa055a84b9234baf54775e55eb23ca5017c71661
+    sha256: 3a2277ec259c6b2fb89c162b5992eac8cdb3ff182f51a32af7045563e2f6b4fc
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
@@ -192,3 +200,58 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/ws.archive.calamari.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.calamari.seabird.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: 'https://manta-ops.s3.amazonaws.com/manta-indexer/v4.0.0/manta-indexer'
+    target: /usr/local/bin/manta-indexer
+    sha256: c6b4afd811e363291245c26ec995a7709bdeb43732e89720527b8a3f1b58ac22
+    command:
+      pre:
+        - test -d /usr/local/bin || sudo mkdir -p /usr/local/bin
+      post:
+        - sudo chmod +x /usr/local/bin/manta-indexer
+        - systemctl is-active --quiet manta-indexer.service && sudo systemctl restart manta-indexer.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c4/etc/manta-indexer/config.toml'
+    target: /etc/manta-indexer/config.toml
+    sha256: 74786a7cef47d2c837ab4e4c1f105c2c024754c7eb82424b10ea6f8755f68234
+    command:
+      pre:
+        - test -d /etc/manta-indexer || sudo mkdir -p /etc/manta-indexer
+      post:
+        - systemctl is-active --quiet manta-indexer.service && sudo systemctl restart manta-indexer.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c4/etc/manta-indexer/log.yaml'
+    target: /etc/manta-indexer/log.yaml
+    sha256: 5b937c95301f1a0ea27c8fe88e179c49fa60780dc5d3c1b90ac09709cd6ff617
+    command:
+      pre:
+        - test -d /etc/manta-indexer || sudo mkdir -p /etc/manta-indexer
+      post:
+        - systemctl is-active --quiet manta-indexer.service && sudo systemctl restart manta-indexer.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c4/var/lib/manta-indexer/migrations/0_schema.sql'
+    target: /var/lib/manta-indexer/migrations/0_schema.sql
+    sha256: c40c46c3bb3c5365da214812e5e308a4dbe24401c9bf0f32dc24672d7e9f5f04
+    command:
+      pre:
+        - test -d /var/lib/manta-indexer/migrations || sudo mkdir -p /var/lib/manta-indexer/migrations
+      post:
+        - systemctl is-active --quiet manta-indexer.service && sudo systemctl restart manta-indexer.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c4/etc/systemd/system/manta-indexer.service
+    target: /etc/systemd/system/manta-indexer.service
+    sha256: 5b7e20f40f9e801312e832cb23d4ab6867989c686c74515f802fc9290401f3c6
+    command:
+      pre:
+        - systemctl is-active --quiet manta-indexer.service && sudo systemctl stop manta-indexer.service
+        - getent passwd manta-indexer &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/manta-indexer --user-group manta-indexer
+        - test -d /var/log/manta-indexer || sudo mkdir -p /var/log/manta-indexer
+        - sudo ln -sf /var/log/manta-indexer /var/lib/manta-indexer/logs
+        - test -d /etc/manta-indexer || sudo mkdir -p /etc/manta-indexer
+        - sudo ln -sf /etc/manta-indexer /var/lib/manta-indexer/conf
+        - sudo chown -R manta-indexer:manta-indexer /var/lib/manta-indexer
+        - sudo chown -R manta-indexer:manta-indexer /var/log/manta-indexer
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet manta-indexer.service || sudo systemctl enable manta-indexer.service
+        - systemctl is-active --quiet manta-indexer.service || sudo systemctl start manta-indexer.service

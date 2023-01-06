@@ -33,6 +33,7 @@ user:
 command:
   - sudo passwd -l root
   - systemctl is-active calamari.service || sudo systemctl restart calamari.service
+  - systemctl is-active manta-indexer.service || sudo systemctl manta-indexer calamari.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
@@ -165,7 +166,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c1/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 80af0ad92439480d934bc67dd52141aa15ea84f7bc9e65d860f5adae81514c82
+    sha256: e5c84554b1a8343a47f68b257c221ea8e2bb209aec8303bb64756707b785b71a
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
