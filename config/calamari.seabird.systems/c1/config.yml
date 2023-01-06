@@ -178,7 +178,7 @@ file:
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.calamari.seabird.systems.conf'
     target: /etc/nginx/sites-available/ws.calamari.seabird.systems.conf
-    sha256: 5836dece65986fc1de0a654ab18f37f03e0b236dd3390fad17a945bbbd92eb5d
+    sha256: 8efe16562db8ba515b7cabf99e0087c2b35c6936b147ef2986290eff88c6ca72
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
