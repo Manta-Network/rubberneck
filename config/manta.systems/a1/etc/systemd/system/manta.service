@@ -4,6 +4,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
+User=manta
+Group=manta
 ExecStart=/usr/bin/manta \
     --pruning archive \
     --chain /usr/share/substrate/manta.json \
@@ -25,8 +27,6 @@ ExecStart=/usr/bin/manta \
     --rpc-methods safe \
     --node-key-file /usr/share/substrate/12D3KooWCpnkG834s9ETesFTWtGqRDjs6Te1UCXHib3iD8GEmXLU \
     --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
-User=manta
-Group=manta
 Restart=always
 RestartSec=120
 

@@ -59,7 +59,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 7d012c53e91df1c741ed9d5763b91cbb68e82385a1556057c24966ec4634f7ae
+    sha256: 3ad396de6e1becc80616339a413c0c1c8e21f96a3ceba2294521fac26941a52e
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -77,16 +77,16 @@ file:
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now prometheus-node-exporter.service
-  #-
-  #  source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.0/manta'
-  #  target: /usr/bin/manta
-  #  sha256: 33d31e22f08ec948173cf982ce8e34ed26ef540a1e5880fdb331db24294a5f60
-  #  command:
-  #    pre:
-  #      - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
-  #    post:
-  #      - sudo chmod +x /usr/bin/manta
-  #      - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
+  -
+    source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.0-rc1/manta'
+    target: /usr/bin/manta
+    sha256: b1517cbd2e90b2e03ce9c2f24236fb2089297bbb00b148a89d224668d0d06759
+    command:
+      pre:
+        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
+      post:
+        - sudo chmod +x /usr/bin/manta
+        - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/manta-genesis.json'
     target: /usr/share/substrate/manta.json
@@ -96,18 +96,18 @@ file:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
       post:
         - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
-  #-
-  #  source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a1/etc/systemd/system/manta.service'
-  #  target: /etc/systemd/system/manta.service
-  #  sha256: 2c28ac245b6221175e4a1393f59cec616f3b5dd9b196815a3af28897a0330e03
-  #  command:
-  #    pre:
-  #      - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
-  #    post:
-  #      - getent passwd manta &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group manta
-  #      - sudo systemctl daemon-reload
-  #      - systemctl is-enabled --quiet manta.service || sudo systemctl enable manta.service
-  #      - sudo systemctl start manta.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a1/etc/systemd/system/manta.service'
+    target: /etc/systemd/system/manta.service
+    sha256: c064ddad6e9fc47173bd9f61182c9082023f5af189a1ecb4863d95850a9f714f
+    command:
+      pre:
+        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
+      post:
+        - getent passwd manta &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group manta
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet manta.service || sudo systemctl enable manta.service
+        - sudo systemctl start manta.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
