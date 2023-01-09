@@ -17,6 +17,7 @@ package:
   - dirmngr
   - nginx
   - python3-certbot-nginx
+  - sqlite3
 user:
   -
     username: root
@@ -58,7 +59,7 @@ file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 7d012c53e91df1c741ed9d5763b91cbb68e82385a1556057c24966ec4634f7ae
+    sha256: 3ad396de6e1becc80616339a413c0c1c8e21f96a3ceba2294521fac26941a52e
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -76,3 +77,96 @@ file:
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now prometheus-node-exporter.service
+  -
+    source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.0-rc1/manta'
+    target: /usr/bin/manta
+    sha256: b1517cbd2e90b2e03ce9c2f24236fb2089297bbb00b148a89d224668d0d06759
+    command:
+      pre:
+        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
+      post:
+        - sudo chmod +x /usr/bin/manta
+        - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/manta-genesis.json'
+    target: /usr/share/substrate/manta.json
+    sha256: 29de0c8669e378f90ae2e74caec6af41d24ff4f191b892986ddee5825075b7b2
+    command:
+      pre:
+        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+      post:
+        - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c5/etc/systemd/system/manta.service'
+    target: /etc/systemd/system/manta.service
+    sha256: 8f06941f864c162e3e8b7ee7cf70b593e4cac296993632a0011164a009f664a4
+    command:
+      pre:
+        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet manta.service || sudo systemctl enable manta.service
+        - sudo systemctl start manta.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
+    target: /etc/letsencrypt/options-ssl-nginx.conf
+    sha256: 17baec778c05571beb0cdeb0bc1c6da3596d44d1fe567e7fee0efef80a860d01
+    command:
+      pre:
+        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
+      post:
+        - sudo chmod 644 /etc/letsencrypt/options-ssl-nginx.conf
+  -
+    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/ssl-dhparams.pem'
+    target: /etc/letsencrypt/ssl-dhparams.pem
+    sha256: 9ba6429597aeed2d8617a7705b56e96d044f64b07971659382e426675105654b
+    command:
+      pre:
+        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
+      post:
+        - sudo chmod 644 /etc/letsencrypt/ssl-dhparams.pem
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/status.conf'
+    target: /etc/nginx/sites-available/status.conf
+    sha256: c123caec7c2871afd3500875adb026cacffc16b7c7dde4375376d1b4fb3f1f14
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c5/etc/nginx/sites-available/substrate.conf'
+    target: /etc/nginx/sites-available/substrate.conf
+    sha256: 082d2abe789634ca39d40ea8e06cd2dbceef7904f7880ac26dc69ece612cee20
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.manta.systems.conf'
+    target: /etc/nginx/sites-available/ws.manta.systems.conf
+    sha256: 804dc1eb84ff6f04820a8fa7e0523476e4efd794945a973d03315ee4d90e17e6
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.manta.systems.conf /etc/nginx/sites-enabled/ws.manta.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.manta.systems.conf'
+    target: /etc/nginx/sites-available/ws.archive.manta.systems.conf
+    sha256: e6bb13c89dc1742f8a03f3a7ca85f0446c2e5abdc730dc839491403c8772390d
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.manta.systems.conf /etc/nginx/sites-enabled/ws.archive.manta.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service

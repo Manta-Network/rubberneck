@@ -18,6 +18,7 @@ package:
   - dirmngr
   - nginx
   - python3-certbot-nginx
+  - sqlite3
 user:
   -
     username: root
@@ -99,7 +100,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a1/etc/systemd/system/manta.service'
     target: /etc/systemd/system/manta.service
-    sha256: c064ddad6e9fc47173bd9f61182c9082023f5af189a1ecb4863d95850a9f714f
+    sha256: 5e87dd857de3a33fb4bd3a6bbb9c7539b7cdbd314e559312484275b1e3c34a2b
     command:
       pre:
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
@@ -139,7 +140,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a1/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 7f00aa4f8a712972498abb1d45c9410c6050553750266a6f2f6fed6613ea6c0a
+    sha256: c0a23cd957bc59d2bf4e2b5bc044d967ad19d910b43aec4e8034ac89068173fa
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
@@ -151,7 +152,7 @@ file:
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.manta.systems.conf'
     target: /etc/nginx/sites-available/ws.manta.systems.conf
-    sha256: a312332c7a1945340ae033d0700c6626f6866db981e375dbd13192f1ad793c49
+    sha256: 804dc1eb84ff6f04820a8fa7e0523476e4efd794945a973d03315ee4d90e17e6
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
@@ -162,7 +163,7 @@ file:
   -
     source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.manta.systems.conf'
     target: /etc/nginx/sites-available/ws.archive.manta.systems.conf
-    sha256: f1f2fe6f3b0aac32521a846d0fecb946e31086e366b9bdb733d428c9735af333
+    sha256: e6bb13c89dc1742f8a03f3a7ca85f0446c2e5abdc730dc839491403c8772390d
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available

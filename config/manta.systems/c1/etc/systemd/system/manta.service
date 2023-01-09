@@ -4,12 +4,13 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=manta
-Group=manta
+User=substrate
+Group=substrate
 ExecStart=/usr/bin/manta \
+    --collator \
     --pruning archive \
     --chain /usr/share/substrate/manta.json \
-    --name '🗃️ a1 🗃️' \
+    --name '🗃️ c1 🗃️' \
     --base-path /var/lib/substrate \
     --port 30333 \
     --ws-port 9944 \
@@ -19,13 +20,13 @@ ExecStart=/usr/bin/manta \
     --rpc-methods safe \
     --state-cache-size 0 \
     --in-peers 100 \
-    --node-key-file /usr/share/substrate/12D3KooWCpnkG834s9ETesFTWtGqRDjs6Te1UCXHib3iD8GEmXLU \
+    --node-key-file /usr/share/substrate/12D3KooWSNwD7tJkqKGdMfCVTJbbzrGFTGbXoeMFZCTwEytpFCM4 \
     -- \
     --chain polkadot \
-    --name '🗃️ manta a1 🗃️' \
+    --name '🗃️ manta c1 🗃️' \
     --rpc-cors all \
     --rpc-methods safe \
-    --node-key-file /usr/share/substrate/12D3KooWCpnkG834s9ETesFTWtGqRDjs6Te1UCXHib3iD8GEmXLU \
+    --node-key-file /usr/share/substrate/12D3KooWSNwD7tJkqKGdMfCVTJbbzrGFTGbXoeMFZCTwEytpFCM4 \
     --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
 Restart=always
 RestartSec=120
