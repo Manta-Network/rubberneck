@@ -88,9 +88,9 @@ file:
         - sudo chmod +x /usr/bin/manta
         - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/manta-genesis.json'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c5/usr/share/substrate/manta.json'
     target: /usr/share/substrate/manta.json
-    sha256: 29de0c8669e378f90ae2e74caec6af41d24ff4f191b892986ddee5825075b7b2
+    sha256: c53c9b42026d163efdad3c5af6ec4b5cc2d7f0d83ed5a9705b08f14c607f8ad7
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
