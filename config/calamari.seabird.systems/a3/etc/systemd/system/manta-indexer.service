@@ -1,0 +1,17 @@
+[Unit]
+Description=manta indexer
+Wants=network-online.target calamari.service
+After=network-online.target calamari.service
+
+[Service]
+User=manta-indexer
+Group=manta-indexer
+WorkingDirectory=/var/lib/manta-indexer
+Type=simple
+ExecStart=/usr/local/bin/manta-indexer
+Restart=always
+RestartSec=120
+RuntimeMaxSec=3600
+
+[Install]
+WantedBy=multi-user.target
