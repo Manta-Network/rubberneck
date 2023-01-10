@@ -11,7 +11,7 @@ ExecStart=/usr/local/bin/calamari \
     --name a3 \
     --pruning archive \
     --base-path /var/lib/calamari \
-    --chain /usr/share/calamari/parachain-spec.json \
+    --chain /usr/share/substrate/calamari-staging.json \
     --port 30333 \
     --ws-port 9944 \
     --ws-max-connections 1000 \
@@ -21,7 +21,7 @@ ExecStart=/usr/local/bin/calamari \
     --rpc-methods safe \
     -- \
     --name 'a3 calamari seabird' \
-    --chain /usr/share/calamari/relaychain-spec.json
+    --chain /usr/share/substrate/kusama-staging.json
 Restart=always
 RestartSec=120
 
