@@ -7,8 +7,6 @@ dns:
   alias:
     -
       name: ws.internal.kusama.systems
-    -
-      name: ws.archive.internal.kusama.systems
 user:
   -
     username: root
