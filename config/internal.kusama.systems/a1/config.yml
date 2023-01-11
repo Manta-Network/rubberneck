@@ -9,6 +9,13 @@ dns:
       name: ws.internal.kusama.systems
     -
       name: ws.archive.internal.kusama.systems
+package:
+  - auditd
+  - certbot
+  - dirmngr
+  - nginx
+  - python3-certbot-nginx
+  - sqlite3
 user:
   -
     username: root
