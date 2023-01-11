@@ -129,7 +129,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a1/etc/systemd/system/kusama-0.service'
     target: /etc/systemd/system/kusama-0.service
-    sha256: e48ee54f1b87d8ac272351e2bbbe1b47dc451dc408c9663db4c7e35416f55c9e
+    sha256: 79261139cb30a46cc538f7adb6c85825bc8ac68cba2e75e1ee671af38955c1c3
     command:
       pre:
         - systemctl is-active --quiet kusama-0.service && sudo systemctl stop kusama-0.service
@@ -141,7 +141,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a1/etc/systemd/system/kusama-1.service'
     target: /etc/systemd/system/kusama-1.service
-    sha256: 2bb3fe720a8a40b756f3d2110149b6f9d1525e2449f25c800035086766262786
+    sha256: fb00d45f1516bd297deb25f31b4d0f71276ef53918a2079e55ab9fe6e22fec0e
     command:
       pre:
         - systemctl is-active --quiet kusama-1.service && sudo systemctl stop kusama-1.service
@@ -153,7 +153,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a1/etc/systemd/system/kusama-2.service'
     target: /etc/systemd/system/kusama-2.service
-    sha256: f124a7f4aa2b669cd00799fa4d2c89a151674512e9c7fc646ae3e4fdce780b69
+    sha256: 0c1d704902445fe54379ca4617d7397f1d26c100849fd007f363e43b280d8961
     command:
       pre:
         - systemctl is-active --quiet kusama-2.service && sudo systemctl stop kusama-2.service
