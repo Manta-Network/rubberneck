@@ -9,8 +9,8 @@ Group=substrate
 Type=simple
 ExecStart=/usr/local/bin/kusama \
   --pruning archive \
-  --name '${node_name} 1' \
-  --base-path /var/lib/substrate/${node_name}-1 \
+  --name 'a3 1' \
+  --base-path /var/lib/substrate/a3-1 \
   --chain /usr/share/substrate/kusama-staging.json \
   --force-kusama \
   --port 30333 \
