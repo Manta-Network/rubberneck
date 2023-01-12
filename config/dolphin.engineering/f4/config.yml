@@ -34,7 +34,7 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active dolphin.service || sudo systemctl restart dolphin.service
+  #- systemctl is-active dolphin.service || sudo systemctl restart dolphin.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
@@ -96,38 +96,38 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
-  -
-    source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.3/manta'
-    target: /usr/bin/manta
-    sha256: 33d31e22f08ec948173cf982ce8e34ed26ef540a1e5880fdb331db24294a5f60
-    command:
-      pre:
-        - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
-      post:
-        - sudo chmod +x /usr/bin/manta
-        - sudo ln -sfr /usr/bin/manta /usr/bin/dolphin
-        - systemctl is-active --quiet dolphin.service || sudo systemctl start dolphin.service
-  -
-    source: 'https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/dolphin-testnet-genesis.json'
-    target: /usr/share/substrate/dolphin.json
-    sha256: d0edc2820d0f298cecde1731ac1aff9d0c4af29b5e6f67c330b5cc907054501c
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet dolphin.service && sudo systemctl restart dolphin.service
-  -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f4/usr/lib/systemd/system/dolphin.service'
-    target: /usr/lib/systemd/system/dolphin.service
-    sha256: dc58375f1148a8f4c447df82bf9cab85f77515db5a8ec3d9ab4ab0153783aad7
-    command:
-      pre:
-        - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
-      post:
-        - getent passwd manta &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group manta
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet dolphin.service || sudo systemctl enable dolphin.service
-        - sudo systemctl start dolphin.service
+  #-
+  #  source: 'https://github.com/Manta-Network/Manta/releases/download/v3.4.3/manta'
+  #  target: /usr/bin/manta
+  #  sha256: 33d31e22f08ec948173cf982ce8e34ed26ef540a1e5880fdb331db24294a5f60
+  #  command:
+  #    pre:
+  #      - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
+  #    post:
+  #      - sudo chmod +x /usr/bin/manta
+  #      - sudo ln -sfr /usr/bin/manta /usr/bin/dolphin
+  #      - systemctl is-active --quiet dolphin.service || sudo systemctl start dolphin.service
+  #-
+  #  source: 'https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/dolphin-testnet-genesis.json'
+  #  target: /usr/share/substrate/dolphin.json
+  #  sha256: d0edc2820d0f298cecde1731ac1aff9d0c4af29b5e6f67c330b5cc907054501c
+  #  command:
+  #    pre:
+  #      - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+  #    post:
+  #      - systemctl is-active --quiet dolphin.service && sudo systemctl restart dolphin.service
+  #-
+  #  source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f4/usr/lib/systemd/system/dolphin.service'
+  #  target: /usr/lib/systemd/system/dolphin.service
+  #  sha256: dc58375f1148a8f4c447df82bf9cab85f77515db5a8ec3d9ab4ab0153783aad7
+  #  command:
+  #    pre:
+  #      - systemctl is-active --quiet dolphin.service && sudo systemctl stop dolphin.service
+  #    post:
+  #      - getent passwd manta &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group manta
+  #      - sudo systemctl daemon-reload
+  #      - systemctl is-enabled --quiet dolphin.service || sudo systemctl enable dolphin.service
+  #      - sudo systemctl start dolphin.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
@@ -156,37 +156,37 @@ file:
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
-  -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f4/etc/nginx/sites-available/substrate.conf'
-    target: /etc/nginx/sites-available/substrate.conf
-    sha256: 5ba52ff0cb429b5cf012ec64efa2965f8ffbd5fce8688ad8a451f3ee94591a78
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
-        - sudo systemctl stop nginx.service
-        - sudo systemctl start nginx.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.dolphin.engineering.conf'
-    target: /etc/nginx/sites-available/ws.dolphin.engineering.conf
-    sha256: f87c44150fc3c43ecea5ae8f5439978d5d22accf74358600d167e997a4cc3c5e
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.dolphin.engineering.conf /etc/nginx/sites-enabled/ws.dolphin.engineering.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.dolphin.engineering.conf'
-    target: /etc/nginx/sites-available/ws.archive.dolphin.engineering.conf
-    sha256: 5c6bda0a57eabdbbff412bdd597a3f706201a5272eb3ac8325c6d456fd2ae305
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.dolphin.engineering.conf /etc/nginx/sites-enabled/ws.archive.dolphin.engineering.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  #-
+  #  source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f4/etc/nginx/sites-available/substrate.conf'
+  #  target: /etc/nginx/sites-available/substrate.conf
+  #  sha256: 5ba52ff0cb429b5cf012ec64efa2965f8ffbd5fce8688ad8a451f3ee94591a78
+  #  command:
+  #    pre:
+  #      - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+  #      - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+  #    post:
+  #      - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+  #      - sudo systemctl stop nginx.service
+  #      - sudo systemctl start nginx.service
+  #-
+  #  source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.dolphin.engineering.conf'
+  #  target: /etc/nginx/sites-available/ws.dolphin.engineering.conf
+  #  sha256: f87c44150fc3c43ecea5ae8f5439978d5d22accf74358600d167e997a4cc3c5e
+  #  command:
+  #    pre:
+  #      - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+  #      - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+  #    post:
+  #      - sudo ln -sfr /etc/nginx/sites-available/ws.dolphin.engineering.conf /etc/nginx/sites-enabled/ws.dolphin.engineering.conf
+  #      - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  #-
+  #  source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.dolphin.engineering.conf'
+  #  target: /etc/nginx/sites-available/ws.archive.dolphin.engineering.conf
+  #  sha256: 5c6bda0a57eabdbbff412bdd597a3f706201a5272eb3ac8325c6d456fd2ae305
+  #  command:
+  #    pre:
+  #      - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+  #      - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+  #    post:
+  #      - sudo ln -sfr /etc/nginx/sites-available/ws.archive.dolphin.engineering.conf /etc/nginx/sites-enabled/ws.archive.dolphin.engineering.conf
+  #      - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service

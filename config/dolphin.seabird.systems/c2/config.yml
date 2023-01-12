@@ -33,7 +33,7 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active dolphin.service || sudo systemctl restart dolphin.service
+  #- systemctl is-active dolphin.service || sudo systemctl restart dolphin.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
@@ -163,37 +163,37 @@ file:
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
-  -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.seabird.systems/c2/etc/nginx/sites-available/substrate.conf'
-    target: /etc/nginx/sites-available/substrate.conf
-    sha256: 16e88a9890afc933b6658f78cb91d1a5017d16be803e1c484e62b433d73ce8b5
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
-        - sudo systemctl stop nginx.service
-        - sudo systemctl start nginx.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.dolphin.seabird.systems.conf'
-    target: /etc/nginx/sites-available/ws.dolphin.seabird.systems.conf
-    sha256: 5dc9da8ce3179357e3d6fc6f86ac1db5eaedf62cf8725a16fc9f8d6fbe6c7f71
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.dolphin.seabird.systems.conf /etc/nginx/sites-enabled/ws.dolphin.seabird.systems.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.dolphin.seabird.systems.conf'
-    target: /etc/nginx/sites-available/ws.archive.dolphin.seabird.systems.conf
-    sha256: 7525419947fcd283bc369ab4500e7404005659a4479f9561701008b298ecf474
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.dolphin.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.dolphin.seabird.systems.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  #-
+  #  source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.seabird.systems/c2/etc/nginx/sites-available/substrate.conf'
+  #  target: /etc/nginx/sites-available/substrate.conf
+  #  sha256: 16e88a9890afc933b6658f78cb91d1a5017d16be803e1c484e62b433d73ce8b5
+  #  command:
+  #    pre:
+  #      - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+  #      - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+  #    post:
+  #      - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+  #      - sudo systemctl stop nginx.service
+  #      - sudo systemctl start nginx.service
+  #-
+  #  source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.dolphin.seabird.systems.conf'
+  #  target: /etc/nginx/sites-available/ws.dolphin.seabird.systems.conf
+  #  sha256: 5dc9da8ce3179357e3d6fc6f86ac1db5eaedf62cf8725a16fc9f8d6fbe6c7f71
+  #  command:
+  #    pre:
+  #      - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+  #      - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+  #    post:
+  #      - sudo ln -sfr /etc/nginx/sites-available/ws.dolphin.seabird.systems.conf /etc/nginx/sites-enabled/ws.dolphin.seabird.systems.conf
+  #      - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  #-
+  #  source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.dolphin.seabird.systems.conf'
+  #  target: /etc/nginx/sites-available/ws.archive.dolphin.seabird.systems.conf
+  #  sha256: 7525419947fcd283bc369ab4500e7404005659a4479f9561701008b298ecf474
+  #  command:
+  #    pre:
+  #      - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+  #      - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+  #    post:
+  #      - sudo ln -sfr /etc/nginx/sites-available/ws.archive.dolphin.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.dolphin.seabird.systems.conf
+  #      - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
