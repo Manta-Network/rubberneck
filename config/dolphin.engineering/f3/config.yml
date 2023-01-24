@@ -156,18 +156,18 @@ file:
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
-  #-
-  #  source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f3/etc/nginx/sites-available/substrate.conf'
-  #  target: /etc/nginx/sites-available/substrate.conf
-  #  sha256: cf4af36a85c8caba896df086582594048d0d599ad6fd8d9b6522454c75facc66
-  #  command:
-  #    pre:
-  #      - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-  #      - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-  #    post:
-  #      - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
-  #      - sudo systemctl stop nginx.service
-  #      - sudo systemctl start nginx.service
+  -
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/dolphin.engineering/f3/etc/nginx/sites-available/substrate.conf'
+    target: /etc/nginx/sites-available/substrate.conf
+    sha256: abe9e24b26ec55dc8abfaed089c4eb45e6fd3c5a80af13e3f6f054a9617c789f
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
   #-
   #  source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.dolphin.engineering.conf'
   #  target: /etc/nginx/sites-available/ws.dolphin.engineering.conf
