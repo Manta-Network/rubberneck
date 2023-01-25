@@ -99,34 +99,35 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
-#  -
-#    source: https://github.com/Manta-Network/Manta/releases/download/v3.4.3/manta
-#    target: /usr/local/bin/calamari
-#    sha256: 33d31e22f08ec948173cf982ce8e34ed26ef540a1e5880fdb331db24294a5f60
-#    command:
-#      pre:
-#        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
-#      post:
-#        - sudo chmod +x /usr/local/bin/calamari
-#        - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
-#  -
-#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/calamari.json
-#    target: /usr/share/substrate/calamari.json
-#    sha256: e8bb119ad961a882cb9d7d980eeac7fb47a1d0c64e408233270ac95148bb75c0
-#    command:
-#      pre:
-#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-#      post:
-#        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
-#  -
-#    source: https://gist.githubusercontent.com/grenade/1ee797d607d32aa8889fff8b7c9f3bb4/raw/seabird.json
-#    target: /usr/share/substrate/seabird.json
-#    sha256: bf6280b356b64dc37cee3688336df34bf8f7497b0c711d0f4e73f2141c91138a
-#    command:
-#      pre:
-#        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-#      post:
-#        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/calamari-staging.json
+    target: /usr/share/substrate/calamari-staging.json
+    sha256: 700bc42a71a237989d67b87dcf82dca7875d1f767348506b34d3acbe4f9fffb0
+    command:
+      pre:
+        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+      post:
+        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/kusama-staging.json
+    target: /usr/share/substrate/kusama-staging.json
+    sha256: 6e0a5614a4f8a94052fd2663f153adbd34cb7794be3ac7691d8febd27c479541
+    command:
+      pre:
+        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+      post:
+        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
+  -
+    source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta'
+    target: /usr/local/bin/manta
+    sha256: 15406935328bac77d741db4d99d6c7b14cebba90de5cf4e5f72314524521884d
+    command:
+      pre:
+        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
+      post:
+        - sudo chmod +x /usr/local/bin/manta
+        - sudo ln -sfr /usr/local/bin/manta /usr/local/bin/calamari
+        - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c4/etc/systemd/system/calamari.service
     target: /etc/systemd/system/calamari.service

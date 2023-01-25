@@ -118,9 +118,9 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.0-rc1/manta'
+    source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta'
     target: /usr/local/bin/manta
-    sha256: b1517cbd2e90b2e03ce9c2f24236fb2089297bbb00b148a89d224668d0d06759
+    sha256: 15406935328bac77d741db4d99d6c7b14cebba90de5cf4e5f72314524521884d
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
