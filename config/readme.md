@@ -35,6 +35,7 @@ the structure of a server manifest is loosely based on [cloudinit/cloud-config](
 
 ```yaml
 ---
+
 # values other than `sync` will notify the synchronisation service to work in dry-run mode which operates as a read-only mechanism, producing log output but making no changes to the server
 action: sync
 
@@ -55,6 +56,7 @@ dns:
     -
       # a dns A record for `a.example.com` will be created with the ip address of a1.example.com
       name: a.example.com
+
 # a list of packages to be installed by the servers distribution package manager, ie: apt, dnf
 # packages listed here must be available from a repository already known to the server, ie: from the distribution's default repository list
 package:
