@@ -31,7 +31,7 @@ this rubberneck component uses several **imperative** conventions:
 
 each server maintained by rubberneck must include a manifest. the manifest must be named `config.yml` and must be available in the rubberneck repository at the conventional path which is: `config/${subdomain}/${hostname}/config.yml`. for example: [config/calamari.systems/a1/config.yml](calamari.systems/a1/config.yml)
 
-the structure of a server manifest is loosely based on [cloudinit/cloud-config](https://cloudinit.readthedocs.io/en/latest/reference/examples.html) with the notable difference that rubberneck manifests are intended to be run on the same instance frequently. the syntax and conventions for an example instance (`a1.example.com`) are as follows:
+the structure of a server manifest is loosely based on [cloudinit/cloud-config](https://cloudinit.readthedocs.io/en/latest/reference/examples.html) with the notable difference that rubberneck manifests are intended to be run on the same instance repeatedly and frequently. the syntax and conventions for an example instance (`a1.example.com`) are as follows:
 
 ```yaml
 ---
