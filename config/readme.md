@@ -17,4 +17,4 @@ this rubberneck component uses several **imperative** conventions:
     - internal.kusama.systems: a *subdomain* which includes server instances that archive and collate the kusama-internal relay-chain
 - folders under the config component directory are named using the *subdomain* name of the servers managed therein
 - folders under the config/*subdomain* directory are named using the hostname of the individual servers within that *subdomain*. ie:
-  - `config/calamari.systems/a1` contains the manifest (`config/calamari.systems/a1/config.yml`) and configuration artifacts (eg: `config/calamari.systems/a1/etc/nginx/sites-available/substrate.conf`) for the server with hostname: `a1` and fully qualified domain name (fqdn): `a1.calamari.systems`
+  - `config/calamari.systems/a1` contains the manifest ([config/calamari.systems/a1/config.yml](calamari.systems/a1/config.yml)) and configuration artifacts (eg: [config/calamari.systems/a1/etc/nginx/sites-available/substrate.conf](calamari.systems/a1/etc/nginx/sites-available/substrate.conf)) for the server with hostname: `a1` and fully qualified domain name (fqdn): `a1.calamari.systems`
