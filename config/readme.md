@@ -52,7 +52,7 @@ dns:
     -
       # a dns load-balanced entry for `a.example.com` will be created as a weighted alias of a1.example.com
       name: a.example.com
-      # the dns entry load balancer weighting.
+      # the dns entry load balancer weighting (a value between 0 and 255 inclusive).
       # 0: no dns queries for a.example.com will be routed to a1.example.com
       # 128: some dns queries for a.example.com will be routed to a1.example.com
       # 255: many dns queries for a.example.com will be routed to a1.example.com
