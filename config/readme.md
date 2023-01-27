@@ -35,12 +35,6 @@ the structure of a server manifest is loosely based on [cloudinit/cloud-config](
 
 ```yaml
 ---
-# the hostname (without domain) of the server
-hostname: a1
-
-# the domain name of the server
-domain: example.com
-
 # values other than `sync` will notify the synchronisation service to work in dry-run mode which operates as a read-only mechanism, producing log output but making no changes to the server
 action: sync
 
