@@ -66,7 +66,8 @@ package:
 user:
   -
     username: root
-    # include the keys listed here in: `/root/.ssh/authorized_keys`, remove any keys from that file which are not listed here
+    # include the keys listed here in: `/root/.ssh/authorized_keys`
+    # remove any keys from `authorized_keys` which are not listed here
     # either or both of the `keys` or `users` properties may be populated or omitted. the authorized_keys file will be deduped before deployment
     authorized:
       # include lines in authorized_keys with the exact key strings in this list
@@ -77,7 +78,8 @@ user:
         - alice
   -
     username: ubuntu
-    # include the keys listed here in: `/home/ubuntu/.ssh/authorized_keys`, remove any keys from that file which are not listed here
+    # include the keys listed here in: `/home/ubuntu/.ssh/authorized_keys`
+    # remove any keys from `authorized_keys` which are not listed here
     # either or both of the `keys` or `users` properties may be populated or omitted. the authorized_keys file will be deduped before deployment
     authorized:
       # include lines in authorized_keys with the exact key strings in this list
@@ -94,10 +96,12 @@ command:
   - sudo passwd -l root
   # attempt to restart the nginx systemd service, if it is not observed to be in an `active` state
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
-  # download and install the promtail binary if the executable is not detected. note that care has been taken in the crafting of this command to account for the download and install steps being skipped if the binary is already present and executable
+  # download and install the promtail binary if the executable is not detected
+  # note that care has been taken in the crafting of this command to account for the download and install steps being skipped, if the binary is already present and executable
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.6.1/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
 
-# each file in this list will be downloaded from the uri specified by `source` to the path specified by `target`, if a file does not already exist at that path with a checksum matching the checksum specified by `sha256`
+# each file in this list will be downloaded from the uri specified by `source` to the path specified by `target`,
+# if a file does not already exist at that path, with a checksum matching the checksum specified by `sha256`
 # notes:
 # - on linux, a sha256 checksum for a given file can be observed with a command like `sha256sum ${file}`
 # - pre and post commands are only executed if the file download is required. they are skipped if the target with correct checksum already exists
