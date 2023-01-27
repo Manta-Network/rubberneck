@@ -1,6 +1,6 @@
 # [rubberneck](https://github.com/Manta-Network/rubberneck) / config
 
-### a collection of instance manifests which describe the configuration of each server maintained by rubberneck
+### a collection of instance manifests and configuration artifacts which describe the configuration of each server maintained by rubberneck
 
 this rubberneck component uses several **imperative** conventions:
 
