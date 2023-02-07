@@ -91,16 +91,18 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c1/usr/share/substrate/manta.json'
     target: /usr/share/substrate/manta.json
-    sha256: 0e35030372c4ae5c6f45a4ef86c883eaae360b8df94429caf13c0ce3c3342d50
+    sha256: 68d8ac709f8d85c1bcb13304a578e31f9df0c088461d33c1097c796031b608ad
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
+        - sudo rm -rf /var/lib/substrate/chains/manta/db/full
       post:
-        - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
+        - sudo systemctl start manta.service
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c1/etc/systemd/system/manta.service'
     target: /etc/systemd/system/manta.service
-    sha256: 9bdd87cea71dca4607a351a9ce6a2cc96c3414ec5e33e807432d9743a0c67b70
+    sha256: 96a989a1c70cdd5350da7f933221000e9d291449c73145224a9d13be4391cc37
     command:
       pre:
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service

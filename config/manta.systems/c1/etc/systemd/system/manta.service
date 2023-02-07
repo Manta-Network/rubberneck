@@ -10,7 +10,7 @@ ExecStart=/usr/bin/manta \
     --collator \
     --pruning archive \
     --chain /usr/share/substrate/manta.json \
-    --name '🗃️ c1 🗃️' \
+    --name '🛡️🗃️ c1 🗃️🛡️' \
     --base-path /var/lib/substrate \
     --port 30333 \
     --ws-port 9944 \
@@ -23,7 +23,7 @@ ExecStart=/usr/bin/manta \
     --node-key-file /usr/share/substrate/12D3KooWSNwD7tJkqKGdMfCVTJbbzrGFTGbXoeMFZCTwEytpFCM4 \
     -- \
     --chain polkadot \
-    --name '🗃️ manta c1 🗃️' \
+    --name '🛡️🗃️ manta c1 🗃️🛡️' \
     --rpc-cors all \
     --rpc-methods safe \
     --node-key-file /usr/share/substrate/12D3KooWSNwD7tJkqKGdMfCVTJbbzrGFTGbXoeMFZCTwEytpFCM4 \

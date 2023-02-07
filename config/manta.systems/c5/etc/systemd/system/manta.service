@@ -10,7 +10,7 @@ ExecStart=/usr/bin/manta \
     --collator \
     --pruning archive \
     --chain /usr/share/substrate/manta.json \
-    --name '🗃️ c5 🗃️' \
+    --name '🛡️🗃️ c5 🗃️🛡️' \
     --base-path /var/lib/substrate \
     --port 30333 \
     --ws-port 9944 \
@@ -23,7 +23,7 @@ ExecStart=/usr/bin/manta \
     --node-key-file /usr/share/substrate/12D3KooWNHVexSGRVeLb7rt7tYS5Y3k5Up9amQn1GyTDCi7L9LLf \
     -- \
     --chain polkadot \
-    --name '🗃️ manta c5 🗃️' \
+    --name '🛡️🗃️ manta c5 🗃️🛡️' \
     --rpc-cors all \
     --rpc-methods safe \
     --node-key-file /usr/share/substrate/12D3KooWNHVexSGRVeLb7rt7tYS5Y3k5Up9amQn1GyTDCi7L9LLf \
