@@ -1,0 +1,34 @@
+[Unit]
+Description=manta archive node
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=manta
+Group=manta
+ExecStart=/usr/bin/manta \
+    --pruning archive \
+    --chain /usr/share/substrate/manta.json \
+    --name '🗃️ a2 🗃️' \
+    --base-path /var/lib/substrate \
+    --port 30333 \
+    --ws-port 9944 \
+    --ws-max-connections 1000 \
+    --rpc-port 9933 \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --state-cache-size 0 \
+    --in-peers 100 \
+    --node-key-file /usr/share/substrate/12D3KooWDwTeTxyyp8tVzrnHQk7jo3hLWs7ukZEC642cduKgp2Fd \
+    -- \
+    --chain polkadot \
+    --name '🗃️ manta a2 🗃️' \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --node-key-file /usr/share/substrate/12D3KooWDwTeTxyyp8tVzrnHQk7jo3hLWs7ukZEC642cduKgp2Fd \
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target

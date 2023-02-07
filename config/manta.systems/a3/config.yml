@@ -1,16 +1,17 @@
 ---
-hostname: c5
+hostname: a3
 domain: manta.systems
+ip: 85.25.134.15
 action: sync
-provider: shock-dedicated
+provider: s4y-dedicated
 dns:
   alias:
     -
       name: ws.manta.systems
-      weight: 50
+      weight: 200
     -
       name: ws.archive.manta.systems
-      weight: 50
+      weight: 200
 package:
   - auditd
   - certbot
@@ -89,9 +90,9 @@ file:
         - sudo chmod +x /usr/bin/manta
         - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c5/usr/share/substrate/manta.json'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a3/usr/share/substrate/manta.json'
     target: /usr/share/substrate/manta.json
-    sha256: 06d9f4a788f1250acd4621ed9a93ef06e7bed8005766df261784c04daf388df7
+    sha256: 43410a2fa9f9efb8b0c55ce75b5afe22c7decaecad9f504d8bea9a609e293cca
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
@@ -100,14 +101,14 @@ file:
       post:
         - sudo systemctl start manta.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c5/etc/systemd/system/manta.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a3/etc/systemd/system/manta.service'
     target: /etc/systemd/system/manta.service
-    sha256: c67d61a9823023a2d7c1e2497c995111a2ba54b23ae7faf1a39a19252c7687da
+    sha256: 4912148ce5ee3732af292b27c5505cef5bc3bf3c06bc7e181212279524c21bdb
     command:
       pre:
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
       post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - getent passwd manta &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group manta
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet manta.service || sudo systemctl enable manta.service
         - sudo systemctl start manta.service
@@ -140,9 +141,9 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c5/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a3/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 082d2abe789634ca39d40ea8e06cd2dbceef7904f7880ac26dc69ece612cee20
+    sha256: 65d068198217287942ef7ea938df5b4961343a4a2812819915211d77326c6f2b
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
