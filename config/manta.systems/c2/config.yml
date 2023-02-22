@@ -45,6 +45,7 @@ command:
   - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
   - test -x /usr/bin/unzip || sudo apt-get install -y unzip
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.6.1/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
+  - test -e /usr/share/substrate/manta.json && ( sudo systemctl stop manta.service && sudo rm /usr/share/substrate/manta.json && sudo rm -rf /var/lib/substrate/chains/manta/db/full )
 file:
   -
     source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.service
@@ -79,9 +80,9 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now prometheus-node-exporter.service
   -
-    source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta'
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.2/manta
     target: /usr/bin/manta
-    sha256: 15406935328bac77d741db4d99d6c7b14cebba90de5cf4e5f72314524521884d
+    sha256: 62b5fb1526da5f3d4281ba01bb6f6a95d45321780bc6d90d8c09d25596a09f21
     command:
       pre:
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
@@ -89,20 +90,9 @@ file:
         - sudo chmod +x /usr/bin/manta
         - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c2/usr/share/substrate/manta.json'
-    target: /usr/share/substrate/manta.json
-    sha256: 79bfc8b266fbf48e72ef446e7857f3791264a761c62b3ecb7c581560f1ddc1df
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
-        - sudo rm -rf /var/lib/substrate/chains/manta/db/full
-      post:
-        - sudo systemctl start manta.service
-  -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/c2/etc/systemd/system/manta.service'
     target: /etc/systemd/system/manta.service
-    sha256: d72166ead8a6ebe7453b320c8b926613af6fbd084b5816a7b60931f0543b6613
+    sha256: 8fa394a01ca943eb00d7dd2d4c4d44345eb7f6a47399d634705529e17ad4aa36
     command:
       pre:
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
