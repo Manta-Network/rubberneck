@@ -83,9 +83,9 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now prometheus-node-exporter.service
   -
-    source: 'https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta'
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.2/manta
     target: /usr/bin/manta
-    sha256: 15406935328bac77d741db4d99d6c7b14cebba90de5cf4e5f72314524521884d
+    sha256: 62b5fb1526da5f3d4281ba01bb6f6a95d45321780bc6d90d8c09d25596a09f21
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
