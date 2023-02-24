@@ -4,7 +4,6 @@ import Spinner from 'react-bootstrap/Spinner';
 import Table from 'react-bootstrap/Table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAws } from '@fortawesome/free-brands-svg-icons';
-import RunningCost from './RunningCost';
 import badge from './badge';
 
 const endpoints = {

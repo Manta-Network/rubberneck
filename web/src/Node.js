@@ -18,6 +18,7 @@ import {
 import { Chart } from 'react-chartjs-2';
 ChartJS.register(...registerables);
 
+/* eslint-disable no-template-curly-in-string */
 const metrics = {
   'block height (best)': {
     color: {

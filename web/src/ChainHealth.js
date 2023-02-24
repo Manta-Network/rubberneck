@@ -1,11 +1,8 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import apiBaseUrl from './apiBaseUrl';
 import ChunkSummary from './ChunkSummary';
-
-
 
 const dateFormat = (timespan) => {
   const difference = (new Date(timespan.to).getTime() - new Date(timespan.from).getTime())

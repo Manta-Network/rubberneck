@@ -1,7 +1,4 @@
-import {
-  Link,
-  useParams,
-} from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -10,11 +7,9 @@ import Table from 'react-bootstrap/Table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAws } from '@fortawesome/free-brands-svg-icons'
 import { faH } from '@fortawesome/free-solid-svg-icons';
-import ChainHead from './ChainHead';
 import ChainMetrics from './ChainMetrics';
 import NodeDiskUsage from './NodeDiskUsage';
 import NodeHealth from './NodeHealth';
-import NodeObservations from './NodeObservations';
 import RunningCost from './RunningCost';
 import badge from './badge';
 import { ReactComponent as ShockLogo } from './shock.svg';
@@ -218,80 +213,72 @@ function Chain(props) {
                   </tr>
                 )
               : nodes.map((node, nI) => (
-                  <Fragment key={nI}>
-                    <tr>
-                      <td>
-                        <Link to={`/node/${node.fqdn}`} style={{textDecoration: 'none'}}>
-                          <strong>
-                            {node.hostname}
-                          </strong>
-                          <span className="text-muted">
-                            .{node.domain}
-                          </span>
-                        </Link>
-                      </td>
-                      <td>
-                        <ChainHead url={`wss://${node.fqdn}`} />
-                        <NodeHealth fqdn={node.fqdn} style={{marginLeft: '0.5em'}} />
-                        {
-                          (!!node.metrics)
-                            ? Object.entries(node.metrics).map(([name, target], tI) => {
-                                const secondsSinceLastScrape = ((Date.now() - (new Date(target.lastScrape))) / 1000);
-                                const scrapeInterval = parseInt(target.scrapeInterval.replace('s', ''));
-                                const state = (secondsSinceLastScrape < scrapeInterval)
-                                  ? 'active'
-                                  : 'inactive';
-                                const clue = (secondsSinceLastScrape < scrapeInterval)
-                                  ? 'text-success'
-                                  : (secondsSinceLastScrape < (scrapeInterval * 2))
-                                    ? 'text-warning'
-                                    : 'text-danger';
-                                return (
-                                  <i key={tI} title={`${secondsSinceLastScrape} seconds since last ${name} metrics scrape`} className={`bi bi-${badge[name][state]} ${clue}`} style={{marginLeft: '0.5em'}} />
-                                );
-                              })
-                            : (
-                                <i title={`metrics unavailable`} className={`bi bi-exclamation text-danger`} />
-                              )
-                        }
-                      </td>
-                      <td>
-                        <NodeDiskUsage fqdn={node.fqdn} />
-                      </td>
-                      <td>
-                        {
-                          (!!node.roles && !!node.roles.length)
-                            ? node.roles.map((role, rI) => (
-                                <i key={rI} title={role} className={`bi bi-${badge[role]}`} />
-                              ))
-                            : null
-                        }
-                      </td>
-                      <td>
-                        {
-                          (!!node.location && !!node.location.country && !!node.location.country.flag)
-                            ? (
-                                <span
-                                  title={`${node.region}: ${node.location.city.name}, ${node.location.country.name}`}>
-                                  {node.location.country.flag}
-                                </span>
-                              )
-                            : <i className={`bi bi-geo`} title={(!!node.location && !!node.location.country)? node.location.country : node.region} />
-                        }
-                      </td>
-                      <td>
-                        {consoleLink(node)}
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <RunningCost node={node} />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ textAlign: 'right' }} colSpan={6}>
-                        <NodeObservations fqdn={node.fqdn}/>
-                      </td>
-                    </tr>
-                  </Fragment>
+                  <tr key={nI}>
+                    <td>
+                      <Link to={`/node/${node.fqdn}`} style={{textDecoration: 'none'}}>
+                        <strong>
+                          {node.hostname}
+                        </strong>
+                        <span className="text-muted">
+                          .{node.domain}
+                        </span>
+                      </Link>
+                    </td>
+                    <td>
+                      <NodeHealth fqdn={node.fqdn} />
+                      {
+                        (!!node.metrics)
+                          ? Object.entries(node.metrics).map(([name, target], tI) => {
+                              const secondsSinceLastScrape = ((Date.now() - (new Date(target.lastScrape))) / 1000);
+                              const scrapeInterval = parseInt(target.scrapeInterval.replace('s', ''));
+                              const state = (secondsSinceLastScrape < scrapeInterval)
+                                ? 'active'
+                                : 'inactive';
+                              const clue = (secondsSinceLastScrape < scrapeInterval)
+                                ? 'text-success'
+                                : (secondsSinceLastScrape < (scrapeInterval * 2))
+                                  ? 'text-warning'
+                                  : 'text-danger';
+                              return (
+                                <i key={tI} title={`${secondsSinceLastScrape} seconds since last ${name} metrics scrape`} className={`bi bi-${badge[name][state]} ${clue}`} style={{marginLeft: '0.5em'}} />
+                              );
+                            })
+                          : (
+                              <i title={`metrics unavailable`} className={`bi bi-exclamation text-danger`} />
+                            )
+                      }
+                    </td>
+                    <td>
+                      <NodeDiskUsage fqdn={node.fqdn} />
+                    </td>
+                    <td>
+                      {
+                        (!!node.roles && !!node.roles.length)
+                          ? node.roles.map((role, rI) => (
+                              <i key={rI} title={role} className={`bi bi-${badge[role]}`} />
+                            ))
+                          : null
+                      }
+                    </td>
+                    <td>
+                      {
+                        (!!node.location && !!node.location.country && !!node.location.country.flag)
+                          ? (
+                              <span
+                                title={`${node.region}: ${node.location.city.name}, ${node.location.country.name}`}>
+                                {node.location.country.flag}
+                              </span>
+                            )
+                          : <i className={`bi bi-geo`} title={(!!node.location && !!node.location.country)? node.location.country : node.region} />
+                      }
+                    </td>
+                    <td>
+                      {consoleLink(node)}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <RunningCost node={node} />
+                    </td>
+                  </tr>
                 ))
           }
         </tbody>
