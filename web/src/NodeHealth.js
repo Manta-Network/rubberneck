@@ -30,7 +30,7 @@ function NodeHealth(props) {
             {
               (health.isSyncing === true)
                 ? (
-                    <Spinner title={`node sync in progress`} style={{...props.style}} animation="grow" size="sm" className={`text-warn`} variant="warning" style={{marginLeft: '0.5em'}}>
+                    <Spinner title={`node sync in progress`} style={{marginLeft: '0.5em', ...props.style}} animation="grow" size="sm" className={`text-warn`} variant="warning">
                       <span className="visually-hidden">node sync in progress</span>
                     </Spinner>
                   )
