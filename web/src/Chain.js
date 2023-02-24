@@ -7,8 +7,8 @@ import Table from 'react-bootstrap/Table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAws } from '@fortawesome/free-brands-svg-icons'
 import { faH } from '@fortawesome/free-solid-svg-icons';
-import ChainMetrics from './ChainMetrics';
 import NodeDiskUsage from './NodeDiskUsage';
+import NodeTcp from './NodeTcp';
 import NodeHealth from './NodeHealth';
 import RunningCost from './RunningCost';
 import badge from './badge';
@@ -182,7 +182,7 @@ function Chain(props) {
               : (
                   <tr>
                     {
-                      ['fqdn', 'metrics', 'disk', 'roles', 'meta', 'console', 'cost'].map((header, hI) => (
+                      ['fqdn', 'metrics', 'disk', 'clients', 'roles', 'meta', 'console', 'cost'].map((header, hI) => (
                         <th key={hI} style={(header === 'cost') ? { textAlign: 'right' } : {}}>
                           {header}
                         </th>
@@ -252,6 +252,9 @@ function Chain(props) {
                       <NodeDiskUsage fqdn={node.fqdn} />
                     </td>
                     <td>
+                      <NodeTcp fqdn={node.fqdn} />
+                    </td>
+                    <td>
                       {
                         (!!node.roles && !!node.roles.length)
                           ? node.roles.map((role, rI) => (
@@ -283,9 +286,6 @@ function Chain(props) {
           }
         </tbody>
       </Table>
-      <Row>
-        <ChainMetrics blockchain={!!parachain ? `${relaychain}/${parachain}` : relaychain} />
-      </Row>
     </Fragment>
   );
 }
