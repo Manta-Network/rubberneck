@@ -12,6 +12,7 @@ import { faAws } from '@fortawesome/free-brands-svg-icons'
 import { faH } from '@fortawesome/free-solid-svg-icons';
 import ChainHead from './ChainHead';
 import ChainMetrics from './ChainMetrics';
+import NodeDiskUsage from './NodeDiskUsage';
 import NodeHealth from './NodeHealth';
 import NodeObservations from './NodeObservations';
 import RunningCost from './RunningCost';
@@ -24,7 +25,7 @@ const consoleLink = (node) => {
   switch (node.provider) {
     case 'amazon-ec2':
       return (
-        <a href={`https://console.aws.amazon.com/ec2/v2/home?region=${node.region}#InstanceDetails:instanceId=${node.id}`}>
+        <a href={node.console.url}>
           <span style={{marginRight: '0.3em', color: 'rgb(255, 153, 0)', padding: '0 0.2em'}}>
             <FontAwesomeIcon icon={faAws} />
           </span>
@@ -84,7 +85,7 @@ function Chain(props) {
         if (!!container.error) {
           console.error(container.error);
         } else {
-          setNodes(container.nodes.sort((a, b) => (a.fqdn > b.fqdn) ? 1 : (a.fqdn < b.fqdn) ? -1 : 0));
+          setNodes(container.nodes.filter((n) => (n.hostname !== 'ws')).sort((a, b) => (a.fqdn > b.fqdn) ? 1 : (a.fqdn < b.fqdn) ? -1 : 0));
         }
         setLoading(false);
       })
@@ -186,7 +187,7 @@ function Chain(props) {
               : (
                   <tr>
                     {
-                      ['fqdn', 'metrics', 'roles', 'meta', 'console', 'cost'].map((header, hI) => (
+                      ['fqdn', 'metrics', 'disk', 'roles', 'meta', 'console', 'cost'].map((header, hI) => (
                         <th key={hI} style={(header === 'cost') ? { textAlign: 'right' } : {}}>
                           {header}
                         </th>
@@ -253,6 +254,9 @@ function Chain(props) {
                                 <i title={`metrics unavailable`} className={`bi bi-exclamation text-danger`} />
                               )
                         }
+                      </td>
+                      <td>
+                        <NodeDiskUsage fqdn={node.fqdn} />
                       </td>
                       <td>
                         {

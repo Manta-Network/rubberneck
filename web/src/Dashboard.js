@@ -7,39 +7,57 @@ import Tabs from 'react-bootstrap/Tabs';
 import ChainHealth from './ChainHealth';
 
 function Dashboard(props) {
+  const now = new Date();
   const timespans = [
     {
       title: 'last hour',
       from: new Date(new Date().getTime() - (60 * 60 * 1000)),
-      to: new Date(),
+      to: now,
     },
     {
       title: 'last 3 hours',
       from: new Date(new Date().getTime() - (3 * 60 * 60 * 1000)),
-      to: new Date(),
+      to: now,
     },
     {
       title: 'last 24 hours',
-      from: new Date(new Date().getTime() - (24 * 60 * 60 * 1000)),
-      to: new Date(),
+      from: new Date(new Date(now).setDate(now.getDate() - 1)),
+      to: now,
     },
     {
       title: 'last 3 days',
-      from: new Date(new Date().getTime() - (3 * 24 * 60 * 60 * 1000)),
-      to: new Date(),
+      from: new Date(new Date(now).setDate(now.getDate() - 3)),
+      to: now,
     },
     {
       title: 'last 7 days',
-      from: new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000)),
-      to: new Date(),
+      from: new Date(new Date(now).setDate(now.getDate() - 7)),
+      to: now,
     },
     {
-      title: 'last 30 days',
-      from: new Date(new Date().getTime() - (30 * 24 * 60 * 60 * 1000)),
-      to: new Date(),
+      title: 'last month',
+      from: new Date(new Date(now).setMonth(now.getMonth() - 1)),
+      to: now,
     },
+    /* enable when we have more observation data
+    {
+      title: 'last 3 months',
+      from: new Date(new Date(now).setMonth(now.getMonth() - 3)),
+      to: now,
+    },
+    {
+      title: 'last 6 months',
+      from: new Date(new Date(now).setMonth(now.getMonth() - 6)),
+      to: now,
+    },
+    {
+      title: 'last 12 months',
+      from: new Date(new Date(now).setMonth(now.getMonth() - 12)),
+      to: now,
+    },
+    */
   ];
-  const [timespan, setTimespan] = useState(timespans.find((x) => (x.title === 'last 24 hours')));
+  const [timespan, setTimespan] = useState(timespans.find((x) => (x.title === 'last 3 days')));
   const { blockchains } = props;
   const networks = [...new Set(blockchains.map((blockchain) => blockchain.network).sort())];
   return (

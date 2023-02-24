@@ -5,7 +5,14 @@ import Spinner from 'react-bootstrap/Spinner';
 import apiBaseUrl from './apiBaseUrl';
 import ChunkSummary from './ChunkSummary';
 
-const dateFormat = new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' });
+
+
+const dateFormat = (timespan) => {
+  const difference = (new Date(timespan.to).getTime() - new Date(timespan.from).getTime())
+  return (difference >= (7 * 86400 * 1000))
+    ? new Intl.DateTimeFormat('default', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+    : new Intl.DateTimeFormat('default', { weekday: 'short', hour: 'numeric', minute: 'numeric' });
+}
 
 function ChainHealth(props) {
   const { blockchain, timespan } = props;
@@ -32,9 +39,9 @@ function ChainHealth(props) {
                     ? (
                         <p>
                           {
-                            dateFormat.format(new Date(health.summary.from))
+                            dateFormat(health.summary).format(new Date(health.summary.from)).toLowerCase()
                           } - {
-                            dateFormat.format(new Date(health.summary.to))
+                            dateFormat(health.summary).format(new Date(health.summary.to)).toLowerCase()
                           }
                         </p>
                       )
@@ -52,9 +59,9 @@ function ChainHealth(props) {
                     ? (
                         <p>
                           {
-                            dateFormat.format(new Date(health.summary.from))
+                            dateFormat(health.summary).format(new Date(health.summary.from)).toLowerCase()
                           } - {
-                            dateFormat.format(new Date(health.summary.to))
+                            dateFormat(health.summary).format(new Date(health.summary.to)).toLowerCase()
                           }
                         </p>
                       )
@@ -76,7 +83,7 @@ function ChainHealth(props) {
                   health.chunks.map((chunk, cI) => (
                     <span
                       key={chunk.from}
-                      title={`${chunk.from} - ${chunk.to}: ${chunk.healthy} / ${chunk.total} healthy observations`}
+                      title={`${dateFormat(health.summary).format(new Date(chunk.from)).toLowerCase()} - ${dateFormat(health.summary).format(new Date(chunk.to)).toLowerCase()}: ${chunk.healthy} / ${chunk.total} healthy observations`}
                       onClick={() => setChunkSummary(chunk)}
                       style={{
                         backgroundColor: `rgba(${
