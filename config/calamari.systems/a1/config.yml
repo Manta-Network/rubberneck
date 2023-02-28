@@ -74,7 +74,7 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/cc6f567219f328f0aa468b4744230ffe/raw/prometheus-node-exporter.service'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/prometheus-node-exporter.service
     target: /etc/systemd/system/prometheus-node-exporter.service
     sha256: 4e551485c07fb89f348fd154f264a52cded39e87b6b8f8aad9115b1d353ede05
     command:
@@ -94,9 +94,9 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
   -
-    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.2/manta
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta
     target: /usr/bin/manta
-    sha256: 62b5fb1526da5f3d4281ba01bb6f6a95d45321780bc6d90d8c09d25596a09f21
+    sha256: 15406935328bac77d741db4d99d6c7b14cebba90de5cf4e5f72314524521884d
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
@@ -188,3 +188,12 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/ws.archive.calamari.systems.conf /etc/nginx/sites-enabled/ws.archive.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/var/www/html/calamari.ico
+    target: /var/www/html/calamari.ico
+    sha256: 2e676c3465038990013eb1c28a035783465b587720a4deba233a6ce2d595c3e3
+    command:
+      pre:
+        - test -d /var/www/html || sudo mkdir -p /var/www/html
+      post:
+        - sudo ln -sfr /var/www/html/calamari.ico /var/www/html/favicon.ico
