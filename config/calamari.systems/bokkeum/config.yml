@@ -50,10 +50,8 @@ command:
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
-  - 'sudo rm -f /etc/nginx/sites-enabled/para.metrics.$(hostname -f).conf'
-  - 'sudo rm -f /etc/nginx/sites-enabled/relay.metrics.$(hostname -f).conf'
-  - 'sudo rm -f /etc/nginx/sites-enabled/rpc.$(hostname -f).conf'
-  - sudo rm -f /etc/nginx/sites-enabled/rpc.calamari.systems.conf
+  - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
+  - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
   - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
   - test -x /usr/bin/unzip || sudo apt-get install -y unzip
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.6.1/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
@@ -81,7 +79,7 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/cc6f567219f328f0aa468b4744230ffe/raw/prometheus-node-exporter.service'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/prometheus-node-exporter.service
     target: /etc/systemd/system/prometheus-node-exporter.service
     sha256: 4e551485c07fb89f348fd154f264a52cded39e87b6b8f8aad9115b1d353ede05
     command:
@@ -91,9 +89,19 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now prometheus-node-exporter.service
   -
-    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.2/manta
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/nginx-prometheus-exporter.service
+    target: /etc/systemd/system/nginx-prometheus-exporter.service
+    sha256: 551b688bbcccb24ce3eb3b977ff871242c319bdbf1a72de82b4fe4cae98cec36
+    command:
+      pre:
+        - systemctl is-active --quiet nginx-prometheus-exporter.service && sudo systemctl stop nginx-prometheus-exporter.service
+      post:
+        - sudo systemctl daemon-reload
+        - sudo systemctl enable --now nginx-prometheus-exporter.service
+  -
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta
     target: /usr/bin/manta
-    sha256: 62b5fb1526da5f3d4281ba01bb6f6a95d45321780bc6d90d8c09d25596a09f21
+    sha256: 15406935328bac77d741db4d99d6c7b14cebba90de5cf4e5f72314524521884d
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
@@ -141,19 +149,20 @@ file:
       post:
         - sudo chmod 644 /etc/letsencrypt/ssl-dhparams.pem
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/status.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
     target: /etc/nginx/sites-available/status.conf
-    sha256: c123caec7c2871afd3500875adb026cacffc16b7c7dde4375376d1b4fb3f1f14
+    sha256: f4d24fe91348fffbc43bfa2b07319f2d61046d4cb6d9a6648342b4b579c1dd29
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
+        - sudo systemctl restart nginx.service
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/bokkeum/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 0f951e7987c09871804aea83753e048acb686c628a2c716fef3f63d070d27916
+    sha256: 0895dc81925bee8a2b11d4a54dc0df7fe743034428ca93eca6b026b92aa85c25
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
@@ -184,3 +193,12 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/ws.archive.calamari.systems.conf /etc/nginx/sites-enabled/ws.archive.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/var/www/html/calamari.ico
+    target: /var/www/html/calamari.ico
+    sha256: 2e676c3465038990013eb1c28a035783465b587720a4deba233a6ce2d595c3e3
+    command:
+      pre:
+        - test -d /var/www/html || sudo mkdir -p /var/www/html
+      post:
+        - sudo ln -sfr /var/www/html/calamari.ico /var/www/html/favicon.ico
