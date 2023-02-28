@@ -146,19 +146,18 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
     target: /etc/nginx/sites-available/status.conf
-    sha256: 687413e6be7cc4b1897c8fc2f7dca22ad76485eeb77e412a4a9d6a98f9a574a4
+    sha256: a3edb7b0747787df8603a277be10a740b97c94eac6349a74c398e313fbb89cff
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-        - sudo ln -sfr /etc/letsencrypt/live/\$(hostname -f) /etc/letsencrypt/live/default
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a1/etc/nginx/sites-available/substrate.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a1/etc/nginx/sites-available/substrate.conf
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 7f00aa4f8a712972498abb1d45c9410c6050553750266a6f2f6fed6613ea6c0a
+    sha256: 6baac76f10f8258787e60e73e2b7d60a1a8c41edfacbae76139f4127882e9580
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
