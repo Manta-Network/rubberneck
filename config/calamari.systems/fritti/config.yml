@@ -162,7 +162,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/fritti/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: e78f40d5157bfff5a6ac0c969a8362ba005ddffb66f9796c771c06ac72dd232d
+    sha256: e650b583543985429e6f4a99c99488f6efdab3679e2d0582cb738fb1fbad56a4
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
