@@ -167,7 +167,7 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/tender.calamari.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c5/etc/nginx/sites-available/tender.calamari.systems.conf
     target: /etc/nginx/sites-available/tender.calamari.systems.conf
     sha256: 3fdf4df88cefc606e5d5e2a7298a495afa747420ca2320d6156358f4f39ee98f
     command:

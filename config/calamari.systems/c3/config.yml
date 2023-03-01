@@ -167,7 +167,7 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/hotdog.calamari.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c3/etc/nginx/sites-available/hotdog.calamari.systems.conf
     target: /etc/nginx/sites-available/hotdog.calamari.systems.conf
     sha256: b0213f11d5b794dfa97229fbfee714807b52726b73e53a387420a7f52dd52da0
     command:

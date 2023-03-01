@@ -167,7 +167,7 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/crunchy.calamari.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c2/etc/nginx/sites-available/crunchy.calamari.systems.conf
     target: /etc/nginx/sites-available/crunchy.calamari.systems.conf
     sha256: 7473827ea0eb40056b7a0b43a4bc845629dde036eecad8d1ad3b033bf785c67b
     command:
