@@ -168,9 +168,9 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/tasty.calamari.systems.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/tasty.calamari.systems.conf
     target: /etc/nginx/sites-available/tasty.calamari.systems.conf
-    sha256: e66da0d5d2dce0ef58183347cd5222a51d5f6a30a4293b31aaab1b45f81b2c6a
+    sha256: a16e74184500aab6edb78e3307fc8a4495ec7a9a66ec75bc73bf3ab37e31ede7
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available

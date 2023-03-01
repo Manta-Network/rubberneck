@@ -168,9 +168,9 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/crispy.calamari.systems.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/c1/etc/nginx/sites-available/crispy.calamari.systems.conf
     target: /etc/nginx/sites-available/crispy.calamari.systems.conf
-    sha256: 66cd9708d402377de2401e9b2e6477105257ac7a9613a0c177f33a213bc7021d
+    sha256: 3117c2da9eccbe0ca2a8a2a0fae5ea03317e354473df08d5a2bf9019ae97b183
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
