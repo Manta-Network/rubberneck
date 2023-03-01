@@ -175,7 +175,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a3/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: fa2e00c41b5750328e0768e8ebe9646ee4e0a4c06a3db101ad260fbdda344089
+    sha256: b0f3199afe4753e6c6d52fce59fc9cb19d5154092e5ee5efc72eadc19ebda7a4
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
