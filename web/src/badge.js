@@ -9,6 +9,10 @@ const badge = {
     active: 'cpu-fill',
     inactive: 'cpu',
   },
+  nginx: {
+    active: 'globe',
+    inactive: 'globe',
+  },
   para: {
     active: 'hdd-network-fill',
     inactive: 'hdd-network',
