@@ -42,6 +42,7 @@ command:
   - systemctl is-active calamari.service || sudo systemctl restart calamari.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
+  - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
@@ -157,7 +158,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/f4/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: d23b611201eb9a451ddb7e34291196988fdfc80ddf12c3e3f36b95968de0d1e4
+    sha256: 77254c5db8d5469f1e9c9fcc16e4fe9fd395ac00c426a9b4df0abbb9bb0fe3c3
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
