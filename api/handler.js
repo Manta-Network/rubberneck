@@ -3,7 +3,6 @@
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 const sslCertificate = require('get-ssl-certificate');
-
 const blockchainDbRead = (process.env.blockchain_db_read || 'mongodb+srv://chainreader:LG9YHNLfYCcpJisW@chaincluster.oulrzox.mongodb.net');
 
 const cache = {
@@ -99,7 +98,7 @@ const fetchInstances = async () => {
     const nodes = await db.collection('node').find().toArray();
     const instances = await Promise.all(nodes.map(async (node) => ({
       provider: node.provider,
-      profile: node.metadata.profile,
+      profile: (!!node.metadata) ? node.metadata.profile : null,
       fqdn: node.fqdn,
       hostname: node.fqdn.split('.')[0],
       domain: node.fqdn.split('.').slice(1).join('.'),
@@ -130,7 +129,7 @@ const fetchBlockchains = async () => {
       .sort((a, b) => (a.chain > b.chain) ? 1 : (a.chain < b.chain) ? -1 : 0)
       .map((blockchain) => ({
         ...blockchain,
-        network: ['kusama/calamari'].includes(blockchain.chain)
+        network: ['kusama/calamari', 'polkadot/manta'].includes(blockchain.chain)
           ? 'mainnet'
           : (!!blockchain.tier)
             ? `testnet (${blockchain.relay})`
@@ -146,7 +145,17 @@ const fetchTargets = async () => {
     const json = await response.json();
     const targets = json.data.activeTargets.map((target) => ({
       ...target,
-      fqdn: target.labels.instance.split(':')[0].replace(/(para|relay|calamari|kusama|dolphin|rococo|manta|polkadot)\.metrics\./, '')
+      fqdn: target.discoveredLabels.__address__,
+      exporter: (target.discoveredLabels.__metrics_path__ === '/node/metrics')
+        ? 'node'
+        : (target.discoveredLabels.__metrics_path__ === '/nginx/metrics')
+          ? 'nginx'
+          : (['/para/metrics', '/relay/metrics'].includes(target.discoveredLabels.__metrics_path__))
+            ? 'substrate'
+            : undefined,
+      tier: (['/para/metrics', '/relay/metrics'].includes(target.discoveredLabels.__metrics_path__))
+        ? (target.discoveredLabels.__metrics_path__ === '/relay/metrics') ? 'relay' : 'para'
+        : undefined,
     }));
     cacheAppend('targets', targets);
   }
@@ -165,29 +174,26 @@ const fetchChainNodes = async (relaychain, parachain) => {
       ...instance,
       roles: invulnerables.includes(instance.hostname) ? ['invulnerable'] : ['full'],
       metrics: {
-        node: targets.find((target) => target.fqdn === instance.fqdn && (
-            target.discoveredLabels.__metrics_path__ === '/node/metrics'
-            ||
-            (target.discoveredLabels.__metrics_path__ === '/metrics' && target.discoveredLabels.__address__ === target.fqdn)
-          )),
-        ...(!!blockchain.tier) && {
-          para: targets.find((target) => target.fqdn === instance.fqdn && (
-            target.discoveredLabels.__metrics_path__ === '/para/metrics'
-            ||
-            target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`
-            ||
-            (new RegExp(`/${blockchain.name}.*\\.${target.fqdn}/`)).test(target.fqdn)
-          ))
-        },
-        ...(!!blockchain.tier) && {
-          relay: targets.find((target) => target.fqdn === instance.fqdn && (
-            target.discoveredLabels.__metrics_path__ === '/relay/metrics'
-            ||
-            target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`
-            || 
-            (new RegExp(`/${blockchain.relay}.*\\.${target.fqdn}/`)).test(target.fqdn)
-          ))
-        },
+        node: targets.find((target) => (
+          (target.fqdn === instance.fqdn)
+          && (target.exporter === 'node')
+        )),
+        nginx: targets.find((target) => (
+          (target.fqdn === instance.fqdn)
+          && (target.exporter === 'nginx')
+        )),
+        /*
+        para: targets.find((target) => (
+          (target.fqdn === instance.fqdn)
+          && (target.exporter === 'substrate')
+          && (target.tier === 'para')
+        )),
+        relay: targets.find((target) => (
+          (target.fqdn === instance.fqdn)
+          && (target.exporter === 'substrate')
+          && (target.tier === 'relay')
+        )),
+        */
       }
     }));
   return nodes;
@@ -208,28 +214,25 @@ const fetchAllNodes = async () => {
               : [],
         metrics: {
           node: targets.find((target) => (
-            (target.discoveredLabels.__metrics_path__ === '/metrics' && target.discoveredLabels.__address__ === target.fqdn)
-            ||
-            (target.discoveredLabels.__metrics_path__ === '/node/metrics')
+            (target.fqdn === instance.fqdn)
+            && (target.exporter === 'node')
           )),
-          ...((!!blockchain) && (!!blockchain.tier)) && {
-            para: targets.find((target) => target.fqdn === instance.fqdn && (
-              target.discoveredLabels.__metrics_path__ === '/para/metrics'
-              ||
-              target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`
-              ||
-              (new RegExp(`/${blockchain.name}.*\\.${target.fqdn}/`)).test(target.fqdn)
-            ))
-          },
-          ...((!!blockchain) && (!!blockchain.tier)) && {
-            relay: targets.find((target) => target.fqdn === instance.fqdn && (
-              target.discoveredLabels.__metrics_path__ === '/relay/metrics'
-              ||
-              target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`
-              || 
-              (new RegExp(`/${blockchain.relay}.*\\.${target.fqdn}/`)).test(target.fqdn)
-            ))
-          },
+          nginx: targets.find((target) => (
+            (target.fqdn === instance.fqdn)
+            && (target.exporter === 'nginx')
+          )),
+          /*
+          para: targets.find((target) => (
+            (target.fqdn === instance.fqdn)
+            && (target.exporter === 'substrate')
+            && (target.tier === 'para')
+          )),
+          relay: targets.find((target) => (
+            (target.fqdn === instance.fqdn)
+            && (target.exporter === 'substrate')
+            && (target.tier === 'relay')
+          )),
+          */
         }
       };
     });
@@ -271,15 +274,20 @@ const fetchNode = async (fqdn) => {
   //const wsResponses = await fetchWebsocketResponses(instance.fqdn, [{ method: 'system_localPeerId' }, { method: 'system_health' }]);
   const blockchain = blockchains.find((b) => b.domains.includes(instance.domain));
   const metrics = {
-    ...targets.some((target) => target.discoveredLabels.__address__ === target.fqdn) && {
-      node: targets.find((target) => target.discoveredLabels.__address__ === target.fqdn)
+    ...targets.some((target) => ((target.fqdn === fqdn) && (target.exporter === 'node'))) && {
+      node: targets.find((target) => ((target.fqdn === fqdn) && (target.exporter === 'node')))
     },
-    ...targets.some((target) => target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`) && {
-      para: targets.find((target) => target.discoveredLabels.__address__ === `para.metrics.${target.fqdn}`)
+    ...targets.some((target) => ((target.fqdn === fqdn) && (target.exporter === 'nginx'))) && {
+      nginx: targets.find((target) => ((target.fqdn === fqdn) && (target.exporter === 'nginx')))
     },
-    ...targets.some((target) => target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`) && {
-      relay: targets.find((target) => target.discoveredLabels.__address__ === `relay.metrics.${target.fqdn}`)
+    /*
+    ...targets.some((target) => ((target.fqdn === fqdn) && (target.exporter === 'substrate') && (target.tier === 'para'))) && {
+      para: targets.find((target) => ((target.fqdn === fqdn) && (target.exporter === 'substrate') && (target.tier === 'para')))
     },
+    ...targets.some((target) => ((target.fqdn === fqdn) && (target.exporter === 'substrate') && (target.tier === 'relay'))) && {
+      relay: targets.find((target) => ((target.fqdn === fqdn) && (target.exporter === 'substrate') && (target.tier === 'relay')))
+    },
+    */
   };
   const latestMetrics = await Promise.all(Object.keys(metrics).map((key) => fetchInstanceMetrics(key, metrics[key].labels.instance)));
   latestMetrics.forEach((lm) => {

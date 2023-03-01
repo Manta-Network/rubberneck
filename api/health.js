@@ -188,11 +188,39 @@ module.exports.chain = async (event) => {
       span: (6 * oneHour),
     },
     
-    // 7 days ~ 30 days: 48 hour spans
+    // 7 days ~ 30 days: 24 hour spans
     {
       min: (7 * oneDay),
       max: (30 * oneDay),
+      span: (oneDay),
+    },
+
+    // 30 days ~ 60 days: 48 hour spans
+    {
+      min: (30 * oneDay),
+      max: (60 * oneDay),
       span: (2 * oneDay),
+    },
+
+    // 60 days ~ 90 days: 3 day spans
+    {
+      min: (60 * oneDay),
+      max: (90 * oneDay),
+      span: (3 * oneDay),
+    },
+
+    // 90 days ~ 180 days: 6 day spans
+    {
+      min: (90 * oneDay),
+      max: (180 * oneDay),
+      span: (6 * oneDay),
+    },
+
+    // 180 days ~ 365 days: 15 day spans
+    {
+      min: (180 * oneDay),
+      max: (365 * oneDay),
+      span: (15 * oneDay),
     },
   ];
   const timespan = (to.getTime() - from.getTime());
