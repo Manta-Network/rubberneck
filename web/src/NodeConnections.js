@@ -7,29 +7,29 @@ const threshold = {
   warning: 0.66,
 };
 
-function NodeTcp(props) {
+function NodeConnections(props) {
   const { fqdn } = props;
-  const [tcpConnections, setTcpConnections] = useState(0);
+  const [connections, setConnections] = useState(0);
   useEffect(() => {
-    fetch(`https://pulse.pelagos.systems/api/v1/query?query=node_netstat_Tcp_CurrEstab{instance%3D%22${fqdn}:443%22}`)
+    fetch(`https://pulse.pelagos.systems/api/v1/query?query=nginx_connections_active{instance%3D%22${fqdn}:443%22}`)
       .then(r => r.json())
       .then((container) => {
         if (!!container.data && !!container.data.result && !!container.data.result.length) {
-          setTcpConnections(container.data.result[0].value[1]);
+          setConnections(container.data.result[0].value[1]);
         }
       })
       .catch(console.error);
   }, [fqdn]);
   return (
-    (!!tcpConnections)
+    (!!connections)
       ? (
           <ProgressBar
-            now={((tcpConnections / 1000) * 100)}
-            title={`tcp connections: ${tcpConnections} / 1000`}
+            now={((connections / 1000) * 100)}
+            title={`connections: ${connections} / 1000`}
             variant={
-              ((tcpConnections / 1000) > threshold.danger)
+              ((connections / 1000) > threshold.danger)
                 ? 'danger'
-                : ((tcpConnections / 1000) > threshold.warning)
+                : ((connections / 1000) > threshold.warning)
                   ? 'warning'
                   : 'success'
             }
@@ -43,4 +43,4 @@ function NodeTcp(props) {
   );
 }
 
-export default NodeTcp;
+export default NodeConnections;

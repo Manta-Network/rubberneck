@@ -8,7 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAws } from '@fortawesome/free-brands-svg-icons'
 import { faH } from '@fortawesome/free-solid-svg-icons';
 import NodeDiskUsage from './NodeDiskUsage';
-import NodeTcp from './NodeTcp';
+import NodeOs from './NodeOs';
+import NodeConnections from './NodeConnections';
 import NodeHealth from './NodeHealth';
 import RunningCost from './RunningCost';
 import badge from './badge';
@@ -182,7 +183,7 @@ function Chain(props) {
               : (
                   <tr>
                     {
-                      ['fqdn', 'metrics', 'disk', 'clients', 'roles', 'meta', 'console', 'cost'].map((header, hI) => (
+                      ['fqdn', 'metrics', 'os', 'disk', 'clients', 'roles', 'meta', 'console', 'cost'].map((header, hI) => (
                         <th key={hI} style={(header === 'cost') ? { textAlign: 'right' } : {}}>
                           {header}
                         </th>
@@ -249,10 +250,13 @@ function Chain(props) {
                       }
                     </td>
                     <td>
+                      <NodeOs fqdn={node.fqdn} />
+                    </td>
+                    <td>
                       <NodeDiskUsage fqdn={node.fqdn} />
                     </td>
                     <td>
-                      <NodeTcp fqdn={node.fqdn} />
+                      <NodeConnections fqdn={node.fqdn} />
                     </td>
                     <td>
                       {
