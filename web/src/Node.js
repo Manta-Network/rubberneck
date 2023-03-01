@@ -20,6 +20,14 @@ ChartJS.register(...registerables);
 
 /* eslint-disable no-template-curly-in-string */
 const metrics = {
+  'active connections': {
+    color: {
+      background: 'rgb(158, 193, 249, .5)',
+      border: 'rgb(158, 193, 249)'
+    },
+    exporter: 'nginx',
+    query: 'nginx_connections_active{instance="${instance}"}'
+  },
   'block height (best)': {
     color: {
       background: 'rgb(158, 193, 249, .5)',
@@ -174,6 +182,7 @@ const lineOptions = {
 };
 const tabs = {
   node: 'node',
+  nginx: 'nginx',
   para: 'parachain',
   relay: 'relay-chain',
 };
@@ -222,7 +231,7 @@ function Node(props) {
           start.setDate(start.getDate() - 2);
 
           Object.keys(container.node.metrics).forEach((key) => {
-            Object.entries(metrics).filter(([name, m]) => ((key === 'node' && m.exporter === 'node') || (m.exporter === 'substrate'))).forEach(([name, metric]) => {
+            Object.entries(metrics).filter(([name, m]) => ((key === 'nginx' && m.exporter === 'nginx') || (key === 'node' && m.exporter === 'node') || (m.exporter === 'substrate'))).forEach(([name, metric]) => {
               const url = {
                 scheme: 'https',
                 hostname: 'pulse.pelagos.systems',
@@ -298,7 +307,7 @@ function Node(props) {
     <Fragment>
       {
         (!!node && !!node.blockchain)
-          ? (node.blockchain.tier === 'parachain')
+          ? (node.blockchain.tier === 1)
             ? (
                 <h2>
                   <Link to={`/chain/${node.blockchain.relay}/${node.blockchain.name}`} style={{textDecoration: 'none'}}>
@@ -329,7 +338,11 @@ function Node(props) {
                                   telemetry name
                                 </th>
                                 <td>
-                                  {node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.name}
+                                  {
+                                    (!!node.metrics[(node.blockchain.tier === 1) ? 'para' : 'relay'])
+                                      ? node.metrics[(node.blockchain.tier === 1) ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.name
+                                      : null
+                                  }
                                 </td>
                               </tr>  
                               <tr>
@@ -337,7 +350,11 @@ function Node(props) {
                                   substrate version
                                 </th>
                                 <td>
-                                  {node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.version}
+                                  {
+                                    (!!node.metrics[(node.blockchain.tier === 1) ? 'para' : 'relay'])
+                                      ? node.metrics[(node.blockchain.tier === 1) ? 'para' : 'relay'].latest.find((m) => m.metric.__name__ === 'substrate_build_info').metric.version
+                                      : null
+                                  }
                                 </td>
                               </tr>
                             </Fragment>
@@ -366,7 +383,7 @@ function Node(props) {
                               : null
                           }
                           {
-                            (!!node.metrics && !!node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'])
+                            (!!node.metrics && !!node.metrics[(node.blockchain.tier === 1) ? 'para' : 'relay'])
                               ? (
                                   <li>
                                     substrate (re)start:
@@ -375,7 +392,7 @@ function Node(props) {
                                         new Intl.DateTimeFormat('default', { dateStyle: 'full', timeStyle: 'long' }).format(
                                           new Date(
                                             parseInt(
-                                              node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest
+                                              node.metrics[(node.blockchain.tier === 1) ? 'para' : 'relay'].latest
                                                 .find((m) => m.metric.__name__ === 'substrate_process_start_time_seconds')
                                                 .value[1]
                                             ) * 1000
@@ -388,7 +405,7 @@ function Node(props) {
                                         dateDiff(
                                           new Date(
                                             parseInt(
-                                              node.metrics[(node.blockchain.tier === 'parachain') ? 'para' : 'relay'].latest
+                                              node.metrics[(node.blockchain.tier === 1) ? 'para' : 'relay'].latest
                                                 .find((m) => m.metric.__name__ === 'substrate_process_start_time_seconds')
                                                 .value[1]
                                             ) * 1000
@@ -438,7 +455,7 @@ function Node(props) {
                               </th>
                               <td>
                                 <a href={`https://github.com/Manta-Network/pelagos/blob/main/terraform/deployment/${
-                                  (node.blockchain.tier === 'parachain')
+                                  (node.blockchain.tier === 1)
                                     ? `${node.blockchain.relay}/${node.blockchain.name}`
                                     : node.blockchain.name
                                   }/${node.hostname}/main.tf`}>
@@ -556,7 +573,7 @@ function Node(props) {
                     <Row xs={1} md={3} className="g-4">
                       {
                         Object.keys(metrics)
-                          .filter((m) => metrics[m].exporter === ((tab === 'node') ? 'node' : 'substrate'))
+                          .filter((m) => metrics[m].exporter === ((tab === 'node') ? 'node' : (tab === 'nginx') ? 'nginx' : 'substrate'))
                           .sort((a, b) => (a > b) ? 1 : (a < b) ? -1 : 0)
                           .map((name, mI) => (
                           <Col key={mI}>
