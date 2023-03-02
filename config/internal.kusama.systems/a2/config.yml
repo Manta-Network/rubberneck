@@ -43,7 +43,7 @@ command:
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
-  - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
+  - '(test -s /etc/letsencrypt/renewal/$(hostname -f).conf && grep webroot_path /etc/letsencrypt/renewal/$(hostname -f).conf) || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
   - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
@@ -138,7 +138,7 @@ file:
         - systemctl is-active --quiet kusama-1.service || sudo systemctl start kusama-1.service
         - systemctl is-active --quiet kusama-2.service || sudo systemctl start kusama-2.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a2/etc/systemd/system/kusama-0.service'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a2/etc/systemd/system/kusama-0.service
     target: /etc/systemd/system/kusama-0.service
     sha256: d7f266a245a3432ac51861158e356f99610fb9b914e578c421ac437401b63387
     command:
@@ -150,9 +150,9 @@ file:
         - systemctl is-enabled --quiet kusama-0.service || sudo systemctl enable kusama-0.service
         - sudo systemctl start kusama-0.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a2/etc/systemd/system/kusama-1.service'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a2/etc/systemd/system/kusama-1.service
     target: /etc/systemd/system/kusama-1.service
-    sha256: 3c932969e285892e8d07b533d8724aa6b55984b0f38f03b67a21484f0f1ea495
+    sha256: 76d72892ed3073ac5ae89562d79147e7ddc885cede8e5909fe21a4b43e489fd7
     command:
       pre:
         - systemctl is-active --quiet kusama-1.service && sudo systemctl stop kusama-1.service
@@ -162,9 +162,9 @@ file:
         - systemctl is-enabled --quiet kusama-1.service || sudo systemctl enable kusama-1.service
         - sudo systemctl start kusama-1.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a2/etc/systemd/system/kusama-2.service'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/a2/etc/systemd/system/kusama-2.service
     target: /etc/systemd/system/kusama-2.service
-    sha256: bbeb3df7e7fd40f698a747f54a974c214ac47f1c1a99f5c2a380cec80ee1b8f5
+    sha256: 2463709e53c9f5b042b58545b5089e1bda41c7e832dcee6e373eb25d1e829c10
     command:
       pre:
         - systemctl is-active --quiet kusama-2.service && sudo systemctl stop kusama-2.service
