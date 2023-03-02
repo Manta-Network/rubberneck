@@ -122,7 +122,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/fritti/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
-    sha256: d1e274b8014affde06afa7d3c95abddb44f0f2d0538bb91de0fa4c141340a083
+    sha256: 48567a21d34005289794e4d8fa46035522e3e2b2c82335e0793a4f900832ddf1
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
@@ -163,7 +163,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/fritti/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
-    sha256: 2fe7bc5ddb8a7db069ba9e741f0111bac104136eae01df95eac87c6a5895dcf3
+    sha256: 250f77068d5e15280ea3f801931acc65977155fc921b2988a8f3fed880ebe0f4
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
@@ -173,9 +173,9 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.calamari.systems.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.calamari.systems.conf
     target: /etc/nginx/sites-available/ws.calamari.systems.conf
-    sha256: a312332c7a1945340ae033d0700c6626f6866db981e375dbd13192f1ad793c49
+    sha256: bdcbcf3aee326ee2d0e47e3ebb1b70a40b97664b868cb78f448ae65dd5361931
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
@@ -184,9 +184,9 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/ws.calamari.systems.conf /etc/nginx/sites-enabled/ws.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.calamari.systems.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.calamari.systems.conf
     target: /etc/nginx/sites-available/ws.archive.calamari.systems.conf
-    sha256: f1f2fe6f3b0aac32521a846d0fecb946e31086e366b9bdb733d428c9735af333
+    sha256: dce7c5170b594a515468e224a09b1905894c49eddd9fb7474ae2f5d4f0c7b48e
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available

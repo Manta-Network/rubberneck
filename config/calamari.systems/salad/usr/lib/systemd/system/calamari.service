@@ -10,9 +10,9 @@ ExecStart=/usr/bin/calamari \
     --name '🦑🗃️ salad 🗃️🦑' \
     --base-path /var/lib/substrate \
     --port 31333 \
-    --ws-port 9144 \
+    --ws-port 9944 \
     --ws-max-connections 1000 \
-    --rpc-port 9133 \
+    --rpc-port 9933 \
     --rpc-cors all \
     --rpc-methods safe \
     --state-cache-size 0 \

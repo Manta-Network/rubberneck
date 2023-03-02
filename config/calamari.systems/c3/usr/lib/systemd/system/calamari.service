@@ -10,9 +10,9 @@ ExecStart=/usr/bin/calamari \
     --name '🦑🛡️ c3 🛡️🦑' \
     --base-path /var/lib/substrate \
     --port 30333 \
-    --ws-port 9144 \
+    --ws-port 9944 \
     --ws-max-connections 100 \
-    --rpc-port 9133 \
+    --rpc-port 9933 \
     --rpc-cors all \
     --rpc-methods safe \
     --state-cache-size 0 \
