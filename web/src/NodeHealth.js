@@ -4,17 +4,34 @@ import Spinner from 'react-bootstrap/Spinner';
 
 function NodeHealth(props) {
   const { fqdn } = props;
-  const [health, setHealth] = useState(undefined);
+  const [healths, setHealths] = useState({
+    0: null,
+    1: null,
+    2: null,
+  });
   useEffect(() => {
-    fetch(`https://${fqdn}/health`)
-      .then(r => r.json())
-      .then(setHealth)
-      .catch(console.error);
+    const domain = fqdn.split('.').slice(1).join('.');
+    switch (domain) {
+      case 'internal.kusama.systems':
+        [0,1,2].map((n) => (
+          fetch(`https://${fqdn}/${n}/health`)
+            .then(r => r.json())
+            .then((fetchedHealth) => setHealths((h) => ({...h, [n]: fetchedHealth})))
+            .catch(console.error)
+        ));
+        break;
+      default:
+        fetch(`https://${fqdn}/health`)
+          .then(r => r.json())
+          .then((fetchedHealth) => setHealths({0: fetchedHealth}))
+          .catch(console.error);
+        break;
+    }
   }, [fqdn]);
   return (
-    (!!health)
-      ? (
-          <span style={{...props.style}}>
+    (!!healths[0])
+      ? Object.values(healths).filter((h) => !!h).map((health, hI) => (
+          <span key={hI} style={{...props.style}}>
             {
               (!!health.peers)
                 ? (
@@ -24,7 +41,10 @@ function NodeHealth(props) {
                     </Badge>
                   )
                 : (
-                    <i title={`no peers`} className={`bi bi-people text-danger`} />
+                    <Badge title={`${health.peers} peers`} pill bg="danger" style={{marginLeft: '0.5em'}}>
+                      <i className={`bi bi-people`} />
+                      <span style={{marginLeft: '0.5em'}}>{health.peers}</span>
+                    </Badge>
                   )
             }
             {
@@ -39,7 +59,7 @@ function NodeHealth(props) {
                   )
             }
           </span>
-        )
+        ))
       : (
           <Spinner style={{...props.style}} animation="grow" size="sm" className="text-secondary">
             <span className="visually-hidden">node health lookup in progress</span>
