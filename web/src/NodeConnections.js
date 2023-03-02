@@ -25,23 +25,28 @@ function NodeConnections(props) {
     const hostname = fqdn.split('.')[0];
     const domain = fqdn.split('.').slice(1).join('.');
     let unit;
+    let nodesPerInstance;
     switch (domain) {
       case 'baikal.manta.systems':
         unit = 'baikal';
+        nodesPerInstance = 1;
         break;
       case 'baikal.testnet.calamari.systems':
       case 'calamari.moonsea.systems':
       case 'calamari.seabird.systems':
       case 'calamari.systems':
         unit = 'calamari';
+        nodesPerInstance = 1;
         break;
       case 'baikal.testnet.dolphin.training':
       case 'dolphin.engineering':
       case 'dolphin.seabird.systems':
         unit = 'dolphin';
+        nodesPerInstance = 1;
         break;
       case 'acala.seabird.systems':
         unit = 'karura';
+        nodesPerInstance = 1;
         break;
       case 'internal.kusama.systems':
         switch (hostname[0]) {
@@ -52,15 +57,19 @@ function NodeConnections(props) {
             unit = 'kusama0';
             break;
         }
+        nodesPerInstance = 3;
         break;
       case 'manta.systems':
         unit = 'manta';
+        nodesPerInstance = 1;
         break;
       case 'moonriver.seabird.systems':
         unit = 'moonriver';
+        nodesPerInstance = 1;
         break;
       default:
         unit = 'calamari';
+        nodesPerInstance = 1;
         break;
     }
     const unitPrefix = (domain === 'calamari.systems') ? 'usr/lib' : 'etc';
@@ -68,7 +77,7 @@ function NodeConnections(props) {
       .then(r => r.text())
       .then((unitContents) => {
         const regex = /ws-max-connections ([0-9]+) /;
-        setWsMaxConnections((domain === 'internal.kusama.systems') ? (3 * unitContents.match(regex)[1]) : unitContents.match(regex)[1]);
+        setWsMaxConnections((nodesPerInstance * unitContents.match(regex)[1]));
       });
   }, [fqdn]);
   return (
