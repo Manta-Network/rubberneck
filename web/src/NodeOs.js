@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -55,6 +55,7 @@ const osIcon = (os) => {
 function NodeTcp(props) {
   const { fqdn } = props;
   const [os, setOs] = useState(undefined);
+  const [uname, setUname] = useState(undefined);
   useEffect(() => {
     fetch(`https://pulse.pelagos.systems/api/v1/query?query=node_os_info{instance%3D%22${fqdn}:443%22}`)
       .then(r => r.json())
@@ -74,14 +75,38 @@ function NodeTcp(props) {
       })
       .catch(console.error);
   }, [fqdn]);
+  useEffect(() => {
+    fetch(`https://pulse.pelagos.systems/api/v1/query?query=node_uname_info{instance%3D%22${fqdn}:443%22}`)
+      .then(r => r.json())
+      .then((container) => {
+          const { release, sysname, version } = container.data.result[0].metric;
+          setUname({release, sysname, version});
+      })
+      .catch(console.error);
+  }, [fqdn]);
   return (
-    (!!os)
-      ? osIcon(os)
-      : (
-          <Spinner style={{...props.style}} animation="grow" size="sm" className="text-secondary">
-            <span className="visually-hidden">tcp connection count lookup in progress</span>
-          </Spinner>
-        )
+    <Fragment>
+      {
+        (!!os)
+          ? osIcon(os)
+          : (
+              <Spinner style={{...props.style}} animation="grow" size="sm" className="text-secondary">
+                <span className="visually-hidden">operating system lookup in progress</span>
+              </Spinner>
+            )
+      }
+      {
+        (!!uname)
+          ? (
+              <FontAwesomeIcon icon={faLinux} title={`${uname.release} - ${uname.sysname} - ${uname.version}`} style={{ marginLeft: '0.5em'}} />
+            )
+          : (
+              <Spinner style={{...props.style}} animation="grow" size="sm" className="text-secondary">
+                <span className="visually-hidden">kernel version lookup in progress</span>
+              </Spinner>
+            )
+      }
+    </Fragment>
   );
 }
 
