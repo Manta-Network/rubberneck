@@ -15,7 +15,9 @@ import RunningCost from './RunningCost';
 import badge from './badge';
 import { ReactComponent as ShockLogo } from './shock.svg';
 import { ReactComponent as S4yLogo } from './s4y.svg';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import apiBaseUrl from './apiBaseUrl';
+import getWsConnections from './getWsConnections';
 
 const consoleLink = (node) => {
   switch (node.provider) {
@@ -65,8 +67,14 @@ const consoleLink = (node) => {
   }
 };
 
+const threshold = {
+  danger: 0.75,
+  warning: 0.5,
+};
+
 function Chain(props) {
   const { relaychain, parachain } = useParams();
+  const [wsConnections, setWsConnections] = useState({ active: 0, max: 100 });
   const [cost, setCost] = useState(undefined);
   const [nodes, setNodes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +107,11 @@ function Chain(props) {
           [currency]: (!!accumulator[currency]) ? accumulator[currency] + Number(amount) : Number(amount)
         };
       }, {}));
+      (
+        async () => {
+          setWsConnections((await Promise.all(nodes.map((n) => getWsConnections(n.fqdn)))).reduce((a, c) => ({ active: (a.active + c.active), max: (a.max + c.max) }), { active: 0, max: 0 }));
+        }
+      )()
     }
   }, [nodes]);
   return (
@@ -158,7 +171,32 @@ function Chain(props) {
             : null
         }
       </Row>
-      
+      <Row>
+        <Col>
+          {
+            (!!wsConnections.active)
+            ? (
+                <ProgressBar
+                  striped
+                  now={((wsConnections.active / wsConnections.max) * 100)}
+                  title={`connections: ${wsConnections.active} active / ${wsConnections.max} max`}
+                  variant={
+                    ((wsConnections.active / wsConnections.max) > threshold.danger)
+                      ? 'danger'
+                      : ((wsConnections.active / wsConnections.max) > threshold.warning)
+                        ? 'warning'
+                        : 'success'
+                  }
+                />
+              )
+            : (
+                <Spinner style={{...props.style}} animation="grow" size="sm" className="text-secondary">
+                  <span className="visually-hidden">websocket active connection count lookup in progress</span>
+                </Spinner>
+              )
+          }
+        </Col>
+      </Row>
       <Table>
         <thead>
           {
