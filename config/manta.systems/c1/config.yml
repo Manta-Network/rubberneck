@@ -6,6 +6,9 @@ provider: shock-dedicated
 dns:
   alias:
     -
+      name: ws.manta.systems
+      weight: 50
+    -
       name: ws.archive.manta.systems
       weight: 50
 package:
