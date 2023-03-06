@@ -3,7 +3,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const fetch = require('node-fetch');
 const sslCertificate = require('get-ssl-certificate');
-const blockchainDbRead = (process.env.blockchain_db_read || 'mongodb+srv://chainreader:LG9YHNLfYCcpJisW@chaincluster.oulrzox.mongodb.net');
+const blockchainDbRead = process.env.blockchain_db_read;
 
 const cache = {
   lifetime: 3600

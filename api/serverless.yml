@@ -37,6 +37,8 @@ functions:
 
   blockchains:
     handler: handler.blockchains
+    environment:
+      blockchain_db_read: ${ssm:/rubberneck_blockchain_db_read}
     events:
       -
         http:
@@ -48,6 +50,7 @@ functions:
     timeout: 29
     handler: handler.nodes
     environment:
+      blockchain_db_read: ${ssm:/rubberneck_blockchain_db_read}
       rubberneck_hetzner_calamari: ${ssm:/rubberneck_hetzner_calamari}
       rubberneck_hetzner_dolphin: ${ssm:/rubberneck_hetzner_dolphin}
       rubberneck_hetzner_robot_default_username: ${ssm:/rubberneck_hetzner_robot_default_username}
@@ -76,6 +79,8 @@ functions:
   node:
     timeout: 29
     handler: handler.node
+    environment:
+      blockchain_db_read: ${ssm:/rubberneck_blockchain_db_read}
     events:
       -
         http:
