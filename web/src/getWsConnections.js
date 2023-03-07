@@ -2,7 +2,8 @@
 const getActive = async (fqdn) => {
   let active;
   try {
-    const response = await fetch(`https://pulse.pelagos.systems/api/v1/query?query=nginx_connections_active{instance%3D%22${fqdn}:443%22}`);
+    // https://substrate.stackexchange.com/questions/3027/add-current-ws-connection-number-metric
+    const response = await fetch(`https://pulse.pelagos.systems/api/v1/query?query=substrate_rpc_sessions_opened{instance%3D%22${fqdn}:443%22}-substrate_rpc_sessions_closed{instance%3D%22${fqdn}:443%22}`);
     const json = await response.json();
     active = json.data.result[0].value[1];
   } catch(exception) {

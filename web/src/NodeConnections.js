@@ -10,12 +10,12 @@ const threshold = {
 
 function NodeConnections(props) {
   const { fqdn } = props;
-  const [wsConnections, setWsConnections] = useState({ active: 0, max: 100 });
+  const [wsConnections, setWsConnections] = useState({ active: 0, max: 100, loading: true });
   useEffect(() => {
-    getWsConnections(fqdn).then(setWsConnections);
+    getWsConnections(fqdn).then((observed) => setWsConnections({ ...observed, loading: false }));
   }, [fqdn]);
   return (
-    (!!wsConnections.active)
+    (!wsConnections.loading)
       ? (
           <ProgressBar
             striped
