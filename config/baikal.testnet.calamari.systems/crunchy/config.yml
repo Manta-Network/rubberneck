@@ -12,6 +12,12 @@ dns:
     -
       name: ws.archive.baikal.testnet.calamari.systems
       weight: 200
+package:
+  - certbot
+  - dirmngr
+  - nginx
+  - sqlite3
+  - unattended-upgrades
 user:
   -
     username: root

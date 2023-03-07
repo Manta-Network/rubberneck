@@ -12,12 +12,11 @@ dns:
       name: ws.archive.manta.systems
       weight: 50
 package:
-  - auditd
   - certbot
   - dirmngr
   - nginx
-  - python3-certbot-nginx
   - sqlite3
+  - unattended-upgrades
 user:
   -
     username: root
