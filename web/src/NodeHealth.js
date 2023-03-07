@@ -41,10 +41,9 @@ function NodeHealth(props) {
                     </Badge>
                   )
                 : (
-                    <Badge title={`${health.peers} peers`} pill bg="danger" style={{marginLeft: '0.5em'}}>
-                      <i className={`bi bi-people`} />
-                      <span style={{marginLeft: '0.5em'}}>{health.peers}</span>
-                    </Badge>
+                    <Spinner style={{...props.style}} animation="border" size="sm" className="text-secondary">
+                      <span className="visually-hidden">node peer count lookup in progress</span>
+                    </Spinner>
                   )
             }
             {
@@ -61,7 +60,7 @@ function NodeHealth(props) {
           </span>
         ))
       : (
-          <Spinner style={{...props.style}} animation="grow" size="sm" className="text-secondary">
+          <Spinner style={{...props.style}} animation="border" size="sm" className="text-secondary">
             <span className="visually-hidden">node health lookup in progress</span>
           </Spinner>
         )

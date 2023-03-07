@@ -24,7 +24,6 @@ function Chain(props) {
     ? `${apiBaseUrl}/nodes/${relaychain}/${parachain}`
     : `${apiBaseUrl}/nodes/${relaychain}`;
   useEffect(() => {
-    setLoading(true);
     const interval = setInterval(() => {
       fetch(apiUrl)
         .then(response => response.json())
@@ -86,7 +85,7 @@ function Chain(props) {
         </Col>
         <Col xs={6} style={{textAlign: 'center'}}>
           {
-            (!wsConnections.loading)
+            (!loading && !wsConnections.loading)
             ? (
                 <span className="text-muted">
                   infrastructure utilisation: <strong className="text-dark">
@@ -146,7 +145,7 @@ function Chain(props) {
       <Row>
         <Col>
           {
-            (!wsConnections.loading)
+            (!loading && !wsConnections.loading)
             ? (
                 <ProgressBar
                   striped
