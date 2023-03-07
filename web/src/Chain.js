@@ -16,7 +16,7 @@ const threshold = {
 
 function Chain(props) {
   const { relaychain, parachain } = useParams();
-  const [wsConnections, setWsConnections] = useState({ active: 0, max: 100 });
+  const [wsConnections, setWsConnections] = useState({ active: 0, max: 100, loading: true });
   const [cost, setCost] = useState(undefined);
   const [nodes, setNodes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +59,7 @@ function Chain(props) {
       if (!!nodes && !!nodes.length) {
         (
           async () => {
-            setWsConnections((await Promise.all(nodes.map((n) => getWsConnections(n.fqdn)))).reduce((a, c) => ({ active: (a.active + c.active), max: (a.max + c.max) }), { active: 0, max: 0 }));
+            setWsConnections((await Promise.all(nodes.map((n) => getWsConnections(n.fqdn)))).reduce((a, c) => ({ active: (a.active + c.active), max: (a.max + c.max), loading: false }), { active: 0, max: 0 }));
           }
         )()
       }
@@ -86,7 +86,7 @@ function Chain(props) {
         </Col>
         <Col xs={6} style={{textAlign: 'center'}}>
           {
-            (!!wsConnections.active)
+            (!wsConnections.loading)
             ? (
                 <span className="text-muted">
                   infrastructure utilisation: <strong className="text-dark">
@@ -146,7 +146,7 @@ function Chain(props) {
       <Row>
         <Col>
           {
-            (!!wsConnections.active)
+            (!wsConnections.loading)
             ? (
                 <ProgressBar
                   striped
