@@ -14,13 +14,15 @@ function NodeDiskUsage(props) {
     fetch(`https://pulse.pelagos.systems/api/v1/query?query=node_filesystem_size_bytes{instance%3D%22${fqdn}:443%22}`)
       .then(r => r.json())
       .then((container) => {
-        const size = (container.data.result.some((r) => r.metric.mountpoint === '/data'))
-          ? container.data.result.find((r) => r.metric.mountpoint === '/data').value[1]
-          : container.data.result.find((r) => r.metric.mountpoint === '/').value[1];
-        setDisk((d) => ({
-          ...d,
-          size,
-        }));
+        if (!!container.data.result) {
+          const size = (container.data.result.some((r) => r.metric.mountpoint === '/data'))
+            ? container.data.result.find((r) => r.metric.mountpoint === '/data').value[1]
+            : container.data.result.find((r) => r.metric.mountpoint === '/').value[1];
+          setDisk((d) => ({
+            ...d,
+            size,
+          }));
+        }
       })
       .catch(console.error);
     fetch(`https://pulse.pelagos.systems/api/v1/query?query=node_filesystem_avail_bytes{instance%3D%22${fqdn}:443%22}`)
