@@ -111,9 +111,9 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/kusama-staging.json
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/seabird-kusama.json
     target: /usr/share/substrate/kusama-staging.json
-    sha256: 6e0a5614a4f8a94052fd2663f153adbd34cb7794be3ac7691d8febd27c479541
+    sha256: f60bca4b1d4b99d91fb960b14a39a99e5741c06f98021e1194061c7b64ba9fc8
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
