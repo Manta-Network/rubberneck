@@ -141,7 +141,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c3/etc/systemd/system/calamari.service
     target: /etc/systemd/system/calamari.service
-    sha256: 873efebb87fc4d33e60b32554a264c965759a6eab04e2b2e9c9cb0e71b8d926d
+    sha256: 49f12fb7417109962365a1cf6d637333614b7a120bec1d9816e4956a4c3bdd09
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
