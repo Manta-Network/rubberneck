@@ -132,6 +132,7 @@ file:
         - systemctl is-active --quiet kusama-2.service && sudo systemctl stop kusama-2.service
       post:
         - sudo chmod +x /usr/local/bin/polkadot
+        - test -x /usr/local/bin/kusama && sudo rm /usr/local/bin/kusama
         - sudo ln -sfr /usr/local/bin/polkadot /usr/local/bin/kusama
         - systemctl is-active --quiet kusama-0.service || sudo systemctl start kusama-0.service
         - systemctl is-active --quiet kusama-1.service || sudo systemctl start kusama-1.service
