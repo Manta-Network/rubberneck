@@ -122,9 +122,9 @@ file:
         - systemctl is-active --quiet kusama-1.service && sudo systemctl restart kusama-1.service
         - systemctl is-active --quiet kusama-2.service && sudo systemctl restart kusama-2.service
   -
-    source: https://github.com/paritytech/polkadot/releases/download/v0.9.33/polkadot
+    source: https://github.com/paritytech/polkadot/releases/download/v0.9.39/polkadot
     target: /usr/local/bin/polkadot
-    sha256: 01b376450b958e1a74caff86bf1140220899e486baa301e5119665fc3cb37147
+    sha256: 6016b26e5df5aad30c4680dddcb1bc64ec3690ea00a2b6d9e05ffdee8bd5b312
     command:
       pre:
         - systemctl is-active --quiet kusama-0.service && sudo systemctl stop kusama-0.service
