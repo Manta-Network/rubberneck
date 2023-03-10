@@ -110,12 +110,13 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/calamari-staging.json
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/seabird-calamari.json
     target: /usr/share/substrate/calamari-staging.json
-    sha256: 700bc42a71a237989d67b87dcf82dca7875d1f767348506b34d3acbe4f9fffb0
+    sha256: 37759ed38469b2f711c7e9d607fb61272ffd824813bb398b56f073bd31374929
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+        - sudo systemctl stop calamari.service && sudo rm -rf /var/lib/substrate/calamari && sudo rm -rf /var/lib/substrate/chains && sudo rm -rf /var/lib/substrate/polkadot )
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
@@ -141,7 +142,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/a1/etc/systemd/system/calamari.service
     target: /etc/systemd/system/calamari.service
-    sha256: 15b6633f2b1e9879510688914eaf4fa6e043559fc29175e9a21708ab419fe6b0
+    sha256: 89f360af48fa4e6314e2eb729f473cce9eb5cfe27ed623af8de6ee599b34b094
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service

@@ -19,9 +19,11 @@ ExecStart=/usr/local/bin/calamari \
     --rpc-cors all \
     --state-cache-size 0 \
     --rpc-methods safe \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
     --name 'a3 calamari seabird' \
-    --chain /usr/share/substrate/kusama-staging.json
+    --chain /usr/share/substrate/kusama-staging.json \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 Restart=always
 RestartSec=120
 

@@ -110,18 +110,19 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/calamari-staging.json
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/seabird-calamari.json
     target: /usr/share/substrate/calamari-staging.json
-    sha256: 700bc42a71a237989d67b87dcf82dca7875d1f767348506b34d3acbe4f9fffb0
+    sha256: 37759ed38469b2f711c7e9d607fb61272ffd824813bb398b56f073bd31374929
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+        - sudo systemctl stop calamari.service && sudo rm -rf /var/lib/substrate/calamari && sudo rm -rf /var/lib/substrate/chains && sudo rm -rf /var/lib/substrate/polkadot )
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/kusama-staging.json
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/seabird-kusama.json
     target: /usr/share/substrate/kusama-staging.json
-    sha256: 6e0a5614a4f8a94052fd2663f153adbd34cb7794be3ac7691d8febd27c479541
+    sha256: f60bca4b1d4b99d91fb960b14a39a99e5741c06f98021e1194061c7b64ba9fc8
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
@@ -141,7 +142,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/a3/etc/systemd/system/calamari.service
     target: /etc/systemd/system/calamari.service
-    sha256: 246c9c1dbac57bf500bf155bfeb588ecf2785e9bf033dcdd8f659a05c4ba2a5a
+    sha256: 0a5b097801a7754cf06612ea15e609b4327c2fcbefa049431be900436f145214
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
