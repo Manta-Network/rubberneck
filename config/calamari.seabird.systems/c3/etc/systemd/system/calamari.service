@@ -22,9 +22,11 @@ ExecStart=/usr/local/bin/calamari \
     --state-cache-size 0 \
     --rpc-methods safe \
     --log=parachain::collation-generation=debug,cumulus-collator=debug,filtering-consensus=debug \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
     --name 'c3 calamari seabird' \
-    --chain /usr/share/calamari/relaychain-spec.json  
+    --chain /usr/share/calamari/relaychain-spec.json \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 Restart=always
 RestartSec=120
 
