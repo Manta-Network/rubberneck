@@ -120,7 +120,7 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/kusama-staging.json
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/seabird-kusama.json
     target: /usr/share/substrate/kusama-staging.json
     sha256: 6e0a5614a4f8a94052fd2663f153adbd34cb7794be3ac7691d8febd27c479541
     command:
