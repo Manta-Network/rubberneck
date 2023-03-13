@@ -120,9 +120,9 @@ file:
         - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
         - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
-    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.3/manta
     target: /usr/bin/manta
-    sha256: 15406935328bac77d741db4d99d6c7b14cebba90de5cf4e5f72314524521884d
+    sha256: 97f864dbcf8786d2a213cbade044974f17b16ed35477a22a990fa18a12fe6dac
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
