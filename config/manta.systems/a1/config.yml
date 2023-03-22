@@ -103,7 +103,7 @@ file:
   -
     source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a1/etc/systemd/system/manta.service'
     target: /etc/systemd/system/manta.service
-    sha256: b59fff1fd030da35c4b12137fb37b7cab2616da722fa8805057e5053afcad6da
+    sha256: 95c2bfca3bbcffe237b0a99c80738b196b474cfa87e73e5e969e6b5ae9ebddc7
     command:
       pre:
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
