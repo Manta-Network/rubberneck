@@ -1,0 +1,33 @@
+[Unit]
+Description=statemine
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+User=root
+Group=root
+Type=simple
+Restart=on-failure
+ExecStart=/usr/local/bin/statemine \
+  --collator \
+  --bob \
+  --name 'c2-statemine-calamari-staging' \
+  --base-path /var/lib/statemine \
+  --node-key-file /usr/share/statemine/node-key \
+  --chain /usr/share/statemine/parachain-spec.json \
+  --port 30333 \
+  --ws-port 9944 \
+  --rpc-port 9933 \
+  --rpc-cors all \
+  --state-cache-size 0 \
+  --rpc-methods safe \
+  -- \
+  --name 'c2-statemine-calamari-staging' \
+  --chain /usr/share/statemine/relaychain-spec.json
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target
