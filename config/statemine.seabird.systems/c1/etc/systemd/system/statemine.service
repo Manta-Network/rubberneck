@@ -23,9 +23,11 @@ ExecStart=/usr/local/bin/statemine \
   --rpc-cors all \
   --state-cache-size 0 \
   --rpc-methods safe \
+  --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
   -- \
   --name 'c1-statemine-calamari-staging' \
-  --chain /usr/share/statemine/relaychain-spec.json
+  --chain /usr/share/statemine/relaychain-spec.json \
+  --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 Restart=always
 RestartSec=120
 

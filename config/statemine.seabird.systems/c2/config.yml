@@ -81,7 +81,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/statemine.seabird.systems/c2/etc/systemd/system/statemine.service
     target: /etc/systemd/system/statemine.service
-    sha256: 2d5d3b7da41ece56e7c6cfbca642fa9bdfaa7f8b284777a44e0d494e8dd9e51a
+    sha256: b02cd2f2d6745770169357c3f31cc942de884c1b7755d53d829a99e14d7d1f2e
     command:
       pre:
         - systemctl is-active --quiet statemine.service && sudo systemctl stop statemine.service
