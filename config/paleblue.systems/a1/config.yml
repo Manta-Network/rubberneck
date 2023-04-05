@@ -1,0 +1,238 @@
+---
+hostname: a1
+domain: paleblue.systems
+action: sync
+provider: hetzner-robot
+dns:
+  alias:
+    -
+      name: ws.paleblue.systems
+    -
+      name: ws.archive.paleblue.systems
+package:
+  - certbot
+  - dirmngr
+  - nginx
+  - sqlite3
+  - unattended-upgrades
+user:
+  -
+    username: root
+    authorized:
+      keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBZ/7EBrBGj975hyT5sNROd9FTym7yGoiX4wUL+DcDpY
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGhEy3dlSZZtj9RI+g7Q7K5n01cvTQryCMCDpkTqfF3/
+  -
+    username: mobula
+    authorized:
+      keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIBSdR9Wy3S4L+Zdcu8waYe5vW2VzMoi+QafgV3IIFj
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJx8I0j6oYirfie4pAQZQB1+fWJ7w5mFZayQvLhtSV0
+      users:
+        - stechu
+        - ferrell-code
+        - garandor
+        - ghzlatarev
+command:
+  - sudo passwd -l root
+  - systemctl is-active polkadot-0.service || sudo systemctl restart polkadot-0.service
+  - systemctl is-active polkadot-1.service || sudo systemctl restart polkadot-1.service
+  - systemctl is-active polkadot-2.service || sudo systemctl restart polkadot-2.service
+  - systemctl is-active nginx.service || sudo systemctl restart nginx.service
+  - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
+  - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
+  - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
+  - '(test -s /etc/letsencrypt/renewal/$(hostname -f).conf && grep webroot_path /etc/letsencrypt/renewal/$(hostname -f).conf) || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
+  - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
+  - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
+  - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
+  - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
+  - test -x /usr/bin/unzip || sudo apt-get install -y unzip
+  - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.6.1/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
+file:
+  -
+    source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.service
+    target: /etc/systemd/system/promtail.service
+    sha256: 35ab9c5313c3729bf7cdedde972cf7b6e566d75bc5789edd88ab034a4e14096a
+    command:
+      pre:
+        - ( systemctl is-active --quiet promtail.service && sudo systemctl stop promtail.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet promtail.service || sudo systemctl enable promtail.service
+        - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
+  -
+    source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
+    target: /etc/promtail/promtail.yml
+    sha256: 3ad396de6e1becc80616339a413c0c1c8e21f96a3ceba2294521fac26941a52e
+    command:
+      pre:
+        - sudo mkdir -p /etc/promtail
+        - ( systemctl is-active --quiet promtail.service && sudo systemctl stop promtail.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/prometheus-node-exporter.service
+    target: /etc/systemd/system/prometheus-node-exporter.service
+    sha256: 4e551485c07fb89f348fd154f264a52cded39e87b6b8f8aad9115b1d353ede05
+    command:
+      pre:
+        - systemctl is-active --quiet prometheus-node-exporter.service && sudo systemctl stop prometheus-node-exporter.service
+      post:
+        - sudo systemctl daemon-reload
+        - sudo systemctl enable --now prometheus-node-exporter.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/nginx-prometheus-exporter.service
+    target: /etc/systemd/system/nginx-prometheus-exporter.service
+    sha256: 551b688bbcccb24ce3eb3b977ff871242c319bdbf1a72de82b4fe4cae98cec36
+    command:
+      pre:
+        - systemctl is-active --quiet nginx-prometheus-exporter.service && sudo systemctl stop nginx-prometheus-exporter.service
+      post:
+        - sudo systemctl daemon-reload
+        - sudo systemctl enable --now nginx-prometheus-exporter.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.yml'
+    target: /etc/go-audit.yml
+    sha256: 8267a422d920a249b9d744a322c0824a14f2fd8acc0f88aa9caf0fae604f5ef1
+    command:
+      post:
+        - systemctl is-active --quiet go-audit.service && sudo systemctl restart go-audit.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.service'
+    target: /etc/systemd/system/go-audit.service
+    sha256: bd5536398fd1fb4b18fbbb951d86960851d47cc68a41d5bbb5ea591f9d635cf8
+    command:
+      pre:
+        - ( systemctl is-active --quiet go-audit.service && sudo systemctl stop go-audit.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
+        - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/paleblue-polkadot.json
+    target: /usr/share/substrate/polkadot-staging.json
+    sha256: f60bca4b1d4b99d91fb960b14a39a99e5741c06f98021e1194061c7b64ba9fc8
+    command:
+      pre:
+        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
+      post:
+        - systemctl is-active --quiet polkadot-0.service && sudo systemctl restart polkadot-0.service
+        - systemctl is-active --quiet polkadot-1.service && sudo systemctl restart polkadot-1.service
+        - systemctl is-active --quiet polkadot-2.service && sudo systemctl restart polkadot-2.service
+  -
+    source: https://github.com/paritytech/polkadot/releases/download/v0.9.39/polkadot
+    target: /usr/local/bin/polkadot
+    sha256: 6016b26e5df5aad30c4680dddcb1bc64ec3690ea00a2b6d9e05ffdee8bd5b312
+    command:
+      pre:
+        - systemctl is-active --quiet polkadot-0.service && sudo systemctl stop polkadot-0.service
+        - systemctl is-active --quiet polkadot-1.service && sudo systemctl stop polkadot-1.service
+        - systemctl is-active --quiet polkadot-2.service && sudo systemctl stop polkadot-2.service
+      post:
+        - sudo chmod +x /usr/local/bin/polkadot
+        - test -x /usr/local/bin/kusama && sudo rm /usr/local/bin/kusama
+        - sudo ln -sfr /usr/local/bin/polkadot /usr/local/bin/kusama
+        - systemctl is-active --quiet polkadot-0.service || sudo systemctl start polkadot-0.service
+        - systemctl is-active --quiet polkadot-1.service || sudo systemctl start polkadot-1.service
+        - systemctl is-active --quiet polkadot-2.service || sudo systemctl start polkadot-2.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/paleblue.systems/a1/etc/systemd/system/polkadot-0.service
+    target: /etc/systemd/system/polkadot-0.service
+    sha256: c39a0ca2b6622ce592c5bf0b30b687ed68282c1f30959d1bbbe31acb43a170df
+    command:
+      pre:
+        - systemctl is-active --quiet polkadot-0.service && sudo systemctl stop polkadot-0.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet polkadot-0.service || sudo systemctl enable polkadot-0.service
+        - sudo systemctl start polkadot-0.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/paleblue.systems/a1/etc/systemd/system/polkadot-1.service
+    target: /etc/systemd/system/polkadot-1.service
+    sha256: 667cc9cbec2df8e856c30b61ea7160a55b3508abd784334293ff291d60a5fab1
+    command:
+      pre:
+        - systemctl is-active --quiet polkadot-1.service && sudo systemctl stop polkadot-1.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet polkadot-1.service || sudo systemctl enable polkadot-1.service
+        - sudo systemctl start polkadot-1.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/paleblue.systems/a1/etc/systemd/system/polkadot-2.service
+    target: /etc/systemd/system/polkadot-2.service
+    sha256: 9a4511eccf08e3479e767c4e9832349b7a146bd574fa44d070c3a71fd67a790c
+    command:
+      pre:
+        - systemctl is-active --quiet polkadot-2.service && sudo systemctl stop polkadot-2.service
+      post:
+        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
+        - sudo systemctl daemon-reload
+        - systemctl is-enabled --quiet polkadot-2.service || sudo systemctl enable polkadot-2.service
+        - sudo systemctl start polkadot-2.service
+  -
+    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
+    target: /etc/letsencrypt/options-ssl-nginx.conf
+    sha256: 17baec778c05571beb0cdeb0bc1c6da3596d44d1fe567e7fee0efef80a860d01
+    command:
+      pre:
+        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
+      post:
+        - sudo chmod 644 /etc/letsencrypt/options-ssl-nginx.conf
+  -
+    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/ssl-dhparams.pem'
+    target: /etc/letsencrypt/ssl-dhparams.pem
+    sha256: 9ba6429597aeed2d8617a7705b56e96d044f64b07971659382e426675105654b
+    command:
+      pre:
+        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
+      post:
+        - sudo chmod 644 /etc/letsencrypt/ssl-dhparams.pem
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
+    target: /etc/nginx/sites-available/status.conf
+    sha256: 03127f61971cb3cc15a278672e49182ada2506afdddb02a90cf660e82c89c3bf
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
+        - sudo systemctl restart nginx.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/paleblue.systems/a1/etc/nginx/sites-available/substrate.conf
+    target: /etc/nginx/sites-available/substrate.conf
+    sha256: eb86d780b305d69907731fd89b9411813ad94988c0ad711b234361be7a4d7b6e
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo systemctl stop nginx.service
+        - sudo systemctl start nginx.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.paleblue.systems.conf
+    target: /etc/nginx/sites-available/ws.paleblue.systems.conf
+    sha256: c4a52067731b706d06ff7b92af1a18bcdf4cf251f8cca3594fd172727ba7baf5
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.paleblue.systems.conf /etc/nginx/sites-enabled/ws.paleblue.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.paleblue.systems.conf
+    target: /etc/nginx/sites-available/ws.archive.paleblue.systems.conf
+    sha256: 83b9a9a50dfd37482e5ba695b397ef81c27e036336c6cced19c0ca54e848154e
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.paleblue.systems.conf /etc/nginx/sites-enabled/ws.archive.paleblue.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service

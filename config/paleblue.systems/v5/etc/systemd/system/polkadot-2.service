@@ -1,0 +1,29 @@
+[Unit]
+Description=polkadot 2
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/polkadot \
+  --validator \
+  --name v5-2 \
+  --base-path /var/lib/polkadot2 \
+  --node-key-file /var/lib/polkadot2/node-key \
+  --chain /usr/share/polkadot/relaychain-spec.json \
+  --force-polkadot \
+  --port 30435 \
+  --ws-port 7946 \
+  --rpc-port 7935 \
+  --rpc-cors all \
+  --rpc-methods safe \
+  --log="parachain=debug" \
+  --ws-max-connections 1000 \
+  --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target
