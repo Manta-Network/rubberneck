@@ -44,12 +44,11 @@ command:
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
   - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
-  - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
   - test -x /usr/bin/unzip || sudo apt-get install -y unzip
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.6.1/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
 file:
   -
-    source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.service
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/promtail.service
     target: /etc/systemd/system/promtail.service
     sha256: 35ab9c5313c3729bf7cdedde972cf7b6e566d75bc5789edd88ab034a4e14096a
     command:
@@ -60,9 +59,9 @@ file:
         - systemctl is-enabled --quiet promtail.service || sudo systemctl enable promtail.service
         - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
   -
-    source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/promtail/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 3ad396de6e1becc80616339a413c0c1c8e21f96a3ceba2294521fac26941a52e
+    sha256: 8c70b3b76053d7897e54b75d046541d8aeee7ffdddb6c88831737af8e374ab35
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -90,24 +89,6 @@ file:
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.yml'
-    target: /etc/go-audit.yml
-    sha256: 8267a422d920a249b9d744a322c0824a14f2fd8acc0f88aa9caf0fae604f5ef1
-    command:
-      post:
-        - systemctl is-active --quiet go-audit.service && sudo systemctl restart go-audit.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.service'
-    target: /etc/systemd/system/go-audit.service
-    sha256: bd5536398fd1fb4b18fbbb951d86960851d47cc68a41d5bbb5ea591f9d635cf8
-    command:
-      pre:
-        - ( systemctl is-active --quiet go-audit.service && sudo systemctl stop go-audit.service ) || true
-      post:
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
-        - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
   -
     source: https://github.com/paritytech/polkadot/releases/download/v0.9.39/polkadot
     target: /usr/local/bin/polkadot
@@ -190,15 +171,15 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/paleblue.systems/v5/etc/nginx/sites-available/substrate.conf
-    target: /etc/nginx/sites-available/substrate.conf
-    sha256: 10f65772e3237f63e237abea0e3c06abcc2796d2a3ebe462a3eca52c9cabed9d
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/paleblue.systems/v5/etc/nginx/sites-available/polkadot.conf
+    target: /etc/nginx/sites-available/polkadot.conf
+    sha256: 27c7ed2135a41756fb3863a9b829d5b5d03b50abb069f1818220f9702f6e20c0
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo ln -sfr /etc/nginx/sites-available/polkadot.conf /etc/nginx/sites-enabled/polkadot.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
