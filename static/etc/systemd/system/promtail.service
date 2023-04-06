@@ -1,0 +1,12 @@
+[Unit]
+Description=promtail
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/local/bin/promtail-linux-amd64 --config.file=/etc/promtail/promtail.yml --client.external-labels="host=%H"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

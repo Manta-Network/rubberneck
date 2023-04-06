@@ -1,0 +1,39 @@
+server:
+  disable: true
+clients:
+  -
+    url: https://log.p0xeidon.systems/loki/api/v1/push
+positions:
+  filename: /tmp/positions.yml
+scrape_configs:
+  -
+    job_name: logfile
+    pipeline_stages:
+      -
+        drop:
+          expression: ".*DEBUG.*"
+    static_configs:
+      -
+        targets:
+          - localhost
+        labels:
+          job: logfile
+          unit: manta-indexer
+          __path__: /var/log/manta-indexer/*.log
+  -
+    job_name: journal
+    journal:
+      max_age: 12h
+      json: false
+      labels:
+        job: journal
+    relabel_configs:
+      -
+        action: keep
+        source_labels:
+          - __journal__systemd_unit
+        regex: (auditd|certbot|cron|dbus|filebeat|fwupd-refresh|fwupd|go-audit|motd-news|nginx|packagekit|ssh|ufw|unattended-upgrades|calamari|dolphin|karura|kusama0|kusama1|kusama2|manta|moonriver|polkadot0|polkadot1|polkadot2).service
+      -
+        source_labels:
+          - __journal__systemd_unit
+        target_label: unit
