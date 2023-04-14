@@ -3,12 +3,12 @@ hostname: i1
 domain: calamari.systems
 ip: 94.130.217.89
 action: sync
-launch: '2022-09-08T11:21:00Z'
+launch: '2023-04-08T05:07:00Z'
 provider: hetzner-robot
 price:
-  amount: 170.98
+  amount: 47.70
   currency: usd
-  term: quarterly
+  term: monthly
 dns:
   alias:
     -
