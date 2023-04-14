@@ -152,7 +152,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/i.calamari.systems.conf
     target: /etc/nginx/sites-available/i.calamari.systems.conf
-    sha256: e98657edab2329578654b6110db73aa1204e63d85fece202b35a2840f08ee2cc
+    sha256: 6d090ebe4efc5700cfe42d74022f102e5b014cb552e02e79d067ffec13532203
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
@@ -163,7 +163,7 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/i.archive.calamari.systems.conf
     target: /etc/nginx/sites-available/i.archive.calamari.systems.conf
-    sha256: e62e8d2b7e5cee6be16b62c3844f06e0814a62a1f1cefdc8a750067bea15fe83
+    sha256: 17ff48bf130727b93b7a57edadd1e34d95e656894a93661bfefabb5de060dbb7
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
