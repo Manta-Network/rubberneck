@@ -5,6 +5,9 @@ import { faAws } from '@fortawesome/free-brands-svg-icons'
 import { faH } from '@fortawesome/free-solid-svg-icons';
 
 const consoleLink = (node) => {
+  if (!node.console) {
+    return null;
+  }
   switch (node.provider) {
     case 'amazon-ec2':
       return (

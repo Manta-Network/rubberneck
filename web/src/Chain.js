@@ -31,7 +31,7 @@ function Chain(props) {
           if (!!container.error) {
             console.error(container.error);
           } else {
-            setNodes(container.nodes.filter((n) => (n.hostname !== 'ws')).sort((a, b) => (a.fqdn > b.fqdn) ? 1 : (a.fqdn < b.fqdn) ? -1 : 0));
+            setNodes(container.nodes.filter((n) => (!['i', 'ws'].includes(n.hostname))).sort((a, b) => (a.fqdn > b.fqdn) ? 1 : (a.fqdn < b.fqdn) ? -1 : 0));
           }
           setLoading(false);
         })

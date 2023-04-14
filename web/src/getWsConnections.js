@@ -70,8 +70,12 @@ const getMax = async (fqdn) => {
     const response = await fetch(`https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/${config.domain}/${config.hostname}/${config.unitPrefix}/systemd/system/${config.unit}.service`);
     const text = await response.text();
     max = (config.nodesPerInstance * text.match(config.regex)[1]);
-  } catch(exception) {
-    max = 100;
+  } catch (_) {
+    try {
+      max = (config.nodesPerInstance * (await (await fetch(`https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/${config.domain}/${config.hostname}/${(config.unitPrefix === 'usr/lib') ? 'etc' : 'usr/lib'}/systemd/system/${config.unit}.service`)).text()).match(config.regex)[1]);
+    } catch (_) {
+      max = 100;
+    }
   }
   return max;
 };
