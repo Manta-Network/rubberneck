@@ -13,16 +13,16 @@ dns:
   alias:
     -
       name: ws.calamari.systems
-      weight: 0
+      weight: 200
     -
       name: ws.archive.calamari.systems
-      weight: 0
+      weight: 200
     -
-      name: ws.asia.calamari.systems
-      weight: 0
+      name: asia.calamari.systems
+      weight: 200
     -
-      name: ws.archive.asia.calamari.systems
-      weight: 0
+      name: asia.archive.calamari.systems
+      weight: 200
 package:
   - certbot
   - dirmngr

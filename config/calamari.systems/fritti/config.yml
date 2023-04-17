@@ -18,10 +18,10 @@ dns:
       name: ws.archive.calamari.systems
       weight: 200
     -
-      name: ws.asia.calamari.systems
+      name: asia.calamari.systems
       weight: 200
     -
-      name: ws.archive.asia.calamari.systems
+      name: asia.archive.calamari.systems
       weight: 200
 package:
   - certbot
