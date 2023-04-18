@@ -12,10 +12,10 @@ price:
 dns:
   alias:
     -
-      name: ws.calamari.systems
+      name: calamari.systems
       weight: 0
     -
-      name: ws.archive.calamari.systems
+      name: archive.calamari.systems
       weight: 0
     -
       name: north-america.calamari.systems
