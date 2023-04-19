@@ -1,7 +1,7 @@
 ---
-hostname: a4
+hostname: a5
 domain: calamari.systems
-ip: 43.230.163.154
+ip: 103.159.64.250
 action: sync
 launch: '2023-04-18T11:36:00Z'
 provider: shock-dedicated
@@ -121,9 +121,9 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a4/etc/systemd/system/calamari.service
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a5/etc/systemd/system/calamari.service
     target: /etc/systemd/system/calamari.service
-    sha256: 8c8ff4e737aebc7687a3bc0445c65dd48c173d3772a58cfe28a0c9e797f6b11a
+    sha256: a2b6c50d7908d12add493a18c2a79aed3cb56bd3dd590d1f996f81fefd23bc57
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
@@ -144,9 +144,9 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a4/etc/nginx/sites-available/calamari.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a5/etc/nginx/sites-available/calamari.conf
     target: /etc/nginx/sites-available/calamari.conf
-    sha256: 3f436545d795e2079bc67e8faa2f0a8d25b64ea409f6dc105dee709638b37a3a
+    sha256: e2c013a5d00c1437cb3a3cde19d83b235d03490f90f05efc55ad9ef4d15cde10
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
