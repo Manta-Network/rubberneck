@@ -101,9 +101,9 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
   -
-    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.5/manta
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.6/manta
     target: /usr/bin/manta
-    sha256: aa42c26cd52d3a84298b45f2929db6913b2ea0c607f163ac7f6ca220c0725ddf
+    sha256: d743b00bcafdf83560d4c409f155afd9906b56d78cd4a16926d4ded0c315afe0
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
