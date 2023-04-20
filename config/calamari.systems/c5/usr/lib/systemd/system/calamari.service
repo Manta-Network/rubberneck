@@ -15,7 +15,6 @@ ExecStart=/usr/bin/calamari \
     --rpc-port 9933 \
     --rpc-cors all \
     --rpc-methods safe \
-    --state-cache-size 0 \
     --node-key-file /usr/share/substrate/node-key \
     --bootnodes \
         /dns/a1.calamari.systems/tcp/30333/p2p/12D3KooWBL5E61p9tdAq2LnZGgfgxArrb3T6KYdHSo4yaHy7KYku \

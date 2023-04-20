@@ -7,19 +7,19 @@ After=network-online.target
 ExecStart=/usr/bin/calamari \
     --pruning archive \
     --chain /usr/share/substrate/calamari.json \
-    --name '🦑🗃️ a2 🗃️🦑' \
+    --name '🗃️ a2 🗃️' \
     --base-path /var/lib/substrate \
-    --port 31333 \
+    --port 30333 \
     --ws-port 9944 \
-    --ws-max-connections 1000 \
+    --ws-max-connections 16000 \
+    --max-runtime-instances 256 \
     --rpc-port 9933 \
     --rpc-cors all \
     --rpc-methods safe \
-    --state-cache-size 0 \
     --in-peers 100 \
     -- \
     --chain kusama \
-    --name '🦑🗃️ a2 🗃️🦑' \
+    --name '🗃️ a2 🗃️' \
     --rpc-cors all \
     --rpc-methods safe \
     --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'

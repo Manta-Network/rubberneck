@@ -11,11 +11,11 @@ ExecStart=/usr/local/bin/calamari \
     --base-path /var/lib/substrate \
     --port 31333 \
     --ws-port 9944 \
-    --ws-max-connections 1000 \
+    --ws-max-connections 16000 \
+    --max-runtime-instances 256 \
     --rpc-port 9933 \
     --rpc-cors all \
     --rpc-methods safe \
-    --state-cache-size 0 \
     --tx-ban-seconds 0 \
     -- \
     --chain kusama \
