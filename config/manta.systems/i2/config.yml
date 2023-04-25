@@ -114,14 +114,14 @@ file:
         - sudo systemctl enable --now nginx-prometheus-exporter.service
   -
     source: https://github.com/Manta-Network/Manta/releases/download/v4.0.6/manta
-    target: /usr/bin/manta
+    target: /usr/local/bin/manta
     sha256: d743b00bcafdf83560d4c409f155afd9906b56d78cd4a16926d4ded0c315afe0
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
       post:
-        - sudo chmod +x /usr/bin/manta
+        - sudo chmod +x /usr/local/bin/manta
         - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
         - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
   -
