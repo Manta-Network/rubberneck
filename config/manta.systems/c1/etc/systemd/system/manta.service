@@ -14,7 +14,7 @@ ExecStart=/usr/bin/manta \
     --base-path /var/lib/substrate \
     --port 30333 \
     --ws-port 9944 \
-    --ws-max-connections 1000 \
+    --ws-max-connections 100 \
     --rpc-port 9933 \
     --rpc-cors all \
     --rpc-methods safe \
