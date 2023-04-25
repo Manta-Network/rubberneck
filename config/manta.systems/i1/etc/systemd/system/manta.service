@@ -17,7 +17,6 @@ ExecStart=/usr/local/bin/manta \
     --rpc-port 7933 \
     --rpc-cors all \
     --rpc-methods safe \
-    --state-cache-size 0 \
     --tx-ban-seconds 0 \
     --bootnodes \
         /dns/a2.manta.systems/tcp/30333/p2p/12D3KooWDwTeTxyyp8tVzrnHQk7jo3hLWs7ukZEC642cduKgp2Fd \
