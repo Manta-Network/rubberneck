@@ -62,7 +62,6 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/modules-enabled/worker_rlimit_nofile.conf
     target: /etc/nginx/modules-enabled/worker_rlimit_nofile.conf
-    sha256: ffff5e164772643bbc1528db9628e194b3a11058b1431d32bcfe8d31771ddaa7
     command:
       pre:
         - ( systemctl is-active --quiet nginx.service && sudo systemctl stop nginx.service ) || true
