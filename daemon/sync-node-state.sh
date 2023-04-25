@@ -157,14 +157,48 @@ for domain in ${domain_list[@]}; do
       for file_as_base64 in ${file_list_as_base64[@]}; do
         file_source=$(_decode_property ${file_as_base64} .source)
         file_target=$(_decode_property ${file_as_base64} .target)
-        file_sha256=$(_decode_property ${file_as_base64} .sha256)
-        actual_sha256=$(ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "sha256sum ${file_target} 2> /dev/null | cut -d ' ' -f 1")
+        file_sha256_expected=$(_decode_property ${file_as_base64} .sha256)
 
-        
-        if [ "${file_sha256}" = "${actual_sha256}" ]; then
-          echo "[${fqdn}:file ${file_index}] validation succeeded. target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256}, actual: ${actual_sha256}"
+        if [ ${#file_sha256_expected} -eq 64 ]; then
+          # checksum provided.
+          # manifest contains a sha256 checksum for file. require a matching sha256 checksum observation.
+          file_sha256_observed=$(ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "sha256sum ${file_target} 2> /dev/null | cut -d ' ' -f 1")
+        elif [[ ${file_source} == "https://raw.githubusercontent.com/"* ]]; then
+          # eg: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c2/etc/systemd/system/calamari.service
+          # no checksum provided. checksum is discoverable from github repository.
+          # file_source is a raw github file. fetch git sha of file from github. require a matching git sha observation.
+          file_source_owner=$(echo ${file_source} | cut -d '/' -f 4)
+          file_source_repo=$(echo ${file_source} | cut -d '/' -f 5)
+          file_source_rev=$(echo ${file_source} | cut -d '/' -f 6)
+          file_source_path=$(echo ${file_source} | cut -d '/' -f 7-)
+          file_shagit_expected=$(curl -sL \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            --header 'Accept: application/vnd.github.object' \
+            --header "Authorization: Bearer ${rubberneck_github_token}" \
+            --url "https://api.github.com/repos/${file_source_owner}/${file_source_repo}/contents/${file_source_path}?ref=${file_source_rev}" \
+            | jq -r '.sha')
+          file_shagit_observed=$(ssh -o ConnectTimeout=1 -i ${ops_private_key} ${ops_username}@${fqdn} "git hash-object ${file_target} 2> /dev/null")
+        #elif [[ ${file_source} == https://github.com/Manta-Network/Manta/releases/download/v* ]]; then
+        #  # no checksum provided. checksum is discoverable from github repository.
+        #  # file_source is a raw github file. fetch git sha of file from github. require a matching git sha observation.
+        #else
+        #  # no checksum provided. checksum is not discoverable.
+        fi
+
+        if [ ${#file_sha256_expected} -eq 64 ] && [ ${#file_sha256_observed} -eq 64 ] && [ "${file_sha256_expected}" = "${file_sha256_observed}" ]; then
+          # observed sha256 checksum is valid and matches expected sha256 checksum
+          echo "[${fqdn}:file ${file_index}] sha256 validation succeeded. target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256_expected}, observed: ${file_sha256_observed}"
+        elif [ ${#file_shagit_expected} -eq 40 ] && [ ${#file_shagit_observed} -eq 40 ] && [ "${file_shagit_expected}" = "${file_shagit_observed}" ]; then
+          # observed git sha is valid and matches expected git sha
+          echo "[${fqdn}:file ${file_index}] git sha validation succeeded. target: ${file_target}, source: ${file_source}, git sha expected: ${file_shagit_expected}, observed: ${file_shagit_observed}"
         else
-          echo "[${fqdn}:file ${file_index}] validation failed. target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256}, actual: ${actual_sha256}"
+          if [ ${#file_sha256_expected} -eq 64 ]; then
+            echo "[${fqdn}:file ${file_index}] sha256  validation failed. target: ${file_target}, source: ${file_source}, sha256 expected: ${file_sha256_expected}, observed: ${file_sha256_observed}"
+          elif [ ${#file_shagit_expected} -eq 40 ]; then
+            echo "[${fqdn}:file ${file_index}] git sha validation failed. target: ${file_target}, source: ${file_source}, git sha expected: ${file_shagit_expected}, observed: ${file_shagit_observed}"
+          else
+            echo "[${fqdn}:file ${file_index}] validation failed. target: ${file_target}, source: ${file_source}"
+          fi
           file_pre_command_list_as_base64=$(_decode_property ${file_as_base64} '(.command.pre//empty)|.[]|@base64')
           command_index=0
           for file_pre_command_as_base64 in ${file_pre_command_list_as_base64[@]}; do
@@ -196,6 +230,11 @@ for domain in ${domain_list[@]}; do
             fi
           fi
         fi
+        unset file_source
+        unset file_target
+        unset file_sha256_expected
+        unset file_shagit_expected
+        file_index=$((file_index+1))
       done
     else
       echo "[${fqdn}] config fetch failed"
