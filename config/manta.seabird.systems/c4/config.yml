@@ -124,8 +124,8 @@ file:
       post:
         - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/kusama-staging.json
-    target: /usr/share/substrate/kusama-staging.json
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/polkadot-staging.json
+    target: /usr/share/substrate/polkadot-staging.json
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
