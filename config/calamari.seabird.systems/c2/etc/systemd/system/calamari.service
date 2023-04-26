@@ -4,29 +4,28 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=root
 Group=root
 Type=simple
 ExecStart=/usr/local/bin/calamari \
     --name c2 \
     --collator \
     --pruning archive \
-    --base-path /var/lib/calamari \
+    --base-path /var/lib/substrate \
     --node-key-file /usr/share/calamari/node-key \
-    --chain /usr/share/calamari/parachain-spec.json \
+    --chain /usr/share/substrate/calamari-staging.json \
     --port 30333 \
     --ws-port 9944 \
-    --ws-max-connections 1000 \
     --rpc-port 9933 \
     --rpc-cors all \
-    --state-cache-size 0 \
     --rpc-methods safe \
     --log=parachain::collation-generation=debug,cumulus-collator=debug,filtering-consensus=debug \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
     --name 'c2 calamari seabird' \
-    --chain /usr/share/calamari/relaychain-spec.json \
+    --chain /usr/share/substrate/kusama-staging.json \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
+User=substrate
+Group=substrate
 Restart=always
 RestartSec=120
 

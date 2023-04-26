@@ -4,8 +4,6 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=substrate
-Group=substrate
 Type=simple
 ExecStart=/usr/local/bin/calamari \
     --name a1 \
@@ -14,16 +12,18 @@ ExecStart=/usr/local/bin/calamari \
     --chain /usr/share/substrate/calamari-staging.json \
     --port 30333 \
     --ws-port 9944 \
-    --ws-max-connections 1000 \
+    --ws-max-connections 8000 \
+    --max-runtime-instances 128 \
     --rpc-port 9933 \
     --rpc-cors all \
-    --state-cache-size 0 \
     --rpc-methods safe \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
     --name 'a1 calamari seabird' \
     --chain /usr/share/substrate/kusama-staging.json \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
+User=substrate
+Group=substrate
 Restart=always
 RestartSec=120
 
