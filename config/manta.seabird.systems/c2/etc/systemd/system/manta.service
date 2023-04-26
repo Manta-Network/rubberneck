@@ -1,0 +1,32 @@
+[Unit]
+Description=manta
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/manta \
+    --name 'c2-manta-staging' \
+    --base-path /var/lib/substrate \
+    --node-key-file /usr/share/manta/node-key \
+    --chain /usr/share/manta/parachain-spec.json \
+    --port 30433 \
+    --ws-port 7944 \
+    --rpc-port 7933 \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --collator \
+    --pruning archive \
+    --log=parachain::collation-generation=debug,cumulus-collator=debug,filtering-consensus=debug \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
+    -- \
+    --name 'c2-manta-staging' \
+    --chain /usr/share/manta/relaychain-spec.json \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
+User=substrate
+Group=substrate
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target

@@ -54,6 +54,9 @@ command:
   - grep 'worker_connections 32768;' /etc/nginx/nginx.conf &> /dev/null || sudo sed -i 's/worker_connections \+[0-9]\+;/worker_connections 32768;/' /etc/nginx/nginx.conf
 file:
   -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/ssh/sshd_config.d/timeout-180.conf.conf
+    target: /etc/ssh/sshd_config.d/timeout-180.conf.conf
+  -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/modules-enabled/worker_rlimit_nofile.conf
     target: /etc/nginx/modules-enabled/worker_rlimit_nofile.conf
     command:

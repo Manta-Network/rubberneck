@@ -6,7 +6,7 @@ After=network-online.target
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/calamari \
-    --name a1 \
+    --name '🗃️ a1 🗃️' \
     --pruning archive \
     --base-path /var/lib/substrate \
     --chain /usr/share/substrate/calamari-staging.json \
@@ -19,7 +19,7 @@ ExecStart=/usr/local/bin/calamari \
     --rpc-methods safe \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
-    --name 'a1 calamari seabird' \
+    --name '🗃️ a1 calamari 🗃️' \
     --chain /usr/share/substrate/kusama-staging.json \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 User=substrate

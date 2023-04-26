@@ -1,0 +1,31 @@
+[Unit]
+Description=manta
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/manta \
+    --name a2 \
+    --pruning archive \
+    --base-path /var/lib/substrate \
+    --chain /usr/share/substrate/manta-staging.json \
+    --port 30433 \
+    --ws-port 7944 \
+    --ws-max-connections 8000 \
+    --max-runtime-instances 128 \
+    --rpc-port 7933 \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
+    -- \
+    --name 'a2 manta seabird' \
+    --chain /usr/share/substrate/polkadot-staging.json \
+    --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
+User=substrate
+Group=substrate
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target

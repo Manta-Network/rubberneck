@@ -7,7 +7,7 @@ After=network-online.target
 Group=root
 Type=simple
 ExecStart=/usr/local/bin/calamari \
-    --name c2 \
+    --name '🛡️ c2 🛡️' \
     --collator \
     --pruning archive \
     --base-path /var/lib/substrate \
@@ -21,7 +21,7 @@ ExecStart=/usr/local/bin/calamari \
     --log=parachain::collation-generation=debug,cumulus-collator=debug,filtering-consensus=debug \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
-    --name 'c2 calamari seabird' \
+    --name '🛡️ c2 calamari 🛡️' \
     --chain /usr/share/substrate/kusama-staging.json \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 User=substrate
