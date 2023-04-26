@@ -6,7 +6,7 @@ After=network-online.target
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/manta \
-    --name 'c3-manta-staging' \
+    --name '🛡️ c3 🛡️' \
     --base-path /var/lib/substrate \
     --node-key-file /usr/share/manta/node-key \
     --chain /usr/share/manta/parachain-spec.json \
@@ -17,11 +17,15 @@ ExecStart=/usr/local/bin/manta \
     --rpc-methods safe \
     --collator \
     --pruning archive \
+    --prometheus-port 9715 \
     --log=parachain::collation-generation=debug,cumulus-collator=debug,filtering-consensus=debug \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
-    --name 'c3-manta-staging' \
+    --name '🛡️ c3 manta 🛡️' \
     --chain /usr/share/manta/relaychain-spec.json \
+    --ws-port 7945 \
+    --rpc-port 7934 \
+    --prometheus-port 9716 \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 User=substrate
 Group=substrate

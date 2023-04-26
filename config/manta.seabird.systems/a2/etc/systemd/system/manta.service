@@ -6,7 +6,7 @@ After=network-online.target
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/manta \
-    --name a2 \
+    --name '🗃️ a2 🗃️' \
     --pruning archive \
     --base-path /var/lib/substrate \
     --chain /usr/share/substrate/manta-staging.json \
@@ -17,10 +17,14 @@ ExecStart=/usr/local/bin/manta \
     --rpc-port 7933 \
     --rpc-cors all \
     --rpc-methods safe \
+    --prometheus-port 9715 \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0' \
     -- \
-    --name 'a2 manta seabird' \
+    --name '🗃️ a2 manta 🗃️' \
     --chain /usr/share/substrate/polkadot-staging.json \
+    --ws-port 7945 \
+    --rpc-port 7934 \
+    --prometheus-port 9716 \
     --telemetry-url 'wss://api.telemetry.pelagos.systems/submit/ 0'
 User=substrate
 Group=substrate

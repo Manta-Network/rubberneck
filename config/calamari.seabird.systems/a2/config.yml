@@ -138,10 +138,12 @@ file:
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
+        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
       post:
         - sudo chmod +x /usr/local/bin/manta
         - sudo ln -sfr /usr/local/bin/manta /usr/local/bin/calamari
         - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
+        - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/a2/etc/systemd/system/calamari.service
     target: /etc/systemd/system/calamari.service

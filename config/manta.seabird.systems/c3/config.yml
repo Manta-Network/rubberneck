@@ -1,18 +1,18 @@
 ---
 hostname: c3
-domain: calamari.seabird.systems
+domain: manta.seabird.systems
 action: sync
 provider: shock-dedicated
 dns:
   alias:
     -
-      name: calamari.seabird.systems
+      name: manta.seabird.systems
     -
-      name: archive.calamari.seabird.systems
+      name: archive.manta.seabird.systems
     -
-      name: ws.calamari.seabird.systems
+      name: ws.manta.seabird.systems
     -
-      name: ws.archive.calamari.seabird.systems
+      name: ws.archive.manta.seabird.systems
 package:
   - certbot
   - dirmngr
@@ -40,8 +40,8 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active calamari.service || sudo systemctl restart calamari.service
-  - systemctl is-active manta-indexer.service || sudo systemctl manta-indexer calamari.service
+  - systemctl is-active manta.service || sudo systemctl restart manta.service
+  - systemctl is-active manta-indexer.service || sudo systemctl manta-indexer manta.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
@@ -116,13 +116,13 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/calamari-staging.json
-    target: /usr/share/substrate/calamari-staging.json
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/manta-staging.json
+    target: /usr/share/substrate/manta-staging.json
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
       post:
-        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
+        - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/kusama-staging.json
     target: /usr/share/substrate/kusama-staging.json
@@ -130,7 +130,7 @@ file:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
       post:
-        - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
+        - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
   -
     source: https://github.com/Manta-Network/Manta/releases/download/v4.0.6/manta
     target: /usr/local/bin/manta
@@ -145,16 +145,16 @@ file:
         - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
         - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c3/etc/systemd/system/calamari.service
-    target: /etc/systemd/system/calamari.service
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.seabird.systems/c3/etc/systemd/system/manta.service
+    target: /etc/systemd/system/manta.service
     command:
       pre:
-        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
+        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
       post:
         - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
         - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet calamari.service || sudo systemctl enable calamari.service
-        - sudo systemctl start calamari.service
+        - systemctl is-enabled --quiet manta.service || sudo systemctl enable manta.service
+        - sudo systemctl start manta.service
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
     target: /etc/nginx/sites-available/status.conf
@@ -166,55 +166,55 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.seabird.systems/c3/etc/nginx/sites-available/calamari.conf
-    target: /etc/nginx/sites-available/calamari.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.seabird.systems/c3/etc/nginx/sites-available/manta.conf
+    target: /etc/nginx/sites-available/manta.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/calamari.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo ln -sfr /etc/nginx/sites-available/manta.conf /etc/nginx/sites-enabled/substrate.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.calamari.seabird.systems.conf
-    target: /etc/nginx/sites-available/ws.calamari.seabird.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.manta.seabird.systems.conf
+    target: /etc/nginx/sites-available/ws.manta.seabird.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.calamari.seabird.systems.conf /etc/nginx/sites-enabled/ws.calamari.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.manta.seabird.systems.conf /etc/nginx/sites-enabled/ws.manta.seabird.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.calamari.seabird.systems.conf
-    target: /etc/nginx/sites-available/ws.archive.calamari.seabird.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.manta.seabird.systems.conf
+    target: /etc/nginx/sites-available/ws.archive.manta.seabird.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.calamari.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.calamari.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.manta.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.manta.seabird.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/calamari.seabird.systems.conf
-    target: /etc/nginx/sites-available/calamari.seabird.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/manta.seabird.systems.conf
+    target: /etc/nginx/sites-available/manta.seabird.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/calamari.seabird.systems.conf /etc/nginx/sites-enabled/calamari.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/manta.seabird.systems.conf /etc/nginx/sites-enabled/manta.seabird.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/archive.calamari.seabird.systems.conf
-    target: /etc/nginx/sites-available/archive.calamari.seabird.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/archive.manta.seabird.systems.conf
+    target: /etc/nginx/sites-available/archive.manta.seabird.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/archive.calamari.seabird.systems.conf /etc/nginx/sites-enabled/archive.calamari.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/archive.manta.seabird.systems.conf /etc/nginx/sites-enabled/archive.manta.seabird.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
     source: https://manta-ops.s3.amazonaws.com/manta-indexer/v4.0.0/manta-indexer
