@@ -4,7 +4,6 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-Group=root
 Type=simple
 ExecStart=/usr/local/bin/calamari \
     --name '🛡️ c2 🛡️' \
