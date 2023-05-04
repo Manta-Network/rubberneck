@@ -33,9 +33,8 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active kusama0.service || sudo systemctl restart kusama0.service
-  - systemctl is-active kusama1.service || sudo systemctl restart kusama1.service
-  - systemctl is-active kusama2.service || sudo systemctl restart kusama2.service
+  - systemctl is-active kusama-0.service || sudo systemctl restart kusama-0.service
+  - systemctl is-active kusama-1.service || sudo systemctl restart kusama-1.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
@@ -89,58 +88,6 @@ file:
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
-  -
-    source: https://github.com/paritytech/polkadot/releases/download/v0.9.39/polkadot
-    target: /usr/local/bin/polkadot
-    sha256: 6016b26e5df5aad30c4680dddcb1bc64ec3690ea00a2b6d9e05ffdee8bd5b312
-    command:
-      pre:
-        - systemctl is-active --quiet kusama0.service && sudo systemctl stop kusama0.service
-        - systemctl is-active --quiet kusama1.service && sudo systemctl stop kusama1.service
-        - systemctl is-active --quiet kusama2.service && sudo systemctl stop kusama2.service
-      post:
-        - sudo chmod +x /usr/local/bin/polkadot
-        - test -x /usr/local/bin/kusama && sudo rm /usr/local/bin/kusama
-        - sudo ln -sfr /usr/local/bin/polkadot /usr/local/bin/kusama
-        - systemctl is-active --quiet kusama0.service || sudo systemctl start kusama0.service
-        - systemctl is-active --quiet kusama1.service || sudo systemctl start kusama1.service
-        - systemctl is-active --quiet kusama2.service || sudo systemctl start kusama2.service
-  -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v1/etc/systemd/system/kusama0.service'
-    target: /etc/systemd/system/kusama0.service
-    sha256: 08cd697ba2e2d880e21c0c991841e2cca452d2d5c5b42efc1975ab145a1bd9c0
-    command:
-      pre:
-        - systemctl is-active --quiet kusama0.service && sudo systemctl stop kusama0.service
-      post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet kusama0.service || sudo systemctl enable kusama0.service
-        - sudo systemctl start kusama0.service
-  -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v1/etc/systemd/system/kusama1.service'
-    target: /etc/systemd/system/kusama1.service
-    sha256: 5767a6cc40de40edcd58b5ee439e66c4aebc734c45bc1b82a9022c0daf4e864c
-    command:
-      pre:
-        - systemctl is-active --quiet kusama1.service && sudo systemctl stop kusama1.service
-      post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet kusama1.service || sudo systemctl enable kusama1.service
-        - sudo systemctl start kusama1.service
-  -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/internal.kusama.systems/v1/etc/systemd/system/kusama2.service'
-    target: /etc/systemd/system/kusama2.service
-    sha256: 4d45095320e99a66955bcf48e2a065b64a53086e6e9d34b93de9b126587deb8d
-    command:
-      pre:
-        - systemctl is-active --quiet kusama2.service && sudo systemctl stop kusama2.service
-      post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet kusama2.service || sudo systemctl enable kusama2.service
-        - sudo systemctl start kusama2.service
   -
     source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
     target: /etc/letsencrypt/options-ssl-nginx.conf
