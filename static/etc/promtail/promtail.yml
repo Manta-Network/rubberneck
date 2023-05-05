@@ -32,7 +32,7 @@ scrape_configs:
         action: keep
         source_labels:
           - __journal__systemd_unit
-        regex: (auditd|certbot|cron|dbus|filebeat|fwupd-refresh|fwupd|go-audit|motd-news|nginx|packagekit|ssh|ufw|unattended-upgrades|calamari|dolphin|karura|kusama0|kusama1|kusama2|manta|moonriver|polkadot0|polkadot1|polkadot2).service
+        regex: (auditd|certbot|cron|dbus|fwupd-refresh|fwupd|motd-news|nginx|packagekit|ssh|ufw|unattended-upgrades|calamari|dolphin|karura|kusama-0|kusama-1|kusama-2|manta|moonriver|polkadot-0|polkadot-1|polkadot-2).service
       -
         source_labels:
           - __journal__systemd_unit
