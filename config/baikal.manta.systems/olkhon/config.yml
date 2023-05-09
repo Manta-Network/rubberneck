@@ -37,7 +37,7 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active baikal.service || sudo systemctl restart baikal.service
+  - systemctl is-active baikal.service || sudo systemctl restart kusama-0.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
