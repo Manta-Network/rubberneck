@@ -13,6 +13,7 @@ package:
   - auditd
   - certbot
   - dirmngr
+  - git
   - nginx
   - python3-certbot-nginx
   - sqlite3

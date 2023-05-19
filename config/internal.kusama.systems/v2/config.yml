@@ -10,6 +10,7 @@ dns:
 package:
   - certbot
   - dirmngr
+  - git
   - nginx
   - sqlite3
   - unattended-upgrades
