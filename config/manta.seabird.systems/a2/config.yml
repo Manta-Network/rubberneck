@@ -41,8 +41,7 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active manta.service || sudo systemctl restart manta.service
-  - systemctl is-active manta-indexer.service || sudo systemctl manta-indexer manta.service
+  - systemctl is-active manta-indexer.service || sudo systemctl restart manta-indexer
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
@@ -116,46 +115,6 @@ file:
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
-  -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/manta-staging.json
-    target: /usr/share/substrate/manta-staging.json
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
-  -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/usr/share/substrate/polkadot-staging.json
-    target: /usr/share/substrate/polkadot-staging.json
-    command:
-      pre:
-        - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
-      post:
-        - systemctl is-active --quiet manta.service && sudo systemctl restart manta.service
-  -
-    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.6/manta
-    target: /usr/local/bin/manta
-    sha256: d743b00bcafdf83560d4c409f155afd9906b56d78cd4a16926d4ded0c315afe0
-    command:
-      pre:
-        - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
-        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
-      post:
-        - sudo chmod +x /usr/local/bin/manta
-        - sudo ln -sfr /usr/local/bin/manta /usr/local/bin/calamari
-        - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
-        - systemctl is-active --quiet manta.service || sudo systemctl start manta.service
-  -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.seabird.systems/a2/etc/systemd/system/manta.service
-    target: /etc/systemd/system/manta.service
-    command:
-      pre:
-        - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service
-      post:
-        - getent passwd substrate &> /dev/null || sudo useradd --system --create-home --home-dir /var/lib/substrate --user-group substrate
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet manta.service || sudo systemctl enable manta.service
-        - sudo systemctl start manta.service
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
     target: /etc/nginx/sites-available/status.conf
