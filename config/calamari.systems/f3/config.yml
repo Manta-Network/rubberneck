@@ -121,8 +121,8 @@ file:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
       post:
-        - sudo chmod +x /usr/bin/manta
-        - sudo ln -sfr /usr/bin/manta /usr/bin/calamari
+        - sudo chmod +x /usr/local/bin/manta
+        - sudo ln -sfr /usr/local/bin/manta /usr/local/bin/calamari
         - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
   -
     source: https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/calamari-genesis.json
