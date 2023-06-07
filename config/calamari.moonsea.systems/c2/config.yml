@@ -34,11 +34,13 @@ user:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN6aq+HBqx3NWg8qWh9p62KV+A4UCx0Cr5fskpPqGWuF
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIBSdR9Wy3S4L+Zdcu8waYe5vW2VzMoi+QafgV3IIFj
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJx8I0j6oYirfie4pAQZQB1+fWJ7w5mFZayQvLhtSV0
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILfxkCWHMdmXufF7hLHGyQdV+v64NTbEiUFDhxyi6+fX
       users:
         - stechu
         - ferrell-code
         - garandor
         - ghzlatarev
+        - aye
 command:
   - sudo passwd -l root
   - systemctl is-active calamari.service || sudo systemctl restart calamari.service

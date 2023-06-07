@@ -32,8 +32,10 @@ user:
       keys:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIBSdR9Wy3S4L+Zdcu8waYe5vW2VzMoi+QafgV3IIFj
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJx8I0j6oYirfie4pAQZQB1+fWJ7w5mFZayQvLhtSV0
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILfxkCWHMdmXufF7hLHGyQdV+v64NTbEiUFDhxyi6+fX
       users:
         - stechu
+        - aye
 command:
   - sudo passwd -l root
   - systemctl is-active manta.service || sudo systemctl restart manta.service
