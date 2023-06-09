@@ -23,7 +23,6 @@ ExecStart=/usr/bin/calamari \
     -- \
     --chain kusama \
     --name '🗃️ salad 🗃️' \
-    --rpc-cors all \
     --rpc-methods safe \
     --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
 User=manta
