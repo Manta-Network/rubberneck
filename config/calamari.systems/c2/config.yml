@@ -18,10 +18,16 @@ dns:
       name: archive.calamari.systems
       weight: 0
     -
-      name: europe.calamari.systems
+      name: asia.calamari.systems
       weight: 0
     -
-      name: europe.archive.calamari.systems
+      name: asia.archive.calamari.systems
+      weight: 0
+    -
+      name: ws.calamari.systems
+      weight: 0
+    -
+      name: ws.archive.calamari.systems
       weight: 0
 package:
   - certbot

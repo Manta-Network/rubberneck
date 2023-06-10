@@ -12,6 +12,9 @@ price:
 dns:
   alias:
     -
+      name: calamari.systems
+      weight: 200
+    -
       name: ws.calamari.systems
       weight: 200
     -

@@ -23,6 +23,12 @@ dns:
     -
       name: north-america.archive.calamari.systems
       weight: 200
+    -
+      name: ws.calamari.systems
+      weight: 200
+    -
+      name: ws.archive.calamari.systems
+      weight: 200
 package:
   - certbot
   - dirmngr
