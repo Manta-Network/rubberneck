@@ -199,6 +199,26 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/archive.calamari.systems.conf /etc/nginx/sites-enabled/archive.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.calamari.systems.conf
+    target: /etc/nginx/sites-available/ws.calamari.systems.conf
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.calamari.systems.conf /etc/nginx/sites-enabled/ws.calamari.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.calamari.systems.conf
+    target: /etc/nginx/sites-available/ws.archive.calamari.systems.conf
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.calamari.systems.conf /etc/nginx/sites-enabled/ws.archive.calamari.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/asia.calamari.systems.conf
     target: /etc/nginx/sites-available/asia.calamari.systems.conf
     command:
