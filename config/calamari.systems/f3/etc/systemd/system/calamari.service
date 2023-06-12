@@ -2,6 +2,8 @@
 Description=calamari full node
 Wants=network-online.target
 After=network-online.target
+AssertPathExists=/usr/local/bin/calamari
+AssertPathExists=/usr/share/substrate/calamari.json
 
 [Service]
 ExecStart=/usr/local/bin/calamari \
@@ -18,6 +20,7 @@ ExecStart=/usr/local/bin/calamari \
     -- \
     --chain kusama \
     --name '🦾 f3 🦾' \
+    --rpc-methods safe \
     --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
 User=substrate
 Group=substrate

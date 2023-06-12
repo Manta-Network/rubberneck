@@ -2,6 +2,8 @@
 Description=calamari archive node
 Wants=network-online.target
 After=network-online.target
+AssertPathExists=/usr/local/bin/calamari
+AssertPathExists=/usr/share/substrate/calamari.json
 
 [Service]
 ExecStart=/usr/local/bin/calamari \
