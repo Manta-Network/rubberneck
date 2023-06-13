@@ -1,14 +1,14 @@
 ---
-hostname: c2
-domain: acala.seabird.systems
+hostname: c1
+domain: acala.paleblue.systems
 action: sync
 provider: shock-dedicated
 dns:
   alias:
     -
-      name: ws.acala.seabird.systems
+      name: ws.acala.paleblue.systems
     -
-      name: ws.archive.acala.seabird.systems
+      name: ws.archive.acala.paleblue.systems
 package:
   - certbot
   - dirmngr
@@ -121,7 +121,7 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c2/etc/nginx/sites-available/substrate.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.paleblue.systems/c1/etc/nginx/sites-available/substrate.conf
     target: /etc/nginx/sites-available/substrate.conf
     command:
       pre:
@@ -132,22 +132,22 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.acala.seabird.systems.conf
-    target: /etc/nginx/sites-available/ws.acala.seabird.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.acala.paleblue.systems.conf
+    target: /etc/nginx/sites-available/ws.acala.paleblue.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.acala.seabird.systems.conf /etc/nginx/sites-enabled/ws.acala.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.acala.paleblue.systems.conf /etc/nginx/sites-enabled/ws.acala.paleblue.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.acala.seabird.systems.conf
-    target: /etc/nginx/sites-available/ws.archive.acala.seabird.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.acala.paleblue.systems.conf
+    target: /etc/nginx/sites-available/ws.archive.acala.paleblue.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.acala.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.acala.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.acala.paleblue.systems.conf /etc/nginx/sites-enabled/ws.archive.acala.paleblue.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
