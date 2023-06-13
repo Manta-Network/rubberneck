@@ -142,7 +142,7 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.moonbeam.paleblue.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.moonbeam.paleblue.systems.conf
     target: /etc/nginx/sites-available/ws.moonbeam.paleblue.systems.conf
     command:
       pre:
@@ -152,7 +152,7 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/ws.moonbeam.paleblue.systems.conf /etc/nginx/sites-enabled/ws.moonbeam.paleblue.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.moonbeam.paleblue.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.moonbeam.paleblue.systems.conf
     target: /etc/nginx/sites-available/ws.archive.moonbeam.paleblue.systems.conf
     command:
       pre:
