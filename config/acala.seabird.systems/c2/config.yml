@@ -121,14 +121,14 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c2/etc/nginx/sites-available/substrate.conf
-    target: /etc/nginx/sites-available/substrate.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/acala.seabird.systems/c2/etc/nginx/sites-available/karura.conf
+    target: /etc/nginx/sites-available/karura.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo ln -sfr /etc/nginx/sites-available/karura.conf /etc/nginx/sites-enabled/karura.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
