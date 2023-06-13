@@ -1,14 +1,14 @@
 ---
 hostname: c1
-domain: moonriver.seabird.systems
+domain: moonbeam.paleblue.systems
 action: sync
 provider: shock-dedicated
 dns:
   alias:
     -
-      name: ws.moonriver.seabird.systems
+      name: ws.moonbeam.paleblue.systems
     -
-      name: ws.archive.moonriver.seabird.systems
+      name: ws.archive.moonbeam.paleblue.systems
 package:
   - certbot
   - dirmngr
@@ -40,13 +40,13 @@ user:
         - ghzlatarev
 command:
   - sudo passwd -l root
-  - systemctl is-active moonriver.service || sudo systemctl restart moonriver.service
+  - systemctl is-active moonbeam.service || sudo systemctl restart moonbeam.service
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
-  - '(test -s /etc/letsencrypt/renewal/$(hostname -f).conf && grep webroot_path /etc/letsencrypt/renewal/$(hostname -f).conf) || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names --key-type ecdsa -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
-  - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
+  - '(test -s /etc/letsencrypt/renewal/c1.moonbeam.paleblue.systems.conf && grep webroot_path /etc/letsencrypt/renewal/c1.moonbeam.paleblue.systems.conf) || sudo certbot certonly --noninteractive --cert-name c1.moonbeam.paleblue.systems --expand --allow-subset-of-names --key-type ecdsa -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d c1.moonbeam.paleblue.systems'
+  - 'test -s /etc/letsencrypt/renewal/c1.moonbeam.paleblue.systems.conf && sudo rm -f /etc/nginx/sites-enabled/default'
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.6.0.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.6.0.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.6.0.linux-amd64/node_exporter )
   - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.8.2/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
@@ -131,33 +131,33 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonriver.seabird.systems/c1/etc/nginx/sites-available/moonriver.conf
-    target: /etc/nginx/sites-available/moonriver.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/moonbeam.paleblue.systems/c1/etc/nginx/sites-available/moonbeam.conf
+    target: /etc/nginx/sites-available/moonbeam.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/moonriver.conf /etc/nginx/sites-enabled/moonriver.conf
+        - sudo ln -sfr /etc/nginx/sites-available/moonbeam.conf /etc/nginx/sites-enabled/moonbeam.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.moonriver.seabird.systems.conf
-    target: /etc/nginx/sites-available/ws.moonriver.seabird.systems.conf
+    source: https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.moonbeam.paleblue.systems.conf
+    target: /etc/nginx/sites-available/ws.moonbeam.paleblue.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.moonriver.seabird.systems.conf /etc/nginx/sites-enabled/ws.moonriver.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.moonbeam.paleblue.systems.conf /etc/nginx/sites-enabled/ws.moonbeam.paleblue.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.moonriver.seabird.systems.conf
-    target: /etc/nginx/sites-available/ws.archive.moonriver.seabird.systems.conf
+    source: https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.moonbeam.paleblue.systems.conf
+    target: /etc/nginx/sites-available/ws.archive.moonbeam.paleblue.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.moonriver.seabird.systems.conf /etc/nginx/sites-enabled/ws.archive.moonriver.seabird.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.moonbeam.paleblue.systems.conf /etc/nginx/sites-enabled/ws.archive.moonbeam.paleblue.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
