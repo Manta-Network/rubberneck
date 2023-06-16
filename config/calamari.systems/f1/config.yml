@@ -25,6 +25,7 @@ package:
   - dirmngr
   - git
   - nginx
+  - scanlogd
   - sqlite3
   - unattended-upgrades
   - unzip

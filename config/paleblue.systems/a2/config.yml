@@ -13,6 +13,7 @@ package:
   - certbot
   - dirmngr
   - nginx
+  - scanlogd
   - sqlite3
   - unattended-upgrades
 user:
