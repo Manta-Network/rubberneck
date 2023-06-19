@@ -24,6 +24,7 @@ ExecStart=/usr/bin/calamari \
         /dns/a3.calamari.systems/tcp/30333/p2p/12D3KooWAPEU494CLKGMfAnCaAjVENXXKJna1qpq2Eu7sCcoy4mh \
         /dns/a4.calamari.systems/tcp/30333/p2p/12D3KooWPsBzWD94yogfngya38kAzWzgvFvTFqNQ8SAsZxB9jZpv \
         /dns/a5.calamari.systems/tcp/30333/p2p/12D3KooWE22Q9vACFoFQosFqsGA32E36HqA4N5yCThZnU3gUcSAv \
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 1' \
     -- \
     --chain kusama \
     --name '🦑🛡️ c1 🛡️🦑' \
