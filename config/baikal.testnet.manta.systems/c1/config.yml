@@ -1,16 +1,16 @@
 ---
-hostname: crispy
-domain: baikal.testnet.calamari.systems
+hostname: c1
+domain: baikal.testnet.manta.systems
 ip: 35.183.113.233
 action: sync
 provider: aws-dev
 dns:
   alias:
     -
-      name: ws.baikal.testnet.calamari.systems
+      name: ws.baikal.testnet.manta.systems
       weight: 200
     -
-      name: ws.archive.baikal.testnet.calamari.systems
+      name: ws.archive.baikal.testnet.manta.systems
       weight: 200
 package:
   - certbot
@@ -144,33 +144,33 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/baikal.testnet.calamari.systems/crispy/etc/nginx/sites-available/substrate.conf'
-    target: /etc/nginx/sites-available/substrate.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/baikal.testnet.manta.systems/c1/etc/nginx/sites-available/manta.conf
+    target: /etc/nginx/sites-available/manta.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/substrate.conf /etc/nginx/sites-enabled/substrate.conf
+        - sudo ln -sfr /etc/nginx/sites-available/manta.conf /etc/nginx/sites-enabled/manta.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.baikal.testnet.calamari.systems.conf
-    target: /etc/nginx/sites-available/ws.baikal.testnet.calamari.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.baikal.testnet.manta.systems.conf
+    target: /etc/nginx/sites-available/ws.baikal.testnet.manta.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.baikal.testnet.calamari.systems.conf /etc/nginx/sites-enabled/ws.baikal.testnet.calamari.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.baikal.testnet.manta.systems.conf /etc/nginx/sites-enabled/ws.baikal.testnet.manta.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.baikal.testnet.calamari.systems.conf
-    target: /etc/nginx/sites-available/ws.archive.baikal.testnet.calamari.systems.conf
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.baikal.testnet.manta.systems.conf
+    target: /etc/nginx/sites-available/ws.archive.baikal.testnet.manta.systems.conf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
         - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
       post:
-        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.baikal.testnet.calamari.systems.conf /etc/nginx/sites-enabled/ws.archive.baikal.testnet.calamari.systems.conf
+        - sudo ln -sfr /etc/nginx/sites-available/ws.archive.baikal.testnet.manta.systems.conf /etc/nginx/sites-enabled/ws.archive.baikal.testnet.manta.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
