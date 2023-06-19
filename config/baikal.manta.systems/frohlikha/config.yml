@@ -40,7 +40,6 @@ user:
         - ferrell-code
         - garandor
         - ghzlatarev
-        - aye
 command:
   - sudo passwd -l root
   - systemctl is-active kusama-0.service || sudo systemctl restart kusama-0.service

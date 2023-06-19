@@ -38,7 +38,6 @@ user:
         - ferrell-code
         - garandor
         - ghzlatarev
-        - aye
 command:
   - sudo passwd -l root
   - systemctl is-active nginx.service || sudo systemctl restart nginx.service
