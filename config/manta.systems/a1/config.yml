@@ -7,6 +7,9 @@ provider: shock-dedicated
 dns:
   alias:
     -
+      name: manta.systems
+      weight: 200
+    -
       name: ws.manta.systems
       weight: 200
     -
@@ -20,6 +23,7 @@ package:
   - scanlogd
   - sqlite3
   - unattended-upgrades
+  - unzip
 user:
   -
     username: root
@@ -42,12 +46,11 @@ command:
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
-  - '(test -s /etc/letsencrypt/renewal/$(hostname -f).conf && grep webroot_path /etc/letsencrypt/renewal/$(hostname -f).conf) || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
+  - '(test -s /etc/letsencrypt/renewal/$(hostname -f).conf && grep webroot_path /etc/letsencrypt/renewal/$(hostname -f).conf) || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names --key-type ecdsa -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
-  - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
+  - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.6.0.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.6.0.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.6.0.linux-amd64/node_exporter )
   - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
-  - test -x /usr/bin/unzip || sudo apt-get install -y unzip
-  - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.6.1/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
+  - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.8.2/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
   - grep 'worker_connections 32768;' /etc/nginx/nginx.conf &> /dev/null || sudo sed -i 's/worker_connections \+[0-9]\+;/worker_connections 32768;/' /etc/nginx/nginx.conf
 file:
   -
@@ -150,7 +153,7 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a1/etc/nginx/sites-available/substrate.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/manta.systems/a1/etc/nginx/sites-available/substrate.conf
     target: /etc/nginx/sites-available/substrate.conf
     command:
       pre:
@@ -161,7 +164,17 @@ file:
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.manta.systems.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/manta.systems.conf
+    target: /etc/nginx/sites-available/manta.systems.conf
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/manta.systems.conf /etc/nginx/sites-enabled/manta.systems.conf
+        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.manta.systems.conf
     target: /etc/nginx/sites-available/ws.manta.systems.conf
     command:
       pre:
@@ -171,7 +184,7 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/ws.manta.systems.conf /etc/nginx/sites-enabled/ws.manta.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/ws.archive.manta.systems.conf'
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.manta.systems.conf
     target: /etc/nginx/sites-available/ws.archive.manta.systems.conf
     command:
       pre:
