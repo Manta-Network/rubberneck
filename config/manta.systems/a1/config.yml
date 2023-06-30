@@ -122,9 +122,9 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
   -
-    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.8-1/manta
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.1.0/manta
     target: /usr/bin/manta
-    sha256: 0aa6bc397ad02ce5c7962b6e14f4f06dd910c75d3fae71b309300b88b98469db
+    sha256: 4f5d0e6c160c222da84800560fae8d793b74b19bcdf22bdb2b4e06f21539b729
     command:
       pre:
         - systemctl is-active --quiet manta.service && sudo systemctl stop manta.service

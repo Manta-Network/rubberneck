@@ -25,6 +25,7 @@ package:
   - scanlogd
   - sqlite3
   - unattended-upgrades
+  - unzip
 user:
   -
     username: root
@@ -47,11 +48,10 @@ command:
   - systemctl is-active prometheus-node-exporter.service || sudo systemctl restart prometheus-node-exporter.service
   - systemctl is-active nginx-prometheus-exporter.service || sudo systemctl restart nginx-prometheus-exporter.service
   - timedatectl show | grep Timezone=UTC &> /dev/null || sudo timedatectl set-timezone UTC
-  - '(test -s /etc/letsencrypt/renewal/$(hostname -f).conf && grep webroot_path /etc/letsencrypt/renewal/$(hostname -f).conf) || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
+  - '(test -s /etc/letsencrypt/renewal/$(hostname -f).conf && grep webroot_path /etc/letsencrypt/renewal/$(hostname -f).conf) || sudo certbot certonly --noninteractive --cert-name $(hostname -f) --expand --allow-subset-of-names --key-type ecdsa -m ops@manta.network --agree-tos --no-eff-email --preferred-challenges http --webroot --webroot-path /var/www/html -d $(hostname -f)'
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.5.0.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.5.0.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.5.0.linux-amd64/node_exporter )
   - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
-  - test -x /usr/bin/unzip || sudo apt-get install -y unzip
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.8.0/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
   - grep 'worker_connections 32768;' /etc/nginx/nginx.conf &> /dev/null || sudo sed -i 's/worker_connections \+[0-9]\+;/worker_connections 32768;/' /etc/nginx/nginx.conf
 file:
@@ -124,9 +124,9 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
   -
-    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.8-1/manta
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.1.0/manta
     target: /usr/local/bin/manta
-    sha256: 0aa6bc397ad02ce5c7962b6e14f4f06dd910c75d3fae71b309300b88b98469db
+    sha256: 4f5d0e6c160c222da84800560fae8d793b74b19bcdf22bdb2b4e06f21539b729
     command:
       pre:
         - systemctl is-active --quiet calamari.service && sudo systemctl stop calamari.service
