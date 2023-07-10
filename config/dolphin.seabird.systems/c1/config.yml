@@ -17,6 +17,7 @@ package:
   - scanlogd
   - sqlite3
   - unattended-upgrades
+  - unzip
 user:
   -
     username: root
@@ -47,14 +48,11 @@ command:
   - 'test -s /etc/letsencrypt/renewal/$(hostname -f).conf && sudo rm -f /etc/nginx/sites-enabled/default'
   - test -x /usr/local/bin/node_exporter || ( curl -sLo /tmp/node_exporter-1.3.1.linux-amd64.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz && sudo tar xvfz /tmp/node_exporter-1.3.1.linux-amd64.tar.gz -C /usr/local/bin --strip-components=1 node_exporter-1.3.1.linux-amd64/node_exporter )
   - test -x /usr/local/bin/nginx-prometheus-exporter || ( curl -sLo /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v0.11.0/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz && sudo tar xvfz /tmp/nginx-prometheus-exporter_0.11.0_linux_amd64.tar.gz -C /usr/local/bin nginx-prometheus-exporter )
-  - test -x /usr/local/bin/go-audit || ( curl -sLo /tmp/go-audit-linux-amd64.tar.gz https://github.com/slackhq/go-audit/releases/download/v1.1.1/go-audit-linux-amd64.tar.gz && sudo tar xvfz /tmp/go-audit-linux-amd64.tar.gz -C /usr/local/bin )
-  - test -x /usr/bin/unzip || sudo apt-get install -y unzip
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.6.1/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
 file:
   -
-    source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.service
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/promtail.service
     target: /etc/systemd/system/promtail.service
-    sha256: 35ab9c5313c3729bf7cdedde972cf7b6e566d75bc5789edd88ab034a4e14096a
     command:
       pre:
         - ( systemctl is-active --quiet promtail.service && sudo systemctl stop promtail.service ) || true
@@ -63,9 +61,8 @@ file:
         - systemctl is-enabled --quiet promtail.service || sudo systemctl enable promtail.service
         - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
   -
-    source: https://gist.githubusercontent.com/grenade/74b5da418ac15b3c9679c1ec6b16f821/raw/promtail.yml
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/promtail/promtail.yml
     target: /etc/promtail/promtail.yml
-    sha256: 3ad396de6e1becc80616339a413c0c1c8e21f96a3ceba2294521fac26941a52e
     command:
       pre:
         - sudo mkdir -p /etc/promtail
@@ -76,7 +73,6 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/prometheus-node-exporter.service
     target: /etc/systemd/system/prometheus-node-exporter.service
-    sha256: 4e551485c07fb89f348fd154f264a52cded39e87b6b8f8aad9115b1d353ede05
     command:
       pre:
         - systemctl is-active --quiet prometheus-node-exporter.service && sudo systemctl stop prometheus-node-exporter.service
@@ -86,31 +82,12 @@ file:
   -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/nginx-prometheus-exporter.service
     target: /etc/systemd/system/nginx-prometheus-exporter.service
-    sha256: 551b688bbcccb24ce3eb3b977ff871242c319bdbf1a72de82b4fe4cae98cec36
     command:
       pre:
         - systemctl is-active --quiet nginx-prometheus-exporter.service && sudo systemctl stop nginx-prometheus-exporter.service
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.yml'
-    target: /etc/go-audit.yml
-    sha256: 8267a422d920a249b9d744a322c0824a14f2fd8acc0f88aa9caf0fae604f5ef1
-    command:
-      post:
-        - systemctl is-active --quiet go-audit.service && sudo systemctl restart go-audit.service
-  -
-    source: 'https://gist.githubusercontent.com/grenade/8ca7512fda41fd73c9d8dbe3fe7a548e/raw/go-audit.service'
-    target: /etc/systemd/system/go-audit.service
-    sha256: bd5536398fd1fb4b18fbbb951d86960851d47cc68a41d5bbb5ea591f9d635cf8
-    command:
-      pre:
-        - ( systemctl is-active --quiet go-audit.service && sudo systemctl stop go-audit.service ) || true
-      post:
-        - sudo systemctl daemon-reload
-        - systemctl is-enabled --quiet go-audit.service || sudo systemctl enable go-audit.service
-        - systemctl is-active --quiet go-audit.service || sudo systemctl start go-audit.service
 #  -
 #    source: https://github.com/Manta-Network/Manta/releases/download/v4.0.1/manta
 #    target: /usr/local/bin/dolphin
@@ -152,27 +129,8 @@ file:
 #        - systemctl is-enabled --quiet dolphin.service || sudo systemctl enable dolphin.service
 #        - sudo systemctl start dolphin.service
   -
-    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/options-ssl-nginx.conf'
-    target: /etc/letsencrypt/options-ssl-nginx.conf
-    sha256: 17baec778c05571beb0cdeb0bc1c6da3596d44d1fe567e7fee0efef80a860d01
-    command:
-      pre:
-        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
-      post:
-        - sudo chmod 644 /etc/letsencrypt/options-ssl-nginx.conf
-  -
-    source: 'https://gist.githubusercontent.com/grenade/ad1a4772c47a0977204edee78691fde1/raw/ssl-dhparams.pem'
-    target: /etc/letsencrypt/ssl-dhparams.pem
-    sha256: 9ba6429597aeed2d8617a7705b56e96d044f64b07971659382e426675105654b
-    command:
-      pre:
-        - test -d /etc/letsencrypt || sudo mkdir -p /etc/letsencrypt
-      post:
-        - sudo chmod 644 /etc/letsencrypt/ssl-dhparams.pem
-  -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
     target: /etc/nginx/sites-available/status.conf
-    sha256: 03127f61971cb3cc15a278672e49182ada2506afdddb02a90cf660e82c89c3bf
     command:
       pre:
         - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available

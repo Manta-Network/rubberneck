@@ -128,6 +128,15 @@ file:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
   -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/certbot.conf
+    target: /etc/nginx/sites-available/certbot.conf
+    command:
+      pre:
+        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
+        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
+      post:
+        - sudo ln -sfr /etc/nginx/sites-available/certbot.conf /etc/nginx/sites-enabled/certbot.conf
+  -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
     target: /etc/nginx/sites-available/status.conf
     command:
