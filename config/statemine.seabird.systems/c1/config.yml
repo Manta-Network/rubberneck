@@ -50,6 +50,15 @@ command:
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.8.2/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
 file:
   -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/access-json.conf
+    target: /etc/nginx/conf.d/access-json.conf
+    command:
+      pre:
+        - ( systemctl is-active --quiet nginx.service && sudo systemctl stop nginx.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
+  -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/error-log-journal.conf
     target: /etc/nginx/conf.d/error-log-journal.conf
     command:

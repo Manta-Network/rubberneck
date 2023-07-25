@@ -59,6 +59,15 @@ file:
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/ssh/sshd_config.d/timeout-180.conf
     target: /etc/ssh/sshd_config.d/timeout-180.conf
   -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/access-json.conf
+    target: /etc/nginx/conf.d/access-json.conf
+    command:
+      pre:
+        - ( systemctl is-active --quiet nginx.service && sudo systemctl stop nginx.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
+  -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/error-log-journal.conf
     target: /etc/nginx/conf.d/error-log-journal.conf
     command:
