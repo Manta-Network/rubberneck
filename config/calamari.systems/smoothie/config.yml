@@ -86,6 +86,15 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
   -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/throttle.conf
+    target: /etc/nginx/conf.d/throttle.conf
+    command:
+      pre:
+        - ( systemctl is-active --quiet nginx.service && sudo systemctl stop nginx.service ) || true
+      post:
+        - sudo systemctl daemon-reload
+        - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
+  -
     source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/modules-enabled/worker_rlimit_nofile.conf
     target: /etc/nginx/modules-enabled/worker_rlimit_nofile.conf
     command:
