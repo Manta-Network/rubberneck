@@ -1,9 +1,9 @@
 ---
-hostname: avocado
+hostname: a7
 domain: calamari.systems
 ip: 3.10.119.92
 action: sync
-launch: '2023-08-14T10:57:00Z'
+launch: '2023-08-14T13:57:00Z'
 provider: amazon-ec2
 price:
   amount: 0.62
