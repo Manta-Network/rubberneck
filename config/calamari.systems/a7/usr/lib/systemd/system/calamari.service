@@ -9,7 +9,7 @@ AssertPathExists=/usr/share/substrate/calamari.json
 ExecStart=/usr/bin/calamari \
     --pruning archive \
     --chain /usr/share/substrate/calamari.json \
-    --name '🗃️ avocado 🗃️' \
+    --name '🗃️ a7 🗃️' \
     --base-path /var/lib/substrate \
     --port 30333 \
     --ws-port 9944 \
@@ -26,7 +26,7 @@ ExecStart=/usr/bin/calamari \
         /dns/a5.calamari.systems/tcp/30333/p2p/12D3KooWE22Q9vACFoFQosFqsGA32E36HqA4N5yCThZnU3gUcSAv \
     -- \
     --chain kusama \
-    --name '🗃️ avocado 🗃️' \
+    --name '🗃️ a7 🗃️' \
     --rpc-methods safe \
     --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
 User=manta

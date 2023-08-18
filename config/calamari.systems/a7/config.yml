@@ -6,13 +6,16 @@ action: sync
 launch: '2023-08-14T13:57:00Z'
 provider: amazon-ec2
 price:
-  amount: 0.62
+  amount: 0.616
   currency: usd
   term: hourly
 dns:
   alias:
     -
       name: calamari.systems
+      weight: 250
+    -
+      name: avocado.calamari.systems
       weight: 250
     -
       name: archive.calamari.systems
@@ -51,9 +54,11 @@ user:
       keys:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJIBSdR9Wy3S4L+Zdcu8waYe5vW2VzMoi+QafgV3IIFj
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJx8I0j6oYirfie4pAQZQB1+fWJ7w5mFZayQvLhtSV0
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILfxkCWHMdmXufF7hLHGyQdV+v64NTbEiUFDhxyi6+fX
       users:
         - stechu
         - ghzlatarev
+        - aye
 command:
   - sudo passwd -l root
   - systemctl is-active calamari.service || sudo systemctl restart calamari.service
@@ -174,7 +179,7 @@ file:
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/avocado-mainnet/usr/lib/systemd/system/calamari.service'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a7/usr/lib/systemd/system/calamari.service'
     target: /usr/lib/systemd/system/calamari.service
     command:
       pre:
@@ -195,7 +200,7 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
   -
-    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/avocado-mainnet/etc/nginx/sites-available/substrate.conf'
+    source: 'https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a7/etc/nginx/sites-available/substrate.conf'
     target: /etc/nginx/sites-available/substrate.conf
     command:
       pre:
