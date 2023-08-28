@@ -4,7 +4,7 @@ domain: calamari.systems
 ip: 35.216.87.190
 action: sync
 launch: '2023-08-28T19:01:53Z'
-provider: gcp
+provider: google-cloud
 price:
   amount: 0.967088
   currency: usd

@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ReactComponent as ShockLogo } from './shock.svg';
 import { ReactComponent as S4yLogo } from './s4y.svg';
+import { ReactComponent as GcpLogo } from './gcp.svg';
 import { faAws } from '@fortawesome/free-brands-svg-icons'
 import { faH } from '@fortawesome/free-solid-svg-icons';
 
@@ -15,6 +16,13 @@ const consoleLink = (node) => {
           <span style={{marginRight: '0.3em', color: 'rgb(255, 153, 0)', padding: '0 0.2em'}}>
             <FontAwesomeIcon icon={faAws} />
           </span>
+          {node.console.text.toLowerCase()}
+        </a>
+      );
+    case 'google-cloud':
+      return (
+        <a href={node.console.url}>
+          <GcpLogo style={{width: '20px', height: '20px', marginRight: '5px'}} />
           {node.console.text.toLowerCase()}
         </a>
       );
