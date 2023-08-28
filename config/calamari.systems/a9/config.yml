@@ -18,12 +18,6 @@ dns:
       name: archive.calamari.systems
       weight: 200
     -
-      name: asia.calamari.systems
-      weight: 200
-    -
-      name: asia.archive.calamari.systems
-      weight: 200
-    -
       name: ws.calamari.systems
       weight: 200
     -
