@@ -1,0 +1,34 @@
+[Unit]
+Description=calamari archive node
+Wants=network-online.target
+After=network-online.target
+AssertPathExists=/usr/local/bin/calamari
+AssertPathExists=/usr/share/substrate/calamari.json
+
+[Service]
+ExecStart=/usr/local/bin/calamari \
+    --pruning archive \
+    --chain /usr/share/substrate/calamari.json \
+    --name '🗃️ a11 🗃️' \
+    --base-path /var/lib/substrate \
+    --port 30333 \
+    --ws-port 9944 \
+    --ws-max-connections 16000 \
+    --max-runtime-instances 256 \
+    --rpc-port 9933 \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --in-peers 100 \
+    -- \
+    --chain kusama \
+    --name '🗃️ a11 🗃️' \
+    --rpc-cors all \
+    --rpc-methods safe \
+    --telemetry-url 'wss://api.telemetry.manta.systems/submit/ 0'
+User=substrate
+Group=substrate
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target
