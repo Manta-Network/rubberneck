@@ -59,7 +59,8 @@ command:
   - test -x /usr/local/bin/promtail-linux-amd64 || ( curl -Lo /tmp/promtail-linux-amd64.zip https://github.com/grafana/loki/releases/download/v2.8.2/promtail-linux-amd64.zip && sudo unzip /tmp/promtail-linux-amd64.zip -d /usr/local/bin )
   - grep 'worker_connections 32768;' /etc/nginx/nginx.conf &> /dev/null || sudo sed -i 's/worker_connections \+[0-9]\+;/worker_connections 32768;/' /etc/nginx/nginx.conf
 file:
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/access-json.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/access-json.conf
     target: /etc/nginx/conf.d/access-json.conf
     command:
       pre:
@@ -67,7 +68,8 @@ file:
       post:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/error-log-journal.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/error-log-journal.conf
     target: /etc/nginx/conf.d/error-log-journal.conf
     command:
       pre:
@@ -75,7 +77,8 @@ file:
       post:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/throttle.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/conf.d/throttle.conf
     target: /etc/nginx/conf.d/throttle.conf
     command:
       pre:
@@ -83,7 +86,8 @@ file:
       post:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/modules-enabled/worker_rlimit_nofile.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/modules-enabled/worker_rlimit_nofile.conf
     target: /etc/nginx/modules-enabled/worker_rlimit_nofile.conf
     command:
       pre:
@@ -91,7 +95,8 @@ file:
       post:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/security/limits.d/www-data-soft-nofile.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/security/limits.d/www-data-soft-nofile.conf
     target: /etc/security/limits.d/www-data-soft-nofile.conf
     command:
       pre:
@@ -99,9 +104,11 @@ file:
       post:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet nginx.service || sudo systemctl start nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/security/limits.d/substrate-soft-nofile.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/security/limits.d/substrate-soft-nofile.conf
     target: /etc/security/limits.d/substrate-soft-nofile.conf
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/promtail.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/promtail.service
     target: /etc/systemd/system/promtail.service
     command:
       pre:
@@ -110,7 +117,8 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet promtail.service || sudo systemctl enable promtail.service
         - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/promtail/promtail.yml
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/promtail/promtail.yml
     target: /etc/promtail/promtail.yml
     command:
       pre:
@@ -119,7 +127,8 @@ file:
       post:
         - sudo systemctl daemon-reload
         - systemctl is-active --quiet promtail.service || sudo systemctl start promtail.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/prometheus-node-exporter.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/prometheus-node-exporter.service
     target: /etc/systemd/system/prometheus-node-exporter.service
     command:
       pre:
@@ -127,7 +136,8 @@ file:
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now prometheus-node-exporter.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/nginx-prometheus-exporter.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/systemd/system/nginx-prometheus-exporter.service
     target: /etc/systemd/system/nginx-prometheus-exporter.service
     command:
       pre:
@@ -135,7 +145,8 @@ file:
       post:
         - sudo systemctl daemon-reload
         - sudo systemctl enable --now nginx-prometheus-exporter.service
-  - source: https://github.com/Manta-Network/Manta/releases/download/v4.3.0/manta
+  -
+    source: https://github.com/Manta-Network/Manta/releases/download/v4.3.0/manta
     target: /usr/local/bin/manta
     sha256: b8c26cce52b3955680b85f92bd17ca0292f5d7007c341d48483e4281969e3639
     command:
@@ -145,14 +156,16 @@ file:
         - sudo chmod +x /usr/local/bin/manta
         - sudo ln -sfr /usr/local/bin/manta /usr/local/bin/calamari
         - systemctl is-active --quiet calamari.service || sudo systemctl start calamari.service
-  - source: https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/calamari-genesis.json
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/Manta/manta/genesis/calamari-genesis.json
     target: /usr/share/substrate/calamari.json
     command:
       pre:
         - test -d /usr/share/substrate || sudo mkdir -p /usr/share/substrate
       post:
         - systemctl is-active --quiet calamari.service && sudo systemctl restart calamari.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a11/etc/systemd/system/calamari.service
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a11/etc/systemd/system/calamari.service
     target: /etc/systemd/system/calamari.service
     command:
       pre:
@@ -162,7 +175,8 @@ file:
         - sudo systemctl daemon-reload
         - systemctl is-enabled --quiet calamari.service || sudo systemctl enable calamari.service
         - sudo systemctl start calamari.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/status.conf
     target: /etc/nginx/sites-available/status.conf
     command:
       pre:
@@ -171,7 +185,8 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/status.conf /etc/nginx/sites-enabled/status.conf
         - sudo systemctl restart nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a11/etc/nginx/sites-available/calamari.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/config/calamari.systems/a11/etc/nginx/sites-available/calamari.conf
     target: /etc/nginx/sites-available/calamari.conf
     command:
       pre:
@@ -181,7 +196,8 @@ file:
         - sudo ln -sfr /etc/nginx/sites-available/calamari.conf /etc/nginx/sites-enabled/calamari.conf
         - sudo systemctl stop nginx.service
         - sudo systemctl start nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/calamari.systems.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/calamari.systems.conf
     target: /etc/nginx/sites-available/calamari.systems.conf
     command:
       pre:
@@ -190,7 +206,8 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/calamari.systems.conf /etc/nginx/sites-enabled/calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/archive.calamari.systems.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/archive.calamari.systems.conf
     target: /etc/nginx/sites-available/archive.calamari.systems.conf
     command:
       pre:
@@ -199,7 +216,8 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/archive.calamari.systems.conf /etc/nginx/sites-enabled/archive.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.calamari.systems.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.calamari.systems.conf
     target: /etc/nginx/sites-available/ws.calamari.systems.conf
     command:
       pre:
@@ -208,7 +226,8 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/ws.calamari.systems.conf /etc/nginx/sites-enabled/ws.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.calamari.systems.conf
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/ws.archive.calamari.systems.conf
     target: /etc/nginx/sites-available/ws.archive.calamari.systems.conf
     command:
       pre:
@@ -217,25 +236,8 @@ file:
       post:
         - sudo ln -sfr /etc/nginx/sites-available/ws.archive.calamari.systems.conf /etc/nginx/sites-enabled/ws.archive.calamari.systems.conf
         - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/asia.calamari.systems.conf
-    target: /etc/nginx/sites-available/asia.calamari.systems.conf
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/asia.calamari.systems.conf /etc/nginx/sites-enabled/asia.calamari.systems.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/etc/nginx/sites-available/asia.archive.calamari.systems.conf
-    target: /etc/nginx/sites-available/asia.archive.calamari.systems.conf
-    command:
-      pre:
-        - test -d /etc/nginx/sites-available || sudo mkdir -p /etc/nginx/sites-available
-        - test -d /etc/nginx/sites-enabled || sudo mkdir -p /etc/nginx/sites-enabled
-      post:
-        - sudo ln -sfr /etc/nginx/sites-available/asia.archive.calamari.systems.conf /etc/nginx/sites-enabled/asia.archive.calamari.systems.conf
-        - systemctl is-active --quiet nginx.service && sudo systemctl restart nginx.service
-  - source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/var/www/html/calamari.ico
+  -
+    source: https://raw.githubusercontent.com/Manta-Network/rubberneck/main/static/var/www/html/calamari.ico
     target: /var/www/html/calamari.ico
     command:
       pre:
