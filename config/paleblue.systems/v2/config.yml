@@ -11,6 +11,7 @@ package:
   - certbot
   - dirmngr
   - nginx
+  - rsync
   - scanlogd
   - sqlite3
   - unattended-upgrades
