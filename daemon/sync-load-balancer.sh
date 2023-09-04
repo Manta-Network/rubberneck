@@ -171,7 +171,7 @@ for domain in ${domain_list[@]}; do
             else
               is_syncing=possible
             fi
-            observed_tcp_connection_count=$(curl -s https://${fqdn}/node/metrics | egrep 'node_netstat_Tcp_CurrEstab [[:digit:]]+' | cut -d ' ' -f 2)
+            observed_tcp_connection_count=$(curl -s https://${fqdn}/node/metrics | grep -E 'node_netstat_Tcp_CurrEstab [[:digit:]]+' | cut -d ' ' -f 2)
 
             curl -s \
               -o ${tmp}/${fqdn}-etc-units-contents.json \
@@ -191,7 +191,7 @@ for domain in ${domain_list[@]}; do
               fi
             done
             for unit_url in ${units_urls[@]}; do
-              configured_ws_max_connections=$(curl -s ${unit_url} | egrep -o 'ws-max-connections [[:digit:]]+ ' | head -n 1 | egrep -o '[[:digit:]]+')
+              configured_ws_max_connections=$(curl -s ${unit_url} | grep -E -o 'ws-max-connections [[:digit:]]+ ' | head -n 1 | grep -E -o '[[:digit:]]+')
               if [ -n "${configured_ws_max_connections}" ]; then
                 #echo "[${fqdn}] observed ws-max-connections (${unit_url}): ${configured_ws_max_connections}"
                 break
